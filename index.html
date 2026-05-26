@@ -216,7 +216,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div id="home-content">
     <button class="btn btn-primary" onclick="createRoom()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">✦ Crear sala nueva</button>
     <div class="divider">o únete a una sala</div>
-    <input class="room-input" id="join-code" placeholder="Código de sala" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+    <input class="room-input" id="join-code" placeholder="Código de sala" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g,'')">
     <p class="error-msg" id="join-error"></p>
     <button class="btn btn-secondary" onclick="joinRoom()" style="width:100%;max-width:300px;justify-content:center">Unirse →</button>
   </div>
@@ -292,6 +292,15 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <p class="subtitle" id="liked-subtitle">Nombres que os gustan a los dos</p>
   <div class="liked-list" id="liked-list"></div>
   <button class="btn btn-primary" onclick="backToSwipe()" style="margin-top:1rem;width:100%;max-width:300px;justify-content:center">← Seguir buscando</button>
+</div>
+
+<!-- SUMMARY -->
+<div class="screen" id="screen-summary">
+  <p class="title-serif" id="summary-title">¡Habéis terminado! 🎉</p>
+  <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
+  <div class="liked-list" id="summary-list" style="max-height:55vh"></div>
+  <button class="btn btn-primary" onclick="restartFromSetup()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
+  <button class="btn btn-secondary" onclick="showScreen('home')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -594,7 +603,12 @@ function onPartnerVote(record) {
 }
 
 /* ── ROOM MANAGEMENT ── */
-function genCode() { return Math.random().toString(36).slice(2,6).toUpperCase(); }
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
 
 async function createRoom() {
   setHomeLoading(true);
@@ -718,6 +732,10 @@ function buildQueue() {
 function renderCards() {
   const stack = document.getElementById('card-stack');
   stack.innerHTML = '';
+  if(state.currentIdx >= state.queue.length) {
+    showSummary();
+    return;
+  }
   for(let i=Math.min(state.currentIdx+2, state.queue.length-1); i>=state.currentIdx; i--) {
     const nm = state.queue[i];
     if(!nm) continue;
@@ -879,7 +897,50 @@ function updateProgress() {
   document.getElementById('progress-bar').style.width = pct+'%';
 }
 
-function continueAfterMatch() { showScreen('swipe'); }
+function showSummary() {
+  const list = document.getElementById('summary-list');
+  list.innerHTML = '';
+  const title = document.getElementById('summary-title');
+  const sub = document.getElementById('summary-sub');
+
+  if(state.matches.length === 0) {
+    title.textContent = 'Habéis terminado 🙈';
+    sub.textContent = 'Ningún match esta vez... ¡seguid explorando!';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1.5rem 1rem;text-align:center">No hay matches aún. Prueba con otros filtros.</p>';
+  } else {
+    title.textContent = `${state.matches.length} match${state.matches.length>1?'es'} encontrado${state.matches.length>1?'s':''}! 💞`;
+    sub.textContent = 'Los nombres que os gustan a los dos';
+    state.matches.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div>
+            <div class="liked-item-name">${name}</div>
+            <div class="liked-item-sub">Match de los dos 💞</div>
+          </div>
+        </div>
+        <span class="match-badge">💞 Match</span>`;
+      list.appendChild(d);
+    });
+  }
+  showScreen('summary');
+}
+
+function restartFromSetup() {
+  state.queue = [];
+  state.currentIdx = 0;
+  state.myLikes = {};
+  state.filters = {gender:'all', origin:'all'};
+  document.getElementById('liked-count').textContent = '0';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
+  document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
+  document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
+  showScreen('setup');
+}
 
 function showLiked() {
   const list = document.getElementById('liked-list');
