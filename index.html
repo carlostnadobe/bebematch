@@ -497,6 +497,19 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <button class="btn btn-primary" onclick="backToSwipe()" style="margin-top:1rem;width:100%;max-width:300px;justify-content:center">← Seguir buscando</button>
 </div>
 
+<!-- SUMMARY AFINAR -->
+<div class="screen" id="screen-summary-refine" style="position:relative;overflow:hidden">
+  <canvas id="summary-refine-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%">
+    <p class="title-serif" id="refine-summary-title">¡Afinado! 🎯</p>
+    <p class="subtitle" id="refine-summary-sub">Los nombres que os gustan más</p>
+    <div class="liked-list" id="refine-summary-list" style="max-height:50vh"></div>
+    <button class="btn btn-primary" onclick="startRefineMode()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center" id="btn-refine-again">🎯 Afinar más</button>
+    <button class="btn btn-secondary" onclick="shareMatches()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Compartir 💞</button>
+    <button class="btn btn-secondary" onclick="showScreen('summary')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">← Volver al resumen</button>
+  </div>
+</div>
+
 <!-- SUMMARY SOLO -->
 <div class="screen" id="screen-summary-solo" style="position:relative;overflow:hidden">
   <canvas id="summary-solo-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
@@ -518,6 +531,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
     <div class="liked-list" id="summary-list" style="max-height:48vh"></div>
     <button class="btn btn-primary" onclick="shareMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir matches 💞</button>
+    <button class="btn btn-primary" id="btn-refine" onclick="startRefineMode()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;background:var(--surface2);color:var(--text);border:1px solid var(--border2)">🎯 Afinar — votar solo los matches</button>
     <button class="btn btn-secondary" onclick="restartFromSetup()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
     <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
   </div>
@@ -548,7 +562,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v8.6</div>
+<div class="version-tag">v8.7</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -1374,6 +1388,7 @@ const state = {
   roomCode: null,
   isHost: false,
   isSolo: false,
+  isRefining: false,
   myId: 'u_' + Math.random().toString(36).slice(2,10),
   partnerConnected: false,
   queue: [],
@@ -1735,6 +1750,7 @@ function renderCards() {
 
 let donePollTimer = null;
 async function finishSwiping() {
+  if(state.isSolo && state.isRefining) { finishRefine(); return; }
   if(state.isSolo) { finishSolo(); return; }
   // insertar __done__ para avisar a la pareja
   try { await dbInsert({room_code: state.roomCode, user_id: state.myId, name: '__done__', liked: false}); } catch(e) {}
@@ -2386,7 +2402,93 @@ function updateStreakBadge() {
   }
 }
 
-function continueAfterMatch() { showScreen('swipe'); }
+/* ── MODO AFINAR ── */
+function startRefineMode() {
+  const matches = [...state.matches];
+  if(matches.length < 2) {
+    showToast('Necesitas al menos 2 matches para afinar');
+    return;
+  }
+  // guardar el queue original y resetear para jugar solo con matches
+  state._prevQueue = state.queue;
+  state._prevIdx = state.currentIdx;
+  state._prevMyLikes = {...state.myLikes};
+  state.isRefining = true;
+  state.myLikes = {};
+  state.partnerLikes = {};
+  state.matches = [];
+  state.superlikes = [];
+  state.mySuperlikes = {};
+  state.streak = 0;
+  state.streakType = null;
+  // construir queue solo con los matches
+  state.queue = matches.map(n => NAMES_DB.find(x=>x.n===n) || {n, g:'neutral', o:'', m:''});
+  state.currentIdx = 0;
+  state.isSolo = true;
+  state.superlikesLeft = 0;
+  document.getElementById('liked-count').textContent = '0';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('partner-progress-bar').style.width = '0%';
+  const superBtn = document.getElementById('btn-super');
+  if(superBtn) superBtn.style.display = 'none';
+  showScreen('swipe');
+  const ps = document.querySelector('.partner-status');
+  if(ps) ps.style.display = 'none';
+  renderCards();
+  showToast(`Afinando ${matches.length} nombres 🎯`);
+}
+
+function finishRefine() {
+  const liked = Object.entries(state.myLikes).filter(([,v])=>v).map(([k])=>k);
+  const list = document.getElementById('refine-summary-list');
+  list.innerHTML = '';
+  const title = document.getElementById('refine-summary-title');
+  const sub = document.getElementById('refine-summary-sub');
+  const refineAgainBtn = document.getElementById('btn-refine-again');
+
+  if(liked.length === 0) {
+    title.textContent = '¡Afinado! 😅';
+    sub.textContent = 'Ninguno superó el corte esta vez';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem;text-align:center">Prueba de nuevo con los matches originales.</p>';
+    if(refineAgainBtn) refineAgainBtn.style.display = 'none';
+  } else {
+    title.textContent = `${liked.length} favorito${liked.length>1?'s':''} afinado${liked.length>1?'s':''}! 🎯`;
+    sub.textContent = liked.length > 1 ? 'Los que más os gustan' : '¡El elegido!';
+    liked.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div class="liked-item-name">${name}</div>
+        </div>
+        <span style="font-size:1rem">🎯</span>`;
+      list.appendChild(d);
+    });
+    // actualizar matches para la siguiente ronda de afinado
+    state.matches = liked;
+    if(refineAgainBtn) refineAgainBtn.style.display = liked.length >= 2 ? '' : 'none';
+  }
+  // restaurar estado
+  state.isSolo = false;
+  state.isRefining = false;
+  showScreen('summary-refine');
+  if(liked.length >= 2) setTimeout(()=>launchRefineConfetti(), 400);
+}
+
+function launchRefineConfetti() {
+  const canvas = document.getElementById('summary-refine-confetti');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+  const COLORS = ['#22C55E','#86EFAC','#E8735A','#F4A261','#E9C46A','#A8DADC'];
+  const pieces = Array.from({length:50},()=>({x:Math.random()*canvas.width,y:-20,w:5+Math.random()*6,h:6+Math.random()*5,r:Math.random()*Math.PI*2,dr:(Math.random()-.5)*.1,vy:2+Math.random()*2.5,vx:(Math.random()-.5)*1.5,color:COLORS[Math.floor(Math.random()*COLORS.length)],alpha:.9}));
+  let frame=0;
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.r+=p.dr;p.alpha-=0.005;if(p.alpha<=0)return;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,2);ctx.fill();ctx.restore();});frame++;if(frame<160)requestAnimationFrame(draw);}
+  draw();
+}
+
+function continueAfterMatch() { showScreen(state.isRefining ? 'swipe' : 'swipe'); }
 
 function copyCode() {
   if(navigator.clipboard) navigator.clipboard.writeText(state.roomCode);
