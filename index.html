@@ -562,7 +562,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v9.1</div>
+<div class="version-tag">v9.2</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -2198,24 +2198,25 @@ function showSummary() {
 
     const allNames = new Set([
       ...Object.keys(state.myLikes),
-      ...Object.keys(state.partnerLikes)
+      ...Object.keys(state.partnerLikes),
+      ...Object.keys(state.mySuperlikes),
+      ...Object.keys(state.partnerSuperlikes)
     ]);
 
     for(const name of allNames) {
-      const myVote = state.myLikes[name];       // true, 'super', o undefined
-      const partnerVote = state.partnerLikes[name]; // true, 'super', o undefined
-      const iMySuper = myVote === 'super' || state.mySuperlikes[name];
-      const iPartnerSuper = partnerVote === 'super' || state.partnerSuperlikes[name];
-      const iMyLiked = !!myVote;
-      const iPartnerLiked = !!partnerVote;
+      const iMySuper = !!state.mySuperlikes[name] || state.myLikes[name] === 'super';
+      const iPartnerSuper = !!state.partnerSuperlikes[name] || state.partnerLikes[name] === 'super';
+      const iMyLiked = !!state.myLikes[name];
+      const iPartnerLiked = !!state.partnerLikes[name];
 
-      // superlike de uno → match automático (con o sin el otro)
+      // actualizar registros para que sean consistentes
+      if(iMySuper) state.mySuperlikes[name] = true;
+      if(iPartnerSuper) state.partnerSuperlikes[name] = true;
+
       if(iMySuper || iPartnerSuper) {
-        if(!state.matches.includes(name)) state.matches.push(name);
+        // cualquier superlike de cualquiera → entra en superlikes
         if(!state.superlikes.includes(name)) state.superlikes.push(name);
-        // registrar superlikes para el display
-        if(iMySuper) state.mySuperlikes[name] = true;
-        if(iPartnerSuper) state.partnerSuperlikes[name] = true;
+        if(!state.matches.includes(name)) state.matches.push(name);
       } else if(iMyLiked && iPartnerLiked) {
         // match normal
         if(!state.matches.includes(name)) state.matches.push(name);
@@ -2233,23 +2234,23 @@ function renderSummary() {
   const sub = document.getElementById('summary-sub');
 
   const onlyMe = Object.entries(state.myLikes)
-    .filter(([name, liked]) => liked && !state.partnerLikes[name])
+    .filter(([name, liked]) => liked && !state.partnerLikes[name] && !state.superlikes.includes(name))
     .map(([name]) => name);
   const onlyPartner = Object.entries(state.partnerLikes)
-    .filter(([name, liked]) => liked && !state.myLikes[name])
+    .filter(([name, liked]) => liked && !state.myLikes[name] && !state.superlikes.includes(name))
     .map(([name]) => name);
 
-  // superlikes arriba del todo — separados en 3 categorías
+  // superlikes — tres secciones
   if(state.superlikes.length > 0) {
-    const mutual = state.superlikes.filter(n => state.mySuperlikes[n] && state.partnerSuperlikes[n]);
-    const onlyMeSuper = state.superlikes.filter(n => state.mySuperlikes[n] && !state.partnerSuperlikes[n]);
-    const onlyPartnerSuper = state.superlikes.filter(n => !state.mySuperlikes[n] && state.partnerSuperlikes[n]);
+    const mutual       = state.superlikes.filter(n => state.mySuperlikes[n] && state.partnerSuperlikes[n]);
+    const onlyMeSuper  = state.superlikes.filter(n => state.mySuperlikes[n] && !state.partnerSuperlikes[n]);
+    const onlyPSuper   = state.superlikes.filter(n => !state.mySuperlikes[n] && state.partnerSuperlikes[n]);
 
-    const addSuperSection = (names, label, sub, icon) => {
-      if(names.length === 0) return;
-      const sl = document.createElement('div');
-      sl.style.cssText = 'width:100%;margin-bottom:.7rem';
-      sl.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif;font-weight:600">${icon} ${label}</p>`;
+    const addSuperSection = (names, label, subtext, icon) => {
+      if(!names.length) return;
+      const sec = document.createElement('div');
+      sec.style.cssText = 'width:100%;margin-bottom:.7rem';
+      sec.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif;font-weight:600">${icon} ${label}</p>`;
       names.forEach(name => {
         const d = document.createElement('div');
         d.className = 'liked-item';
@@ -2260,18 +2261,18 @@ function renderSummary() {
             <span style="font-size:1rem">${icon}</span>
             <div>
               <div class="liked-item-name" style="color:#22C55E">${name}</div>
-              <div class="liked-item-sub">${sub}</div>
+              <div class="liked-item-sub">${subtext}</div>
             </div>
           </div>
           <span class="superlike-badge">${icon} Super</span>`;
-        sl.appendChild(d);
+        sec.appendChild(d);
       });
-      list.appendChild(sl);
+      list.appendChild(sec);
     };
 
-    addSuperSection(mutual, 'SuperMatch mutuo', 'Los dos dais ⭐ — clarísimo 🤩', '⭐');
-    addSuperSection(onlyMeSuper, 'Tu SuperLike', 'Tú diste ⭐ — tu pareja no', '💚');
-    addSuperSection(onlyPartnerSuper, 'SuperLike de tu pareja', 'Tu pareja dio ⭐ — tú no', '🌟');
+    addSuperSection(mutual,      'SuperMatch mutuo',        'Los dos disteis ⭐ 🤩',               '⭐');
+    addSuperSection(onlyMeSuper, 'Tu SuperLike',            'Tú diste ⭐ — tu pareja solo ♥ o ✕',  '💚');
+    addSuperSection(onlyPSuper,  'SuperLike de tu pareja',  'Tu pareja dio ⭐ — tú solo ♥ o ✕',    '🌟');
   }
 
   const normalMatches = state.matches.filter(n => !state.superlikes.includes(n));
