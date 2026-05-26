@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BebéMatch</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --rose:#E8847A;--rose-light:#F5C5C1;--rose-dark:#C25E54;
+  --cream:#FDF8F4;--cream-dark:#F0E8DF;
+  --sage:#7A9E8E;--sage-light:#B5CFCA;
+  --gold:#C9A96E;--gold-light:#E8D4B0;
+  --ink:#2C1F1A;--ink-muted:#6B5147;
+  --bg:#FDF8F4;
+  --radius:20px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);overflow-x:hidden}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center}
+.screen.active{display:flex}
+
+/* HOME */
+.logo{font-family:'Playfair Display',serif;font-size:3rem;color:var(--rose);line-height:1}
+.logo span{font-style:italic;color:var(--gold)}
+.tagline{font-size:1rem;color:var(--ink-muted);margin:.5rem 0 2.5rem;font-weight:300;letter-spacing:.05em}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;border:none;transition:all .25s ease;text-decoration:none}
+.btn-primary{background:var(--rose);color:#fff;box-shadow:0 4px 20px rgba(232,132,122,.4)}
+.btn-primary:hover{background:var(--rose-dark);transform:translateY(-2px)}
+.btn-secondary{background:var(--cream-dark);color:var(--ink);border:1.5px solid var(--gold-light)}
+.btn-secondary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--rose);border:1.5px solid var(--rose)}
+.btn-outline:hover{background:var(--rose-light)}
+.divider{display:flex;align-items:center;gap:1rem;width:100%;max-width:300px;margin:1.5rem 0;color:var(--ink-muted);font-size:.85rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cream-dark)}
+.room-input{width:100%;max-width:300px;padding:.8rem 1rem;border-radius:12px;border:1.5px solid var(--cream-dark);background:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);outline:none;transition:border .2s;text-align:center;letter-spacing:.15em;text-transform:uppercase;margin:.5rem 0}
+.room-input:focus{border-color:var(--rose)}
+.room-input::placeholder{text-transform:none;letter-spacing:0;color:#ccc}
+
+/* WAITING */
+.room-code{font-family:'Playfair Display',serif;font-size:3.5rem;letter-spacing:.25em;color:var(--rose);margin:1rem 0}
+.waiting-anim{display:flex;gap:.5rem;margin:1.5rem 0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--rose-light);animation:pulse 1.2s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.3);opacity:1}}
+.status-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:50px;background:var(--cream-dark);font-size:.85rem;color:var(--ink-muted);margin-bottom:1.5rem}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--sage);animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* SETUP */
+.pill-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0}
+.pill{padding:.35rem .9rem;border-radius:50px;font-size:.8rem;cursor:pointer;border:1.5px solid var(--cream-dark);color:var(--ink-muted);background:#fff;transition:all .2s}
+.pill.selected{background:var(--rose);color:#fff;border-color:var(--rose)}
+
+/* SWIPE */
+.swipe-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:400px;padding:.5rem 0 1rem}
+.partner-status{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--ink-muted)}
+.partner-dot{width:7px;height:7px;border-radius:50%;background:#ccc;transition:background .3s}
+.partner-dot.online{background:var(--sage)}
+.score-badge{display:flex;align-items:center;gap:.3rem;background:var(--rose-light);padding:.3rem .7rem;border-radius:50px;font-size:.8rem;color:var(--rose-dark);font-weight:500}
+.progress{width:100%;max-width:400px;height:4px;background:var(--cream-dark);border-radius:2px;margin:.5rem 0}
+.progress-bar{height:100%;border-radius:2px;background:var(--rose);transition:width .3s ease}
+
+/* CARDS */
+.card-stack{position:relative;width:320px;height:420px;margin:1rem 0}
+.name-card{position:absolute;inset:0;background:#fff;border-radius:var(--radius);box-shadow:0 8px 40px rgba(44,31,26,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;cursor:grab;user-select:none;transform-origin:center bottom}
+.name-card.behind{transform:scale(.94) translateY(12px);z-index:0}
+.name-card.behind2{transform:scale(.88) translateY(24px);z-index:-1}
+.name-card.active{z-index:2}
+.name-card.dragging{cursor:grabbing}
+.card-accent{width:40px;height:3px;border-radius:3px;background:var(--rose-light);margin-bottom:1.5rem}
+.card-name{font-family:'Playfair Display',serif;font-size:3rem;color:var(--ink);line-height:1;margin-bottom:.5rem}
+.card-origin{font-size:.85rem;color:var(--ink-muted);font-weight:300;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+.card-meaning{font-size:.9rem;color:var(--ink-muted);line-height:1.6;max-width:220px;text-align:center;font-style:italic}
+.card-gender{margin-top:1.2rem;padding:.25rem .75rem;border-radius:50px;font-size:.75rem;font-weight:500}
+.gender-girl{background:var(--rose-light);color:var(--rose-dark)}
+.gender-boy{background:#DCEBF5;color:#3A6B8A}
+.gender-neutral{background:var(--gold-light);color:#7A5A20}
+.vote-hint{position:absolute;top:1.2rem;padding:.3rem .8rem;border-radius:50px;font-size:.85rem;font-weight:700;opacity:0;transition:opacity .15s;border:2.5px solid}
+.vote-yes{right:1.2rem;color:#4CAF50;border-color:#4CAF50}
+.vote-no{left:1.2rem;color:#F44336;border-color:#F44336}
+.partner-voted-indicator{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.75rem;color:var(--sage);display:flex;align-items:center;gap:.3rem;opacity:0;transition:opacity .3s;white-space:nowrap}
+.partner-voted-indicator.show{opacity:1}
+
+/* ACTION BUTTONS */
+.action-btns{display:flex;gap:1.2rem;margin:.5rem 0 1rem}
+.action-btn{width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:all .2s ease;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.btn-no{background:#fff;color:#F44336;border:2px solid #FFCDD2}
+.btn-no:hover{background:#FFEBEE;transform:scale(1.1)}
+.btn-yes{background:var(--rose);color:#fff;width:68px;height:68px;font-size:1.8rem}
+.btn-yes:hover{background:var(--rose-dark);transform:scale(1.1)}
+.btn-skip{background:#fff;color:var(--gold);border:2px solid var(--gold-light);font-size:1.2rem}
+.btn-skip:hover{background:var(--gold-light);transform:scale(1.05)}
+
+/* MATCH */
+.match-explosion{font-size:4rem;animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.match-name{font-family:'Playfair Display',serif;font-size:3.5rem;color:var(--rose);margin:1rem 0;font-style:italic}
+.match-hearts{display:flex;justify-content:center;gap:.3rem;font-size:1.5rem;margin:.5rem 0 2rem;animation:float 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hearts-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.heart-fall{position:absolute;font-size:1.5rem;animation:fall linear forwards;top:-50px;opacity:.7}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}
+
+/* LIKED LIST */
+.liked-list{width:100%;max-width:400px;max-height:50vh;overflow-y:auto;margin:1rem 0}
+.liked-item{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;border-radius:12px;background:#fff;border:1px solid var(--cream-dark);margin-bottom:.5rem}
+.liked-item-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink)}
+.liked-item-sub{font-size:.75rem;color:var(--ink-muted);font-weight:300}
+.match-badge{padding:.2rem .5rem;border-radius:50px;background:var(--rose-light);color:var(--rose-dark);font-size:.7rem;font-weight:500}
+
+/* HELPERS */
+.title-serif{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:.3rem}
+.subtitle{font-size:.9rem;color:var(--ink-muted);margin-bottom:1.5rem;font-weight:300}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.5rem 1.2rem;border-radius:50px;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
+.error-msg{color:#F44336;font-size:.85rem;margin:.5rem 0;min-height:1.2rem}
+
+/* LOADING */
+.loading-spinner{width:32px;height:32px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;margin:1rem auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="logo">bebé<span>match</span></div>
+  <p class="tagline">encontrad juntos el nombre perfecto ✨</p>
+  <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--ink-muted)">Conectando...</p></div>
+  <div id="home-content">
+    <button class="btn btn-primary" onclick="createRoom()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">✦ Crear sala nueva</button>
+    <div class="divider">o únete a una sala</div>
+    <input class="room-input" id="join-code" placeholder="Código de 4 letras" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')">
+    <p class="error-msg" id="join-error"></p>
+    <button class="btn btn-secondary" onclick="joinRoom()" style="width:100%;max-width:300px;justify-content:center">Unirse →</button>
+  </div>
+  <p style="font-size:.75rem;color:var(--ink-muted);margin-top:2rem;max-width:280px;line-height:1.6">Dos personas pueden conectarse desde cualquier dispositivo usando el mismo código de sala</p>
+</div>
+
+<!-- WAITING -->
+<div class="screen" id="screen-waiting">
+  <div class="status-bar"><div class="status-dot"></div><span id="waiting-status">Esperando a tu pareja...</span></div>
+  <p class="title-serif">Tu código de sala</p>
+  <div class="room-code" id="room-display">----</div>
+  <button class="btn btn-outline" onclick="copyCode()" style="margin-bottom:1rem">📋 Copiar código</button>
+  <div class="waiting-anim"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <p class="subtitle" style="margin-top:1rem">Comparte el código con tu pareja<br>para empezar juntos</p>
+</div>
+
+<!-- SETUP -->
+<div class="screen" id="screen-setup">
+  <p class="title-serif">Antes de empezar</p>
+  <p class="subtitle">Elige qué nombres quieres ver</p>
+  <p style="font-size:.85rem;color:var(--ink-muted);font-weight:500;margin-bottom:.5rem">Género</p>
+  <div class="pill-row" id="gender-pills">
+    <div class="pill selected" data-v="all" onclick="togglePill(this,'gender')">Todos</div>
+    <div class="pill" data-v="girl" onclick="togglePill(this,'gender')">Niña ♀</div>
+    <div class="pill" data-v="boy" onclick="togglePill(this,'gender')">Niño ♂</div>
+    <div class="pill" data-v="neutral" onclick="togglePill(this,'gender')">Neutro ⚥</div>
+  </div>
+  <p style="font-size:.85rem;color:var(--ink-muted);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Origen</p>
+  <div class="pill-row" id="origin-pills">
+    <div class="pill selected" data-v="all" onclick="togglePill(this,'origin')">Todos</div>
+    <div class="pill" data-v="español" onclick="togglePill(this,'origin')">Español</div>
+    <div class="pill" data-v="inglés" onclick="togglePill(this,'origin')">Inglés</div>
+    <div class="pill" data-v="latino" onclick="togglePill(this,'origin')">Latino</div>
+    <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
+    <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
+  </div>
+  <button class="btn btn-primary" onclick="startSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
+</div>
+
+<!-- SWIPE -->
+<div class="screen" id="screen-swipe" style="padding-top:1rem">
+  <div class="swipe-header">
+    <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
+    <div class="score-badge" id="match-count">💞 0 matches</div>
+  </div>
+  <div class="progress" style="max-width:400px;width:100%"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div class="card-stack" id="card-stack"></div>
+  <div class="action-btns">
+    <button class="action-btn btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
+    <button class="action-btn btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
+    <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
+  </div>
+  <button class="btn" style="font-size:.8rem;color:var(--ink-muted);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
+</div>
+
+<!-- MATCH -->
+<div class="screen" id="screen-match" style="position:relative;overflow:hidden">
+  <div class="hearts-bg" id="hearts-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center">
+    <div class="match-explosion">🎉</div>
+    <p class="title-serif" style="font-size:1.2rem;color:var(--ink-muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:0">¡Es un match!</p>
+    <div class="match-name" id="match-name-display">—</div>
+    <div class="match-hearts">💗 💗 💗</div>
+    <p style="font-size:.9rem;color:var(--ink-muted);max-width:260px;margin-bottom:2rem">¡Los dos adoráis este nombre para vuestro bebé!</p>
+    <button class="btn btn-primary" onclick="continueAfterMatch()" style="width:280px;justify-content:center;margin-bottom:.75rem">Seguir explorando ✨</button>
+    <button class="btn btn-outline" onclick="showLiked()" style="width:280px;justify-content:center">Ver todos los matches</button>
+  </div>
+</div>
+
+<!-- LIKED -->
+<div class="screen" id="screen-liked">
+  <p class="title-serif">Vuestros matches 💞</p>
+  <p class="subtitle" id="liked-subtitle">Nombres que os gustan a los dos</p>
+  <div class="liked-list" id="liked-list"></div>
+  <button class="btn btn-primary" onclick="backToSwipe()" style="margin-top:1rem;width:100%;max-width:300px;justify-content:center">← Seguir buscando</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://myakshqgodbvwnbnvjjn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15YWtzaHFnb2RidnduYm52ampuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjI5MTcsImV4cCI6MjA5NTMzODkxN30._yHuiEPiyve3bxSgQvpOuc_--uwSq2RTiuPKPgmRZHc';
+const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+
+const NAMES_DB = [
+  {n:"Sofía",g:"girl",o:"griego",m:"sabiduría divina"},
+  {n:"Valentina",g:"girl",o:"latino",m:"valiente y fuerte"},
+  {n:"Isabella",g:"girl",o:"hebreo",m:"consagrada a Dios"},
+  {n:"Lucía",g:"girl",o:"latino",m:"portadora de luz"},
+  {n:"Camila",g:"girl",o:"latino",m:"mensajera de los dioses"},
+  {n:"Elena",g:"girl",o:"griego",m:"antorcha brillante"},
+  {n:"Valeria",g:"girl",o:"latino",m:"saludable y fuerte"},
+  {n:"Martina",g:"girl",o:"latino",m:"dedicada a Marte"},
+  {n:"Emma",g:"girl",o:"germánico",m:"todo, universal"},
+  {n:"Noa",g:"girl",o:"hebreo",m:"movimiento, descanso"},
+  {n:"Olivia",g:"girl",o:"inglés",m:"árbol de olivo"},
+  {n:"Alma",g:"girl",o:"español",m:"alma, espíritu"},
+  {n:"Luna",g:"girl",o:"latino",m:"la luna, brillante"},
+  {n:"Amaia",g:"girl",o:"español",m:"fin del amor"},
+  {n:"Vera",g:"girl",o:"moderno",m:"fe, verdad"},
+  {n:"Clara",g:"girl",o:"latino",m:"brillante, clara"},
+  {n:"Ariadna",g:"girl",o:"clásico",m:"muy santa"},
+  {n:"Iris",g:"girl",o:"clásico",m:"arco iris"},
+  {n:"Laia",g:"girl",o:"español",m:"portadora de luz"},
+  {n:"Mia",g:"girl",o:"moderno",m:"mía, amada"},
+  {n:"Abril",g:"girl",o:"español",m:"mes de la primavera"},
+  {n:"Carla",g:"girl",o:"germánico",m:"mujer libre"},
+  {n:"Daniela",g:"girl",o:"hebreo",m:"Dios es mi juez"},
+  {n:"Sara",g:"girl",o:"hebreo",m:"princesa"},
+  {n:"Paula",g:"girl",o:"latino",m:"pequeña, humilde"},
+  {n:"Mateo",g:"boy",o:"hebreo",m:"don de Dios"},
+  {n:"Santiago",g:"boy",o:"hebreo",m:"el que suplanta"},
+  {n:"Sebastián",g:"boy",o:"clásico",m:"venerable, respetado"},
+  {n:"Nicolás",g:"boy",o:"clásico",m:"victoria del pueblo"},
+  {n:"Lucas",g:"boy",o:"clásico",m:"portador de luz"},
+  {n:"Alejandro",g:"boy",o:"clásico",m:"defensor del pueblo"},
+  {n:"Diego",g:"boy",o:"español",m:"el que suplanta"},
+  {n:"Samuel",g:"boy",o:"hebreo",m:"escuchado por Dios"},
+  {n:"Martín",g:"boy",o:"latino",m:"dedicado a Marte"},
+  {n:"Hugo",g:"boy",o:"germánico",m:"mente brillante"},
+  {n:"Leo",g:"boy",o:"latino",m:"león, valiente"},
+  {n:"Adrián",g:"boy",o:"latino",m:"del mar Adriático"},
+  {n:"Marco",g:"boy",o:"latino",m:"consagrado a Marte"},
+  {n:"Pablo",g:"boy",o:"latino",m:"pequeño, humilde"},
+  {n:"Rafael",g:"boy",o:"hebreo",m:"Dios ha curado"},
+  {n:"Álvaro",g:"boy",o:"germánico",m:"guardián de todos"},
+  {n:"Tomás",g:"boy",o:"clásico",m:"gemelo"},
+  {n:"Javier",g:"boy",o:"español",m:"casa nueva"},
+  {n:"Iván",g:"boy",o:"moderno",m:"Dios es misericordioso"},
+  {n:"Bruno",g:"boy",o:"germánico",m:"armadura marrón"},
+  {n:"Oliver",g:"boy",o:"inglés",m:"árbol de olivo"},
+  {n:"Liam",g:"boy",o:"inglés",m:"voluntad fuerte"},
+  {n:"Ariel",g:"neutral",o:"hebreo",m:"león de Dios"},
+  {n:"Alex",g:"neutral",o:"clásico",m:"defensor"},
+  {n:"Nico",g:"neutral",o:"clásico",m:"victoria del pueblo"},
+  {n:"Morgan",g:"neutral",o:"moderno",m:"brillante, del mar"},
+  {n:"Sasha",g:"neutral",o:"moderno",m:"defensor del pueblo"},
+  {n:"Kai",g:"neutral",o:"moderno",m:"mar"},
+  {n:"Quinn",g:"neutral",o:"moderno",m:"descendiente del jefe"},
+  {n:"Rio",g:"neutral",o:"español",m:"río"},
+  {n:"Eden",g:"neutral",o:"hebreo",m:"jardín del placer"},
+  {n:"Ari",g:"neutral",o:"hebreo",m:"leona de Dios"},
+  {n:"Andrea",g:"neutral",o:"clásico",m:"valiente"},
+  {n:"Luca",g:"neutral",o:"latino",m:"portador de luz"},
+  {n:"Noel",g:"neutral",o:"moderno",m:"día de Navidad"},
+  {n:"Mika",g:"neutral",o:"moderno",m:"hermoso aroma"},
+];
+
+const state = {
+  roomCode: null,
+  myId: 'u_' + Math.random().toString(36).slice(2,10),
+  partnerConnected: false,
+  queue: [],
+  currentIdx: 0,
+  myLikes: {},       // name -> liked(bool)
+  partnerLikes: {},  // name -> liked(bool)
+  matches: [],
+  filters: {gender:'all', origin:'all'},
+};
+
+let realtimeWs = null;
+let isDragging = false, startX = 0, currentX = 0;
+let activeCard = null;
+
+/* ── SUPABASE REST ── */
+async function dbInsert(row) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/votes', {
+    method:'POST',
+    headers:{...HEADERS,'Prefer':'return=minimal'},
+    body: JSON.stringify(row)
+  });
+  if(!r.ok) console.error('Insert error', await r.text());
+}
+
+async function dbFetchVotes(roomCode) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/votes?room_code=eq.' + encodeURIComponent(roomCode), {headers: HEADERS});
+  if(r.ok) return await r.json();
+  return [];
+}
+
+/* ── SUPABASE REALTIME ── */
+function connectRealtime(roomCode) {
+  const wsUrl = 'wss://myakshqgodbvwnbnvjjn.supabase.co/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
+  realtimeWs = new WebSocket(wsUrl);
+
+  realtimeWs.onopen = () => {
+    realtimeWs.send(JSON.stringify({
+      topic: 'realtime:public:votes:room_code=eq.' + roomCode,
+      event: 'phx_join',
+      payload: {config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'INSERT',schema:'public',table:'votes',filter:'room_code=eq.'+roomCode}]}},
+      ref: '1'
+    }));
+    // heartbeat
+    setInterval(()=>{
+      if(realtimeWs && realtimeWs.readyState===1)
+        realtimeWs.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'}));
+    }, 25000);
+  };
+
+  realtimeWs.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data);
+      if(msg.event === 'postgres_changes' || (msg.payload && msg.payload.data && msg.payload.data.record)) {
+        const record = msg.payload.data?.record || msg.payload.record;
+        if(record && record.user_id !== state.myId) {
+          onPartnerVote(record);
+        }
+      }
+      // detect partner presence by any activity
+      if(msg.event === 'phx_reply' && msg.payload && msg.payload.status === 'ok') {
+        // joined channel successfully
+      }
+    } catch(err) {}
+  };
+
+  realtimeWs.onerror = () => console.warn('Realtime WS error');
+  realtimeWs.onclose = () => {
+    // reconnect after 3s
+    setTimeout(()=>{ if(state.roomCode) connectRealtime(state.roomCode); }, 3000);
+  };
+}
+
+function onPartnerVote(record) {
+  state.partnerConnected = true;
+  updatePartnerDot(true);
+  state.partnerLikes[record.name] = record.liked;
+  if(record.liked) {
+    showPartnerVotedHint(record.name);
+    checkMatch(record.name);
+  }
+}
+
+/* ── ROOM MANAGEMENT ── */
+function genCode() { return Math.random().toString(36).slice(2,6).toUpperCase(); }
+
+async function createRoom() {
+  setHomeLoading(true);
+  const code = genCode();
+  state.roomCode = code;
+  document.getElementById('room-display').textContent = code;
+  connectRealtime(code);
+  // poll for partner (check if any other user voted in this room)
+  startPartnerPoll();
+  setHomeLoading(false);
+  showScreen('waiting');
+}
+
+async function joinRoom() {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if(code.length !== 4) { document.getElementById('join-error').textContent = 'El código debe tener 4 letras'; return; }
+  document.getElementById('join-error').textContent = '';
+  setHomeLoading(true);
+  state.roomCode = code;
+  document.getElementById('room-display').textContent = code;
+
+  // load existing votes for this room
+  const existing = await dbFetchVotes(code);
+  for(const v of existing) {
+    if(v.user_id !== state.myId) {
+      state.partnerLikes[v.name] = v.liked;
+      if(v.liked) state.partnerConnected = true;
+    }
+  }
+
+  connectRealtime(code);
+  startPartnerPoll();
+  setHomeLoading(false);
+  showScreen('waiting');
+  if(state.partnerConnected) {
+    document.getElementById('waiting-status').textContent = '¡Pareja detectada! ✓';
+    setTimeout(()=>showSetup(), 1200);
+  }
+}
+
+let partnerPollTimer = null;
+function startPartnerPoll() {
+  clearInterval(partnerPollTimer);
+  partnerPollTimer = setInterval(async () => {
+    if(!state.roomCode) return;
+    const votes = await dbFetchVotes(state.roomCode);
+    const partnerVotes = votes.filter(v => v.user_id !== state.myId);
+    if(partnerVotes.length > 0 && !state.partnerConnected) {
+      state.partnerConnected = true;
+      updatePartnerDot(true);
+      document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
+      if(document.getElementById('screen-waiting').classList.contains('active')) {
+        setTimeout(()=>showSetup(), 1200);
+      }
+    }
+    // sync partner likes
+    for(const v of partnerVotes) {
+      state.partnerLikes[v.name] = v.liked;
+    }
+  }, 4000);
+}
+
+/* ── SETUP ── */
+function togglePill(el, group) {
+  document.getElementById(group+'-pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.filters[group] = el.dataset.v;
+}
+
+function showSetup() { showScreen('setup'); }
+
+function startSwiping() {
+  buildQueue();
+  showScreen('swipe');
+  renderCards();
+  clearInterval(partnerPollTimer);
+  // keep syncing partner votes silently
+  setInterval(async()=>{
+    if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
+    const votes = await dbFetchVotes(state.roomCode);
+    for(const v of votes.filter(x=>x.user_id!==state.myId)) {
+      if(state.partnerLikes[v.name] === undefined) {
+        state.partnerLikes[v.name] = v.liked;
+        if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
+      }
+    }
+  }, 5000);
+}
+
+/* ── QUEUE ── */
+function buildQueue() {
+  let pool = [...NAMES_DB];
+  if(state.filters.gender !== 'all') pool = pool.filter(n=>n.g===state.filters.gender);
+  if(state.filters.origin !== 'all') pool = pool.filter(n=>n.o===state.filters.origin || n.o.includes(state.filters.origin));
+  if(pool.length < 8) pool = [...NAMES_DB];
+  pool.sort(()=>Math.random()-.5);
+  state.queue = pool;
+  state.currentIdx = 0;
+}
+
+/* ── CARDS ── */
+function renderCards() {
+  const stack = document.getElementById('card-stack');
+  stack.innerHTML = '';
+  for(let i=Math.min(state.currentIdx+2, state.queue.length-1); i>=state.currentIdx; i--) {
+    const nm = state.queue[i];
+    if(!nm) continue;
+    const card = createCard(nm);
+    if(i===state.currentIdx+2) card.classList.add('behind2');
+    else if(i===state.currentIdx+1) card.classList.add('behind');
+    else card.classList.add('active');
+    stack.appendChild(card);
+  }
+  updateProgress();
+  setupDrag();
+}
+
+function createCard(nm) {
+  const div = document.createElement('div');
+  div.className = 'name-card';
+  div.dataset.name = nm.n;
+  const gc = nm.g==='girl'?'gender-girl':nm.g==='boy'?'gender-boy':'gender-neutral';
+  const gl = nm.g==='girl'?'♀ Niña':nm.g==='boy'?'♂ Niño':'⚥ Neutro';
+  div.innerHTML = `
+    <div class="vote-hint vote-yes">¡SÍ! ♥</div>
+    <div class="vote-hint vote-no">Nope ✕</div>
+    <div class="card-accent"></div>
+    <div class="card-name">${nm.n}</div>
+    <div class="card-origin">${nm.o}</div>
+    <div class="card-meaning">"${nm.m}"</div>
+    <div class="card-gender ${gc}">${gl}</div>
+    <div class="partner-voted-indicator" id="pvi-${nm.n}">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--sage);display:inline-block"></span>
+      Tu pareja también lo valoró
+    </div>`;
+  return div;
+}
+
+function setupDrag() {
+  const top = document.querySelector('.name-card.active');
+  if(!top) return;
+  activeCard = top;
+  top.addEventListener('mousedown', onDragStart);
+  top.addEventListener('touchstart', onDragStart, {passive:true});
+}
+
+function onDragStart(e) {
+  isDragging = true;
+  const p = e.touches ? e.touches[0] : e;
+  startX = p.clientX;
+  activeCard.classList.add('dragging');
+  activeCard.style.transition = 'none';
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('touchmove', onDragMove, {passive:true});
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchend', onDragEnd);
+}
+
+function onDragMove(e) {
+  if(!isDragging||!activeCard) return;
+  const p = e.touches ? e.touches[0] : e;
+  currentX = p.clientX - startX;
+  const rot = currentX * 0.08;
+  activeCard.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
+  const yes = activeCard.querySelector('.vote-yes');
+  const no = activeCard.querySelector('.vote-no');
+  if(currentX>30){yes.style.opacity=Math.min((currentX-30)/60,1);no.style.opacity=0;}
+  else if(currentX<-30){no.style.opacity=Math.min((-currentX-30)/60,1);yes.style.opacity=0;}
+  else{yes.style.opacity=0;no.style.opacity=0;}
+}
+
+function onDragEnd() {
+  if(!isDragging||!activeCard) return;
+  isDragging = false;
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+  document.removeEventListener('touchend', onDragEnd);
+  activeCard.classList.remove('dragging');
+  if(currentX>80) swipeCard(true);
+  else if(currentX<-80) swipeCard(false);
+  else {
+    activeCard.style.transition = 'transform .3s ease';
+    activeCard.style.transform = '';
+    activeCard.querySelector('.vote-yes').style.opacity=0;
+    activeCard.querySelector('.vote-no').style.opacity=0;
+    setTimeout(()=>{ if(activeCard) activeCard.style.transition=''; },300);
+  }
+  currentX = 0;
+}
+
+async function swipeCard(liked) {
+  if(state.currentIdx >= state.queue.length) return;
+  const nm = state.queue[state.currentIdx];
+
+  if(liked !== null) {
+    state.myLikes[nm.n] = liked;
+    if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
+    // persist to Supabase
+    dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked});
+    if(liked) checkMatch(nm.n);
+  }
+
+  const top = document.querySelector('.name-card.active');
+  if(top) {
+    const dir = liked===true?1:liked===false?-1:0;
+    top.style.transition = 'transform .4s ease, opacity .3s ease';
+    top.style.transform = dir!==0 ? `translateX(${dir*450}px) rotate(${dir*20}deg)` : 'translateY(-80px)';
+    top.style.opacity = '0';
+    setTimeout(()=>{ state.currentIdx++; renderCards(); }, 360);
+  } else {
+    state.currentIdx++;
+    renderCards();
+  }
+}
+
+function checkMatch(name) {
+  if(state.myLikes[name] && state.partnerLikes[name]) {
+    if(!state.matches.includes(name)) {
+      state.matches.push(name);
+      triggerMatch(name);
+    }
+  }
+}
+
+function triggerMatch(name) {
+  document.getElementById('match-name-display').textContent = name;
+  document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
+  spawnHearts();
+  showScreen('match');
+}
+
+function spawnHearts() {
+  const bg = document.getElementById('hearts-bg');
+  bg.innerHTML = '';
+  ['💗','💕','💞','❤️','🌸','✨'].forEach(h=>{
+    for(let j=0;j<4;j++){
+      const el = document.createElement('div');
+      el.className='heart-fall';
+      el.textContent=h;
+      el.style.left=Math.random()*100+'%';
+      el.style.animationDuration=(2+Math.random()*2)+'s';
+      el.style.animationDelay=Math.random()+'s';
+      bg.appendChild(el);
+    }
+  });
+}
+
+function showPartnerVotedHint(name) {
+  const el = document.getElementById('pvi-'+name);
+  if(el){el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+}
+
+function updatePartnerDot(online) {
+  const dot = document.getElementById('partner-dot');
+  const lbl = document.getElementById('partner-label');
+  if(dot) dot.classList.toggle('online', online);
+  if(lbl) lbl.textContent = online ? 'Pareja conectada ✓' : 'Sin pareja';
+}
+
+function updateProgress() {
+  const pct = Math.min((state.currentIdx/Math.max(state.queue.length,1))*100,100);
+  document.getElementById('progress-bar').style.width = pct+'%';
+}
+
+function continueAfterMatch() { showScreen('swipe'); }
+
+function showLiked() {
+  const list = document.getElementById('liked-list');
+  list.innerHTML = '';
+  const liked = Object.entries(state.myLikes).filter(([,v])=>v).map(([k])=>k);
+  document.getElementById('liked-subtitle').textContent =
+    state.matches.length>0 ? `${state.matches.length} match${state.matches.length>1?'es':''}` : 'Aún sin matches con tu pareja';
+  if(liked.length===0) {
+    list.innerHTML = '<p style="color:var(--ink-muted);font-size:.9rem;padding:1rem">Aún no has dado ♥ a ningún nombre</p>';
+  } else {
+    liked.forEach(name=>{
+      const isMatch = state.matches.includes(name);
+      const d = document.createElement('div');
+      d.className='liked-item';
+      d.innerHTML=`<div><div class="liked-item-name">${name}</div><div class="liked-item-sub">${isMatch?'¡Match con tu pareja! 🎉':'Solo tú lo has elegido'}</div></div>${isMatch?'<span class="match-badge">💞 Match</span>':'<span style="font-size:1.2rem">♥</span>'}`;
+      list.appendChild(d);
+    });
+  }
+  showScreen('liked');
+}
+
+function backToSwipe() { showScreen('swipe'); }
+
+function copyCode() {
+  if(navigator.clipboard) navigator.clipboard.writeText(state.roomCode);
+  showToast('¡Código copiado!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+function setHomeLoading(on) {
+  document.getElementById('home-loading').style.display = on?'block':'none';
+  document.getElementById('home-content').style.display = on?'none':'';
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+</script>
+</body>
+</html>
