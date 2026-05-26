@@ -301,10 +301,22 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
   <div class="liked-list" id="summary-list" style="max-height:55vh"></div>
   <button class="btn btn-primary" onclick="restartFromSetup()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
-  <button class="btn btn-secondary" onclick="showScreen('home')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
+  <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
 </div>
 
-<div class="version-tag">v1.2</div>
+<!-- CONFIRM HOME MODAL -->
+<div id="confirm-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem 1.5rem;max-width:300px;width:90%;text-align:center">
+    <p style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--text);margin-bottom:.5rem">¿Volver al inicio?</p>
+    <p style="font-size:.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6">Si tu pareja sigue jugando se desconectará de tu sesión. Los matches se perderán.</p>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn btn-secondary" onclick="closeConfirm()" style="flex:1">Cancelar</button>
+      <button class="btn btn-primary" onclick="goHome()" style="flex:1">Salir</button>
+    </div>
+  </div>
+</div>
+
+<div class="version-tag">v1.3</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -933,17 +945,44 @@ function showSummary() {
 }
 
 function restartFromSetup() {
+  // mantiene roomCode, partnerConnected y matches — solo resetea la ronda
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
   state.filters = {gender:'all', origin:'all'};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
   document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
   document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
   showScreen('setup');
+}
+
+function confirmGoHome() {
+  document.getElementById('confirm-overlay').style.display = 'flex';
+}
+function closeConfirm() {
+  document.getElementById('confirm-overlay').style.display = 'none';
+}
+function goHome() {
+  closeConfirm();
+  // desconectar sala completamente
+  state.roomCode = null;
+  state.partnerConnected = false;
+  state.queue = [];
+  state.currentIdx = 0;
+  state.myLikes = {};
+  state.partnerLikes = {};
+  state.matches = [];
+  clearInterval(partnerPollTimer);
+  if(realtimeWs) { try { realtimeWs.close(); } catch(e) {} realtimeWs = null; }
+  document.getElementById('liked-count').textContent = '0';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  document.getElementById('join-code').value = '';
+  document.getElementById('join-error').textContent = '';
+  showScreen('home');
 }
 
 function showLiked() {
