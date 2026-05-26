@@ -133,7 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;colo
   <div id="home-content">
     <button class="btn btn-primary" onclick="createRoom()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">✦ Crear sala nueva</button>
     <div class="divider">o únete a una sala</div>
-    <input class="room-input" id="join-code" placeholder="Código de 4 letras" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')">
+    <input class="room-input" id="join-code" placeholder="Código de 4 letras" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
     <p class="error-msg" id="join-error"></p>
     <button class="btn btn-secondary" onclick="joinRoom()" style="width:100%;max-width:300px;justify-content:center">Unirse →</button>
   </div>
@@ -383,7 +383,7 @@ async function createRoom() {
 
 async function joinRoom() {
   const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if(code.length !== 4) { document.getElementById('join-error').textContent = 'El código debe tener 4 letras'; return; }
+  if(code.length !== 4) { document.getElementById('join-error').textContent = 'El código debe tener 4 caracteres'; return; }
   document.getElementById('join-error').textContent = '';
   setHomeLoading(true);
   state.roomCode = code;
