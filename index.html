@@ -312,6 +312,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--text2)">Conectando...</p></div>
   <div id="home-content">
     <button class="btn btn-primary" onclick="createRoom()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">✦ Crear sala nueva</button>
+    <button class="btn btn-secondary" onclick="startSolo()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">👤 Modo un jugador</button>
     <div class="divider">o únete a una sala</div>
     <input class="room-input" id="join-code" placeholder="Código de sala" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g,'')">
     <p class="error-msg" id="join-error"></p>
@@ -350,6 +351,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="latino" onclick="togglePill(this,'origin')">Latino</div>
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
+    <div class="pill" data-v="calorro" onclick="togglePill(this,'origin')">🔥 Calorro</div>
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Longitud del nombre</p>
   <div class="pill-row" id="length-pills">
@@ -434,6 +436,19 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <button class="btn btn-primary" onclick="backToSwipe()" style="margin-top:1rem;width:100%;max-width:300px;justify-content:center">← Seguir buscando</button>
 </div>
 
+<!-- SUMMARY SOLO -->
+<div class="screen" id="screen-summary-solo" style="position:relative;overflow:hidden">
+  <canvas id="summary-solo-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%">
+    <p class="title-serif" id="solo-summary-title">Tus favoritos 💞</p>
+    <p class="subtitle" id="solo-summary-sub">Los nombres que te han gustado</p>
+    <div class="liked-list" id="solo-summary-list" style="max-height:55vh"></div>
+    <button class="btn btn-primary" onclick="shareSoloMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir ♥</button>
+    <button class="btn btn-secondary" onclick="startSolo()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más →</button>
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
+  </div>
+</div>
+
 <!-- SUMMARY -->
 <div class="screen" id="screen-summary" style="position:relative;overflow:hidden">
   <canvas id="summary-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
@@ -472,7 +487,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v5.3</div>
+<div class="version-tag">v5.6</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -860,6 +875,73 @@ function checkMineWin() {
   }
 }
 
+/* ── MODO SOLO ── */
+function startSolo() {
+  state.isSolo = true;
+  state.isHost = true;
+  state.roomCode = null;
+  state.myLikes = {};
+  state.partnerLikes = {};
+  state.matches = [];
+  state.streak = 0;
+  state.streakType = null;
+  // adaptar UI para solo
+  document.getElementById('setup-subtitle').textContent = 'Elige qué nombres quieres ver';
+  document.getElementById('partner-label').textContent = 'Modo un jugador';
+  showScreen('setup');
+}
+
+function finishSolo() {
+  const liked = Object.entries(state.myLikes).filter(([,v])=>v).map(([k])=>k);
+  const list = document.getElementById('solo-summary-list');
+  list.innerHTML = '';
+  const title = document.getElementById('solo-summary-title');
+  const sub = document.getElementById('solo-summary-sub');
+
+  if(liked.length === 0) {
+    title.textContent = '¡Has terminado! 🙈';
+    sub.textContent = 'No has marcado ningún favorito';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1.5rem 1rem;text-align:center">Prueba con otros filtros.</p>';
+  } else {
+    title.textContent = `${liked.length} favorito${liked.length>1?'s':''} ♥`;
+    sub.textContent = 'Los nombres que más te han gustado';
+    liked.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div class="liked-item-name">${name}</div>
+        </div>
+        <span style="font-size:1.1rem">♥</span>`;
+      list.appendChild(d);
+    });
+  }
+  showScreen('summary-solo');
+  if(liked.length >= 3) {
+    setTimeout(()=>{
+      const canvas = document.getElementById('summary-solo-confetti');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+      const COLORS = ['#E8735A','#F4A261','#E9C46A','#2A9D8F','#A8DADC','#FFB4A2'];
+      const pieces = Array.from({length:60},()=>({x:Math.random()*canvas.width,y:-20,w:5+Math.random()*7,h:7+Math.random()*6,r:Math.random()*Math.PI*2,dr:(Math.random()-.5)*.12,vy:2+Math.random()*3,vx:(Math.random()-.5)*1.5,color:COLORS[Math.floor(Math.random()*COLORS.length)],alpha:.9}));
+      let frame=0;
+      function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.y+=p.vy;p.x+=p.vx;p.r+=p.dr;p.alpha-=0.005;if(p.alpha<=0)return;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.globalAlpha=p.alpha;ctx.fillStyle=p.color;ctx.beginPath();ctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,2);ctx.fill();ctx.restore();});frame++;if(frame<180)requestAnimationFrame(draw);}
+      draw();
+    }, 400);
+  }
+}
+
+function shareSoloMatches() {
+  const liked = Object.entries(state.myLikes).filter(([,v])=>v).map(([k])=>k);
+  if(liked.length === 0) { showToast('No hay favoritos que compartir'); return; }
+  const formatted = liked.length > 1 ? liked.slice(0,-1).join(', ') + ' y ' + liked[liked.length-1] : liked[0];
+  const text = `👶 Mis nombres favoritos son ${formatted}! Elegidos con BebéMatch ♥`;
+  if(navigator.share) navigator.share({text}).catch(()=>{});
+  else if(navigator.clipboard) { navigator.clipboard.writeText(text); showToast('¡Copiado!'); }
+}
+
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light');
   document.getElementById('theme-btn').textContent = isLight ? '🌑' : '🌙';
@@ -873,72 +955,229 @@ function toggleTheme(){
 })();
 
 const NAMES_DB = [
+  // ── GIRL · griego ──
   {n:"Sofía",g:"girl",o:"griego",m:"sabiduría divina"},
+  {n:"Elena",g:"girl",o:"griego",m:"antorcha brillante"},
+  {n:"Irene",g:"girl",o:"griego",m:"diosa de la paz"},
+  {n:"Chloe",g:"girl",o:"griego",m:"hierba verde, floreciente"},
+  {n:"Phoebe",g:"girl",o:"griego",m:"brillante como la luna"},
+  {n:"Calista",g:"girl",o:"griego",m:"la más bella"},
+  {n:"Zoe",g:"girl",o:"griego",m:"vida"},
+  // ── GIRL · latino ──
   {n:"Valentina",g:"girl",o:"latino",m:"valiente y fuerte"},
-  {n:"Isabella",g:"girl",o:"hebreo",m:"consagrada a Dios"},
   {n:"Lucía",g:"girl",o:"latino",m:"portadora de luz"},
   {n:"Camila",g:"girl",o:"latino",m:"mensajera de los dioses"},
-  {n:"Elena",g:"girl",o:"griego",m:"antorcha brillante"},
   {n:"Valeria",g:"girl",o:"latino",m:"saludable y fuerte"},
   {n:"Martina",g:"girl",o:"latino",m:"dedicada a Marte"},
-  {n:"Emma",g:"girl",o:"germánico",m:"todo, universal"},
-  {n:"Noa",g:"girl",o:"hebreo",m:"movimiento, descanso"},
-  {n:"Olivia",g:"girl",o:"inglés",m:"árbol de olivo"},
-  {n:"Alma",g:"girl",o:"español",m:"alma, espíritu"},
   {n:"Luna",g:"girl",o:"latino",m:"la luna, brillante"},
-  {n:"Amaia",g:"girl",o:"español",m:"fin del amor"},
-  {n:"Vera",g:"girl",o:"moderno",m:"fe, verdad"},
   {n:"Clara",g:"girl",o:"latino",m:"brillante, clara"},
-  {n:"Ariadna",g:"girl",o:"clásico",m:"muy santa"},
-  {n:"Iris",g:"girl",o:"clásico",m:"arco iris"},
-  {n:"Laia",g:"girl",o:"español",m:"portadora de luz"},
-  {n:"Mia",g:"girl",o:"moderno",m:"mía, amada"},
-  {n:"Abril",g:"girl",o:"español",m:"mes de la primavera"},
-  {n:"Carla",g:"girl",o:"germánico",m:"mujer libre"},
+  {n:"Paula",g:"girl",o:"latino",m:"pequeña, humilde"},
+  {n:"Aurora",g:"girl",o:"latino",m:"diosa del amanecer"},
+  {n:"Viola",g:"girl",o:"latino",m:"violeta, flor"},
+  {n:"Flora",g:"girl",o:"latino",m:"flor, naturaleza"},
+  {n:"Silvia",g:"girl",o:"latino",m:"del bosque"},
+  {n:"Laura",g:"girl",o:"latino",m:"laureada, victoriosa"},
+  {n:"Beatriz",g:"girl",o:"latino",m:"viajera feliz"},
+  // ── GIRL · hebreo ──
+  {n:"Isabella",g:"girl",o:"hebreo",m:"consagrada a Dios"},
+  {n:"Noa",g:"girl",o:"hebreo",m:"movimiento, descanso"},
   {n:"Daniela",g:"girl",o:"hebreo",m:"Dios es mi juez"},
   {n:"Sara",g:"girl",o:"hebreo",m:"princesa"},
-  {n:"Paula",g:"girl",o:"latino",m:"pequeña, humilde"},
-  {n:"Mateo",g:"boy",o:"hebreo",m:"don de Dios"},
-  {n:"Santiago",g:"boy",o:"hebreo",m:"el que suplanta"},
+  {n:"Hannah",g:"girl",o:"hebreo",m:"llena de gracia"},
+  {n:"Abigail",g:"girl",o:"hebreo",m:"alegría del padre"},
+  {n:"Miriam",g:"girl",o:"hebreo",m:"amada, deseada"},
+  {n:"Rebeca",g:"girl",o:"hebreo",m:"fidelidad"},
+  {n:"Nadia",g:"girl",o:"hebreo",m:"esperanza"},
+  // ── GIRL · español ──
+  {n:"Alma",g:"girl",o:"español",m:"alma, espíritu"},
+  {n:"Amaia",g:"girl",o:"español",m:"fin del amor"},
+  {n:"Laia",g:"girl",o:"español",m:"portadora de luz"},
+  {n:"Abril",g:"girl",o:"español",m:"mes de la primavera"},
+  {n:"Aitana",g:"girl",o:"español",m:"gloria"},
+  {n:"Aroa",g:"girl",o:"español",m:"buena persona"},
+  {n:"Nerea",g:"girl",o:"español",m:"la mía"},
+  {n:"Leire",g:"girl",o:"español",m:"relativa a la leyenda"},
+  // ── GIRL · germánico ──
+  {n:"Emma",g:"girl",o:"germánico",m:"todo, universal"},
+  {n:"Carla",g:"girl",o:"germánico",m:"mujer libre"},
+  {n:"Matilda",g:"girl",o:"germánico",m:"poderosa en la batalla"},
+  {n:"Elsa",g:"girl",o:"germánico",m:"noble, consagrada"},
+  {n:"Heidi",g:"girl",o:"germánico",m:"de noble cuna"},
+  {n:"Bruna",g:"girl",o:"germánico",m:"marrón, oscura"},
+  // ── GIRL · clásico ──
+  {n:"Ariadna",g:"girl",o:"clásico",m:"muy santa"},
+  {n:"Iris",g:"girl",o:"clásico",m:"arco iris"},
+  {n:"Diana",g:"girl",o:"clásico",m:"diosa de la caza"},
+  {n:"Victoria",g:"girl",o:"clásico",m:"victoriosa"},
+  {n:"Julia",g:"girl",o:"clásico",m:"joven, llena de vida"},
+  {n:"Claudia",g:"girl",o:"clásico",m:"la que camina con dificultad"},
+  {n:"Natalia",g:"girl",o:"clásico",m:"nacida en Navidad"},
+  // ── GIRL · inglés ──
+  {n:"Olivia",g:"girl",o:"inglés",m:"árbol de olivo"},
+  {n:"Isla",g:"girl",o:"inglés",m:"isla"},
+  {n:"Amber",g:"girl",o:"inglés",m:"ámbar, joya"},
+  {n:"Scarlett",g:"girl",o:"inglés",m:"rojo escarlata"},
+  {n:"Harper",g:"girl",o:"inglés",m:"tañedora de arpa"},
+  // ── GIRL · moderno ──
+  {n:"Vera",g:"girl",o:"moderno",m:"fe, verdad"},
+  {n:"Mia",g:"girl",o:"moderno",m:"mía, amada"},
+  {n:"Nala",g:"girl",o:"moderno",m:"exitosa"},
+  {n:"Zara",g:"girl",o:"moderno",m:"principesa, flor"},
+  {n:"Nova",g:"girl",o:"moderno",m:"nueva estrella"},
+  {n:"Aria",g:"girl",o:"moderno",m:"melodía, aire"},
+  {n:"Luna",g:"girl",o:"moderno",m:"luminosa"},
+  {n:"Lena",g:"girl",o:"moderno",m:"luz radiante"},
+
+  // ── BOY · clásico ──
   {n:"Sebastián",g:"boy",o:"clásico",m:"venerable, respetado"},
   {n:"Nicolás",g:"boy",o:"clásico",m:"victoria del pueblo"},
   {n:"Lucas",g:"boy",o:"clásico",m:"portador de luz"},
   {n:"Alejandro",g:"boy",o:"clásico",m:"defensor del pueblo"},
-  {n:"Diego",g:"boy",o:"español",m:"el que suplanta"},
+  {n:"Tomás",g:"boy",o:"clásico",m:"gemelo"},
+  {n:"Máximo",g:"boy",o:"clásico",m:"el más grande"},
+  {n:"Augusto",g:"boy",o:"clásico",m:"majestuoso, venerado"},
+  {n:"Víctor",g:"boy",o:"clásico",m:"victorioso"},
+  {n:"Julio",g:"boy",o:"clásico",m:"joven, lleno de vida"},
+  // ── BOY · hebreo ──
+  {n:"Mateo",g:"boy",o:"hebreo",m:"don de Dios"},
+  {n:"Santiago",g:"boy",o:"hebreo",m:"el que suplanta"},
   {n:"Samuel",g:"boy",o:"hebreo",m:"escuchado por Dios"},
+  {n:"Rafael",g:"boy",o:"hebreo",m:"Dios ha curado"},
+  {n:"Daniel",g:"boy",o:"hebreo",m:"Dios es mi juez"},
+  {n:"Elías",g:"boy",o:"hebreo",m:"mi Dios es el Señor"},
+  {n:"Ezra",g:"boy",o:"hebreo",m:"ayuda, apoyo"},
+  {n:"Joel",g:"boy",o:"hebreo",m:"Dios es el Señor"},
+  // ── BOY · latino ──
   {n:"Martín",g:"boy",o:"latino",m:"dedicado a Marte"},
-  {n:"Hugo",g:"boy",o:"germánico",m:"mente brillante"},
   {n:"Leo",g:"boy",o:"latino",m:"león, valiente"},
   {n:"Adrián",g:"boy",o:"latino",m:"del mar Adriático"},
   {n:"Marco",g:"boy",o:"latino",m:"consagrado a Marte"},
   {n:"Pablo",g:"boy",o:"latino",m:"pequeño, humilde"},
-  {n:"Rafael",g:"boy",o:"hebreo",m:"Dios ha curado"},
-  {n:"Álvaro",g:"boy",o:"germánico",m:"guardián de todos"},
-  {n:"Tomás",g:"boy",o:"clásico",m:"gemelo"},
+  {n:"Sergio",g:"boy",o:"latino",m:"guardián, protector"},
+  {n:"Emilio",g:"boy",o:"latino",m:"trabajador, activo"},
+  {n:"Félix",g:"boy",o:"latino",m:"feliz, afortunado"},
+  {n:"Aurelio",g:"boy",o:"latino",m:"dorado, resplandeciente"},
+  // ── BOY · español ──
+  {n:"Diego",g:"boy",o:"español",m:"el que suplanta"},
   {n:"Javier",g:"boy",o:"español",m:"casa nueva"},
-  {n:"Iván",g:"boy",o:"moderno",m:"Dios es misericordioso"},
+  {n:"Iker",g:"boy",o:"español",m:"visita"},
+  {n:"Unai",g:"boy",o:"español",m:"el único"},
+  {n:"Asier",g:"boy",o:"español",m:"el principio"},
+  {n:"Gorka",g:"boy",o:"español",m:"labrador"},
+  // ── BOY · germánico ──
+  {n:"Hugo",g:"boy",o:"germánico",m:"mente brillante"},
+  {n:"Álvaro",g:"boy",o:"germánico",m:"guardián de todos"},
   {n:"Bruno",g:"boy",o:"germánico",m:"armadura marrón"},
+  {n:"Carlos",g:"boy",o:"germánico",m:"hombre libre"},
+  {n:"Rodrigo",g:"boy",o:"germánico",m:"famoso guerrero"},
+  {n:"Fernando",g:"boy",o:"germánico",m:"atrevido en la paz"},
+  // ── BOY · inglés ──
   {n:"Oliver",g:"boy",o:"inglés",m:"árbol de olivo"},
   {n:"Liam",g:"boy",o:"inglés",m:"voluntad fuerte"},
+  {n:"Noah",g:"boy",o:"inglés",m:"descanso, paz"},
+  {n:"Ethan",g:"boy",o:"inglés",m:"fuerte, sólido"},
+  {n:"Owen",g:"boy",o:"inglés",m:"joven guerrero"},
+  // ── BOY · moderno ──
+  {n:"Iván",g:"boy",o:"moderno",m:"Dios es misericordioso"},
+  {n:"Axel",g:"boy",o:"moderno",m:"padre de la paz"},
+  {n:"Enzo",g:"boy",o:"moderno",m:"el que gobierna su hogar"},
+  {n:"Dylan",g:"boy",o:"moderno",m:"hijo del mar"},
+  {n:"Ian",g:"boy",o:"moderno",m:"Dios es bondadoso"},
+  {n:"Niko",g:"boy",o:"moderno",m:"pueblo victorioso"},
+
+  // ── NEUTRAL · hebreo ──
   {n:"Ariel",g:"neutral",o:"hebreo",m:"león de Dios"},
+  {n:"Eden",g:"neutral",o:"hebreo",m:"jardín del placer"},
+  {n:"Ari",g:"neutral",o:"hebreo",m:"leona de Dios"},
+  {n:"Amir",g:"neutral",o:"hebreo",m:"príncipe, cima"},
+  {n:"Tal",g:"neutral",o:"hebreo",m:"rocío del cielo"},
+  // ── NEUTRAL · clásico ──
   {n:"Alex",g:"neutral",o:"clásico",m:"defensor"},
   {n:"Nico",g:"neutral",o:"clásico",m:"victoria del pueblo"},
+  {n:"Andrea",g:"neutral",o:"clásico",m:"valiente"},
+  {n:"René",g:"neutral",o:"clásico",m:"renacido"},
+  {n:"Camil",g:"neutral",o:"clásico",m:"mensajero sagrado"},
+  // ── NEUTRAL · moderno ──
   {n:"Morgan",g:"neutral",o:"moderno",m:"brillante, del mar"},
   {n:"Sasha",g:"neutral",o:"moderno",m:"defensor del pueblo"},
   {n:"Kai",g:"neutral",o:"moderno",m:"mar"},
   {n:"Quinn",g:"neutral",o:"moderno",m:"descendiente del jefe"},
-  {n:"Rio",g:"neutral",o:"español",m:"río"},
-  {n:"Eden",g:"neutral",o:"hebreo",m:"jardín del placer"},
-  {n:"Ari",g:"neutral",o:"hebreo",m:"leona de Dios"},
-  {n:"Andrea",g:"neutral",o:"clásico",m:"valiente"},
-  {n:"Luca",g:"neutral",o:"latino",m:"portador de luz"},
   {n:"Noel",g:"neutral",o:"moderno",m:"día de Navidad"},
   {n:"Mika",g:"neutral",o:"moderno",m:"hermoso aroma"},
+  {n:"River",g:"neutral",o:"moderno",m:"río, fluir libre"},
+  {n:"Skylar",g:"neutral",o:"moderno",m:"estudioso del cielo"},
+  {n:"Remy",g:"neutral",o:"moderno",m:"remero, viajero"},
+  // ── NEUTRAL · español ──
+  {n:"Rio",g:"neutral",o:"español",m:"río"},
+  {n:"Cruz",g:"neutral",o:"español",m:"símbolo sagrado"},
+  {n:"Mar",g:"neutral",o:"español",m:"el mar"},
+  // ── NEUTRAL · latino ──
+  {n:"Luca",g:"neutral",o:"latino",m:"portador de luz"},
+  {n:"Reme",g:"neutral",o:"latino",m:"remedio"},
+  {n:"Vale",g:"neutral",o:"latino",m:"fuerte y sano"},
+  // ── NEUTRAL · germánico ──
+  {n:"Robin",g:"neutral",o:"germánico",m:"brillante de fama"},
+  {n:"Charlie",g:"neutral",o:"germánico",m:"hombre libre"},
+  // ── NEUTRAL · inglés ──
+  {n:"Avery",g:"neutral",o:"inglés",m:"gobernante de los elfos"},
+  {n:"Blake",g:"neutral",o:"inglés",m:"oscuro o brillante"},
+  {n:"Jordan",g:"neutral",o:"inglés",m:"fluir hacia abajo"},
+  // ── CALORRO 🔥 ──
+  {n:"Ulises",g:"boy",o:"calorro",m:"viajero legendario del barrio"},
+  {n:"Isra",g:"boy",o:"calorro",m:"el que lucha con Dios"},
+  {n:"Cristian",g:"boy",o:"calorro",m:"seguidor del Cristo"},
+  {n:"Noé",g:"boy",o:"calorro",m:"el que trae la paz"},
+  {n:"Moisés",g:"boy",o:"calorro",m:"salvado de las aguas"},
+  {n:"Rayan",g:"boy",o:"calorro",m:"puerta del paraíso"},
+  {n:"Yusuf",g:"boy",o:"calorro",m:"Dios aumentará"},
+  {n:"Brayan",g:"boy",o:"calorro",m:"noble y fuerte"},
+  {n:"Kevin",g:"boy",o:"calorro",m:"hermoso al nacer"},
+  {n:"Yeray",g:"boy",o:"calorro",m:"el grande"},
+  {n:"Yago",g:"boy",o:"calorro",m:"el que suplanta"},
+  {n:"Roi",g:"boy",o:"calorro",m:"rey"},
+  {n:"Josué",g:"boy",o:"calorro",m:"Dios es salvación"},
+  {n:"Abner",g:"boy",o:"calorro",m:"padre de la luz"},
+  {n:"Eloy",g:"boy",o:"calorro",m:"elegido"},
+  {n:"Jonay",g:"boy",o:"calorro",m:"la tierra del sol"},
+  {n:"Ayoub",g:"boy",o:"calorro",m:"el paciente"},
+  {n:"Neymar",g:"boy",o:"calorro",m:"estrella del barrio"},
+  {n:"Yasmine",g:"girl",o:"calorro",m:"flor de jazmín"},
+  {n:"Rocío",g:"girl",o:"calorro",m:"rocío de la mañana"},
+  {n:"Noelia",g:"girl",o:"calorro",m:"nacida en Navidad"},
+  {n:"Esmeralda",g:"girl",o:"calorro",m:"piedra preciosa verde"},
+  {n:"Milagros",g:"girl",o:"calorro",m:"llena de milagros"},
+  {n:"Yolanda",g:"girl",o:"calorro",m:"violeta, flor del campo"},
+  {n:"Salomé",g:"girl",o:"calorro",m:"la pacífica"},
+  {n:"Sheila",g:"girl",o:"calorro",m:"ciega, del cielo"},
+  {n:"Nazaret",g:"girl",o:"calorro",m:"del pueblo de Nazaret"},
+  {n:"Soraya",g:"girl",o:"calorro",m:"principesa de las estrellas"},
+  {n:"Leila",g:"girl",o:"calorro",m:"noche oscura y bella"},
+  {n:"Anabel",g:"girl",o:"calorro",m:"gracia y belleza"},
+  {n:"Estrella",g:"girl",o:"calorro",m:"la que brilla en la noche"},
+  {n:"Yaiza",g:"girl",o:"calorro",m:"del pueblo canario"},
+  {n:"Desirée",g:"girl",o:"calorro",m:"la deseada"},
+  {n:"Alejandra",g:"girl",o:"clásico",m:"defensora del pueblo"},
+  {n:"Valentín",g:"boy",o:"latino",m:"valiente y fuerte"},
+  {n:"Sebastiana",g:"girl",o:"clásico",m:"venerable"},
+  {n:"Maximilian",g:"boy",o:"clásico",m:"el más grande"},
+  {n:"Magdalena",g:"girl",o:"hebreo",m:"torre elevada"},
+  {n:"Bartolomé",g:"boy",o:"hebreo",m:"hijo del labrador"},
+  {n:"Theodora",g:"girl",o:"clásico",m:"don de Dios"},
+  {n:"Nathaniel",g:"boy",o:"hebreo",m:"regalo de Dios"},
+  {n:"Persephone",g:"girl",o:"griego",m:"reina del inframundo"},
+  {n:"Alejandro",g:"neutral",o:"clásico",m:"defensor del pueblo"},
+  {n:"Margarita",g:"girl",o:"griego",m:"perla preciosa"},
+  {n:"Guillermo",g:"boy",o:"germánico",m:"voluntad y protección"},
+  {n:"Esperanza",g:"girl",o:"español",m:"esperanza y fe"},
+  {n:"Celestino",g:"boy",o:"latino",m:"del cielo"},
+  {n:"Evangelina",g:"girl",o:"clásico",m:"portadora del evangelio"},
 ];
+
 
 const state = {
   roomCode: null,
   isHost: false,
+  isSolo: false,
   myId: 'u_' + Math.random().toString(36).slice(2,10),
   partnerConnected: false,
   queue: [],
@@ -948,7 +1187,7 @@ const state = {
   matches: [],
   filters: {gender:'all', origin:'all', length:'all', count:20},
   streak: 0,
-  streakType: null, // 'match' | 'nomatch'
+  streakType: null,
 };
 
 let realtimeWs = null;
@@ -1166,19 +1405,31 @@ function startFilterPoll() {
 }
 
 async function hostStartSwiping() {
-  try {
-    await dbDelete(state.roomCode, '__filters__');
-    await dbDelete(state.roomCode, '__done__');
-    await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
-  } catch(e) {}
-  lastFilterId = null;
-  clearInterval(donePollTimer);
+  if(!state.isSolo) {
+    try {
+      await dbDelete(state.roomCode, '__filters__');
+      await dbDelete(state.roomCode, '__done__');
+      await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
+    } catch(e) {}
+    lastFilterId = null;
+    clearInterval(donePollTimer);
+  }
   startSwiping();
 }
 
 async function startSwiping() {
   buildQueue();
   showScreen('swipe');
+  // ocultar elementos de pareja en modo solo
+  const partnerStatus = document.querySelector('.partner-status');
+  const partnerProgressWrap = document.getElementById('partner-progress-bar');
+  if(state.isSolo) {
+    if(partnerStatus) partnerStatus.style.display = 'none';
+    if(partnerProgressWrap) partnerProgressWrap.parentElement.style.display = 'none';
+  } else {
+    if(partnerStatus) partnerStatus.style.display = '';
+    if(partnerProgressWrap) partnerProgressWrap.parentElement.style.display = '';
+  }
   renderCards();
   clearInterval(partnerPollTimer);
   clearInterval(filterPollTimer);
@@ -1260,6 +1511,7 @@ function renderCards() {
 
 let donePollTimer = null;
 async function finishSwiping() {
+  if(state.isSolo) { finishSolo(); return; }
   // insertar __done__ para avisar a la pareja
   try { await dbInsert({room_code: state.roomCode, user_id: state.myId, name: '__done__', liked: false}); } catch(e) {}
   // comprobar si la pareja ya terminó
@@ -1407,8 +1659,8 @@ async function swipeCard(liked) {
   if(liked !== null) {
     state.myLikes[nm.n] = liked;
     if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
-    dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked});
-    if(liked && state.myLikes[nm.n] && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
+    if(!state.isSolo) dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked});
+    if(!state.isSolo && liked && state.myLikes[nm.n] && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
       isMatch = true;
       state.matches.push(nm.n);
     }
@@ -1660,7 +1912,7 @@ function closeConfirm() {
 }
 function goHome() {
   closeConfirm();
-  // desconectar sala completamente
+  state.isSolo = false;
   state.roomCode = null;
   state.partnerConnected = false;
   state.queue = [];
@@ -1668,6 +1920,8 @@ function goHome() {
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
+  state.streak = 0;
+  state.streakType = null;
   clearInterval(partnerPollTimer);
   if(realtimeWs) { try { realtimeWs.close(); } catch(e) {} realtimeWs = null; }
   document.getElementById('liked-count').textContent = '0';
