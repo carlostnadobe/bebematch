@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BebéMatch</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -495,7 +495,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v6.7</div>
+<div class="version-tag">v6.8</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -2077,11 +2077,23 @@ function generateQR(code) {
   if(!container) return;
   container.innerHTML = '';
   const url = `${location.origin}${location.pathname}?join=${code}`;
-  if(typeof QRCode !== 'undefined') {
-    QRCode.toCanvas(url, {width:140, margin:1, color:{dark:'#1a1a1a',light:'#ffffff'}}, (err, canvas)=>{
-      if(!err) container.appendChild(canvas);
-    });
-  }
+  const attempt = (tries) => {
+    if(typeof QRCode !== 'undefined') {
+      try {
+        new QRCode(container, {
+          text: url,
+          width: 140,
+          height: 140,
+          colorDark: '#1a1a1a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch(e) {}
+    } else if(tries > 0) {
+      setTimeout(()=>attempt(tries-1), 300);
+    }
+  };
+  attempt(10);
 }
 
 function showScreen(name) {
