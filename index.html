@@ -153,6 +153,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .btn-super .super-count{position:absolute;top:-4px;right:-4px;background:#22C55E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;line-height:1}
 .superlike-badge{background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border-radius:6px;padding:.2rem .55rem;font-size:.7rem;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:.02em}
 @keyframes superPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+/* SUPERMATCH */
+.supermatch-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#052e16 0%,#000 70%)}
+.supermatch-star{position:absolute;font-size:1.3rem;animation:starFall linear forwards;opacity:0}
+@keyframes starFall{0%{opacity:0;transform:translateY(-40px) scale(.3) rotate(0deg)}15%{opacity:1}85%{opacity:.8}100%{opacity:0;transform:translateY(110vh) scale(.9) rotate(540deg)}}
+.supermatch-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:#22C55E;margin:.6rem 0;font-weight:400;font-style:italic;letter-spacing:-.02em;animation:glowPulse 1.5s ease-in-out infinite}
+@keyframes glowPulse{0%,100%{text-shadow:0 0 30px rgba(34,197,94,.9),0 0 70px rgba(34,197,94,.5)}50%{text-shadow:0 0 60px #22C55E,0 0 120px rgba(74,222,128,.8),0 0 200px rgba(34,197,94,.3)}}
 @keyframes popYes{0%{transform:scale(1)}40%{transform:scale(1.35);box-shadow:0 6px 32px rgba(232,115,90,.6)}100%{transform:scale(1)}}
 @keyframes popNo{0%{transform:scale(1)}40%{transform:scale(1.3);border-color:rgba(255,107,107,.8);color:#FF6B6B}100%{transform:scale(1)}}
 
@@ -395,6 +401,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="40" onclick="togglePill(this,'count')">Largo (~40)</div>
     <div class="pill" data-v="80" onclick="togglePill(this,'count')">Muy largo (~80)</div>
   </div>
+  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Extras</p>
+  <div class="pill-row" id="super-pills">
+    <div class="pill" data-v="on" onclick="togglePillSuper(this)">⭐ SuperLikes</div>
+  </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
 </div>
@@ -465,6 +475,20 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
+<!-- SUPERMATCH -->
+<div class="screen" id="screen-supermatch" style="position:relative;overflow:hidden;background:#000">
+  <div class="supermatch-bg" id="supermatch-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center">
+    <div style="font-size:3.5rem;animation:pop .5s cubic-bezier(.34,1.56,.64,1)">⭐</div>
+    <p style="font-size:.9rem;color:#86EFAC;letter-spacing:.2em;text-transform:uppercase;margin:.5rem 0 0;font-family:'Inter',sans-serif;font-weight:600">¡Super Match!</p>
+    <div class="supermatch-name" id="supermatch-name-display">—</div>
+    <div style="display:flex;gap:.4rem;font-size:1.2rem;margin:.3rem 0 1.5rem;animation:float 2s ease-in-out infinite">⭐ 💚 ⭐ 💚 ⭐</div>
+    <p style="font-size:.9rem;color:#86EFAC;max-width:260px;margin-bottom:2rem;text-align:center">¡Los dos lo tenéis clarísimo! Este nombre es especial 🌟</p>
+    <button class="btn" onclick="continueAfterMatch()" style="width:280px;justify-content:center;margin-bottom:.75rem;background:#22C55E;color:#fff;border:none;box-shadow:0 4px 24px rgba(34,197,94,.4)">Seguir explorando ✨</button>
+    <button class="btn btn-outline" onclick="showLiked()" style="width:280px;justify-content:center;border-color:rgba(34,197,94,.4);color:#86EFAC">Ver todos los matches</button>
+  </div>
+</div>
+
 <!-- LIKED -->
 <div class="screen" id="screen-liked">
   <p class="title-serif">Vuestros matches 💞</p>
@@ -524,7 +548,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v8.3</div>
+<div class="version-tag">v8.6</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -1361,7 +1385,7 @@ const state = {
   superlikesLeft: 2,
   matches: [],
   superlikes: [],    // nombres que son superlike (míos o de pareja)
-  filters: {gender:'all', origin:'all', length:'all', count:20},
+  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false},
   streak: 0,
   streakType: null,
 };
@@ -1539,6 +1563,12 @@ function togglePill(el, group) {
   state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
 }
 
+function togglePillSuper(el) {
+  const on = !el.classList.contains('selected');
+  el.classList.toggle('selected', on);
+  state.filters.superlike = on;
+}
+
 function showSetup() {
   if(state.isHost) {
     showScreen('setup');
@@ -1596,10 +1626,13 @@ async function hostStartSwiping() {
 }
 
 async function startSwiping() {
-  state.superlikesLeft = 2;
+  state.superlikesLeft = state.filters.superlike ? 2 : 0;
   state.mySuperlikes = {};
   state.superlikes = [];
   updateSuperBtn();
+  // mostrar/ocultar botón superlike
+  const superBtn = document.getElementById('btn-super');
+  if(superBtn) superBtn.style.display = state.filters.superlike ? '' : 'none';
   buildQueue();
   showScreen('swipe');
   // ocultar elementos de pareja en modo solo
@@ -1889,6 +1922,10 @@ async function swipeCard(liked) {
       isMatch = true;
       state.matches.push(nm.n);
       if(!state.superlikes.includes(nm.n)) state.superlikes.push(nm.n);
+      // si la pareja también dio superlike → disparar animación de match
+      if(state.partnerLikes[nm.n] === 'super' || state.partnerLikes[nm.n]) {
+        isMatch = true; // ya está marcado, aseguramos que triggerMatch se llame
+      }
     } else if(!state.isSolo && liked && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
       isMatch = true;
       state.matches.push(nm.n);
@@ -1914,12 +1951,12 @@ async function swipeCard(liked) {
     setTimeout(()=>{
       state.currentIdx++;
       renderCards();
-      if(isMatch && !isSuper) triggerMatch(nm.n);
+      if(isMatch && (!isSuper || state.partnerLikes[nm.n])) triggerMatch(nm.n);
     }, 400);
   } else {
     state.currentIdx++;
     renderCards();
-    if(isMatch && !isSuper) triggerMatch(nm.n);
+    if(isMatch && (!isSuper || state.partnerLikes[nm.n])) triggerMatch(nm.n);
   }
 }
 
@@ -1974,9 +2011,12 @@ function checkMatch(name) {
     // pareja dio superlike → match automático
     state.matches.push(name);
     if(!state.superlikes.includes(name)) state.superlikes.push(name);
+    // si además yo también di superlike → animación de match doble
     const top = document.querySelector('.name-card.active');
-    if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
-    else triggerMatch(name);
+    if(iMySuper) {
+      if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
+      else triggerMatch(name);
+    }
   } else if(normalMatch && !state.matches.includes(name)) {
     state.matches.push(name);
     const top = document.querySelector('.name-card.active');
@@ -1994,18 +2034,38 @@ function toggleRush(on) {
 
 function triggerMatch(name) {
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
+  const isSuperMatch = state.mySuperlikes[name] && state.partnerSuperlikes[name];
   if(rushMode) {
-    // modo rush: toast rápido sin salir del swipe
     const toast = document.getElementById('rush-match-toast');
-    toast.textContent = `💞 ${name}`;
+    toast.textContent = `${isSuperMatch?'⭐':'💞'} ${name}`;
     toast.classList.remove('show');
     void toast.offsetWidth;
     toast.classList.add('show');
     setTimeout(()=>toast.classList.remove('show'), 800);
+  } else if(isSuperMatch) {
+    document.getElementById('supermatch-name-display').textContent = name;
+    spawnSuperMatchStars();
+    showScreen('supermatch');
   } else {
     document.getElementById('match-name-display').textContent = name;
     spawnHearts();
     showScreen('match');
+  }
+}
+
+function spawnSuperMatchStars() {
+  const bg = document.getElementById('supermatch-bg');
+  bg.innerHTML = '';
+  const emojis = ['⭐','🌟','💚','✨','💫','🟢'];
+  for(let i=0;i<30;i++){
+    const el = document.createElement('div');
+    el.className = 'supermatch-star';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = Math.random()*100+'%';
+    el.style.animationDuration = (2.5+Math.random()*3)+'s';
+    el.style.animationDelay = (Math.random()*2)+'s';
+    el.style.fontSize = (.8+Math.random()*1.2)+'rem';
+    bg.appendChild(el);
   }
 }
 
@@ -2218,7 +2278,7 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:20};
+  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
@@ -2228,6 +2288,7 @@ function restartFromSetup() {
   document.querySelector('#length-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
   document.querySelector('#count-pills .pill[data-v="20"]').classList.add('selected');
+  document.querySelectorAll('#super-pills .pill').forEach(p => p.classList.remove('selected'));
   if(state.isHost) {
     showScreen('setup');
   } else {
