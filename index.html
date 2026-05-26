@@ -386,18 +386,11 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
   </div>
-  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Longitud del nombre</p>
-  <div class="pill-row" id="length-pills">
-    <div class="pill selected" data-v="all" onclick="togglePill(this,'length')">Todos</div>
-    <div class="pill" data-v="short" onclick="togglePill(this,'length')">Corto ≤4</div>
-    <div class="pill" data-v="medium" onclick="togglePill(this,'length')">Medio 5–7</div>
-    <div class="pill" data-v="long" onclick="togglePill(this,'length')">Largo 8+</div>
-  </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
   <div class="pill-row" id="count-pills">
+    <div class="pill" data-v="5" onclick="togglePill(this,'count')">Flash (5)</div>
     <div class="pill selected" data-v="20" onclick="togglePill(this,'count')">Normal (~20)</div>
     <div class="pill" data-v="40" onclick="togglePill(this,'count')">Largo (~40)</div>
-    <div class="pill" data-v="80" onclick="togglePill(this,'count')">Muy largo (~80)</div>
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Extras</p>
   <div class="pill-row" id="super-pills">
@@ -503,8 +496,13 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%">
     <p class="title-serif" id="refine-summary-title">¡Afinado! 🎯</p>
     <p class="subtitle" id="refine-summary-sub">Los nombres que os gustan más</p>
-    <div class="liked-list" id="refine-summary-list" style="max-height:50vh"></div>
-    <button class="btn btn-primary" onclick="startRefineMode()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center" id="btn-refine-again">🎯 Afinar más</button>
+    <div class="liked-list" id="refine-summary-list" style="max-height:45vh"></div>
+    <div id="refine-pick-section" style="display:none;width:100%;max-width:300px;margin-top:1rem">
+      <p style="font-size:.8rem;color:var(--text2);text-align:center;margin-bottom:.6rem">¿Queréis elegir el ganador final? Pulsa el que más te guste:</p>
+      <div id="refine-pick-btns" style="display:flex;flex-direction:column;gap:.4rem"></div>
+      <p id="refine-pick-status" style="font-size:.75rem;color:var(--text3);text-align:center;margin-top:.6rem"></p>
+    </div>
+    <button class="btn btn-primary" id="btn-refine-again" onclick="startRefineMode()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">🎯 Afinar más</button>
     <button class="btn btn-secondary" onclick="shareMatches()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Compartir 💞</button>
     <button class="btn btn-secondary" onclick="showScreen('summary')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">← Volver al resumen</button>
   </div>
@@ -562,7 +560,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v9.3</div>
+<div class="version-tag">v9.7</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -1374,6 +1372,8 @@ const state = {
   isHost: false,
   isSolo: false,
   isRefining: false,
+  refineRound: 0,
+  refinePrefix: '',
   myId: 'u_' + Math.random().toString(36).slice(2,10),
   partnerConnected: false,
   queue: [],
@@ -1964,10 +1964,14 @@ async function swipeCard(liked) {
 
   let isMatch = false;
   if(liked !== null) {
-    state.myLikes[nm.n] = liked;
     if(isSuper) state.mySuperlikes[nm.n] = true;
     if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
-    if(!state.isSolo) dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked: isSuper ? 'super' : liked});
+    if(!state.isSolo) {
+      const voteKey = nm._refineKey || nm.n;
+      dbInsert({room_code: state.roomCode, user_id: state.myId, name: voteKey, liked: isSuper ? 'super' : liked});
+    }
+    // guardar like con la clave original del nombre para el estado local
+    state.myLikes[nm.n] = isSuper ? 'super' : liked;
     // superlike = match automático sin importar la pareja
     if(isSuper && !state.matches.includes(nm.n)) {
       isMatch = true;
@@ -2380,6 +2384,9 @@ function closeConfirm() {
 function goHome() {
   closeConfirm();
   state.isSolo = false;
+  state.isRefining = false;
+  state.refineRound = 0;
+  state.refinePrefix = '';
   state.roomCode = null;
   state.partnerConnected = false;
   state.queue = [];
@@ -2467,9 +2474,14 @@ function startRefineMode() {
     showToast('Necesitas al menos 2 matches para afinar');
     return;
   }
+  // incrementar ronda de afinado
+  state.refineRound = (state.refineRound || 0) + 1;
+  const prefix = `__r${state.refineRound}__`;
+
   // resetear estado para ronda de afinado
   state.isRefining = true;
-  state.isSolo = false; // juego de 2 jugadores
+  state.refinePrefix = prefix;
+  state.isSolo = false;
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
@@ -2478,10 +2490,12 @@ function startRefineMode() {
   state.partnerSuperlikes = {};
   state.streak = 0;
   state.streakType = null;
-  // cola = solo los matches anteriores
-  state.queue = matches.map(n => NAMES_DB.find(x=>x.n===n) || {n, g:'neutral', o:'', m:''});
+  // cola = solo los matches anteriores, con prefijo en el nombre interno para Supabase
+  state.queue = matches.map(n => {
+    const orig = NAMES_DB.find(x=>x.n===n) || {n, g:'neutral', o:'', m:''};
+    return {...orig, _refineKey: prefix + n}; // key único para Supabase
+  });
   state.currentIdx = 0;
-  // desactivar superlikes en afinado
   state.superlikesLeft = 0;
   const superBtn = document.getElementById('btn-super');
   if(superBtn) superBtn.style.display = 'none';
@@ -2489,10 +2503,7 @@ function startRefineMode() {
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('partner-progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = '💞 0 matches';
-  // insertar señal de nueva ronda de afinado en Supabase para sincronizar
-  if(state.roomCode) {
-    dbDelete(state.roomCode, '__done__').catch(()=>{});
-  }
+  if(state.roomCode) dbDelete(state.roomCode, '__done__').catch(()=>{});
   showScreen('swipe');
   renderCards();
   showToast(`Afinando ${matches.length} nombres 🎯`);
@@ -2526,22 +2537,29 @@ async function finishRefine() {
 }
 
 async function renderRefineResult() {
-  // sincronizar votos de pareja igual que showSummary
+  // sincronizar votos de pareja usando el prefijo de ronda
   if(state.roomCode) {
     try {
+      const prefix = state.refinePrefix || '';
       const votes = await dbFetchVotes(state.roomCode);
       state.partnerLikes = {};
-      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
-        state.partnerLikes[v.name] = v.liked;
+      for(const v of votes.filter(x => x.user_id !== state.myId && x.name !== '__presence__' && x.name !== '__filters__' && x.name !== '__done__')) {
+        // solo coger votos de esta ronda de afinado
+        if(prefix && v.name.startsWith(prefix)) {
+          const realName = v.name.slice(prefix.length);
+          state.partnerLikes[realName] = v.liked;
+        } else if(!prefix) {
+          state.partnerLikes[v.name] = v.liked;
+        }
       }
     } catch(e) {}
   }
-  // calcular nuevos matches (solo los que hicieron match en esta ronda de afinado)
+
+  // calcular nuevos matches (solo los que hicieron match en esta ronda)
   const refined = [];
   for(const [name, liked] of Object.entries(state.myLikes)) {
     if(liked && state.partnerLikes[name]) refined.push(name);
   }
-  // actualizar state.matches con los afinados para próxima ronda
   state.matches = refined;
 
   const list = document.getElementById('refine-summary-list');
@@ -2549,15 +2567,28 @@ async function renderRefineResult() {
   const title = document.getElementById('refine-summary-title');
   const sub = document.getElementById('refine-summary-sub');
   const refineAgainBtn = document.getElementById('btn-refine-again');
+  const pickSection = document.getElementById('refine-pick-section');
+  pickSection.style.display = 'none';
 
   if(refined.length === 0) {
     title.textContent = 'Sin matches nuevos 😅';
     sub.textContent = 'No coincidisteis en esta ronda';
     list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem;text-align:center">Inténtalo de nuevo con los nombres anteriores.</p>';
     if(refineAgainBtn) refineAgainBtn.style.display = 'none';
-  } else {
-    title.textContent = refined.length === 1 ? '¡El elegido! 🎯' : `${refined.length} afinados 🎯`;
-    sub.textContent = refined.length === 1 ? '¡Habéis encontrado vuestro nombre!' : 'Los que os gustan a los dos en esta ronda';
+  } else if(refined.length === 1) {
+    title.textContent = '🏆 ¡El elegido!';
+    sub.textContent = '¡Habéis encontrado vuestro nombre!';
+    const d = document.createElement('div');
+    d.className = 'liked-item';
+    d.style.borderColor = 'rgba(232,115,90,.4)';
+    d.style.background = 'rgba(232,115,90,.06)';
+    d.innerHTML = `<div class="liked-item-name" style="font-size:1.6rem;color:var(--salmon)">${refined[0]}</div><span style="font-size:1.5rem">🏆</span>`;
+    list.appendChild(d);
+    if(refineAgainBtn) refineAgainBtn.style.display = 'none';
+  } else if(refined.length <= 3) {
+    // 2-3 nombres: fase final — mostrar y ofrecer elección opcional
+    title.textContent = `🎯 ${refined.length} finalistas`;
+    sub.textContent = '¡Estos son los que más os gustan a los dos!';
     refined.forEach((name, i) => {
       const d = document.createElement('div');
       d.className = 'liked-item';
@@ -2569,11 +2600,106 @@ async function renderRefineResult() {
         <span style="font-size:1rem">🎯</span>`;
       list.appendChild(d);
     });
-    if(refineAgainBtn) refineAgainBtn.style.display = refined.length >= 2 ? '' : 'none';
+    if(refineAgainBtn) refineAgainBtn.style.display = 'none';
+    // ofrecer elección final opcional
+    pickSection.style.display = '';
+    setupFinalPick(refined);
+  } else {
+    title.textContent = `${refined.length} afinados 🎯`;
+    sub.textContent = 'Los que os gustan a los dos en esta ronda';
+    refined.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div class="liked-item-name">${name}</div>
+        </div>
+        <span style="font-size:1rem">🎯</span>`;
+      list.appendChild(d);
+    });
+    if(refineAgainBtn) refineAgainBtn.style.display = '';
   }
   state.isRefining = false;
   showScreen('summary-refine');
   if(refined.length >= 1) setTimeout(()=>launchRefineConfetti(), 400);
+}
+
+function setupFinalPick(names) {
+  const btns = document.getElementById('refine-pick-btns');
+  const status = document.getElementById('refine-pick-status');
+  btns.innerHTML = '';
+  state._finalPick = null;
+  state._partnerPick = null;
+  let pickPollTimer = null;
+
+  names.forEach(name => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-secondary';
+    b.style.cssText = 'justify-content:center;transition:all .2s';
+    b.textContent = name;
+    b.onclick = async () => {
+      if(state._finalPick) return; // ya elegiste
+      state._finalPick = name;
+      // marcar visualmente
+      btns.querySelectorAll('button').forEach(x => {
+        x.style.opacity = x.textContent === name ? '1' : '.35';
+        x.style.borderColor = x.textContent === name ? 'var(--salmon)' : '';
+        x.style.color = x.textContent === name ? 'var(--salmon)' : '';
+      });
+      status.textContent = 'Tu elección: ' + name + ' · esperando a tu pareja...';
+      // insertar en Supabase
+      if(state.roomCode) {
+        const key = `__pick__${state.refinePrefix}${name}`;
+        await dbInsert({room_code: state.roomCode, user_id: state.myId, name: key, liked: true}).catch(()=>{});
+      }
+      // poll para ver si la pareja ya eligió
+      clearInterval(pickPollTimer);
+      pickPollTimer = setInterval(async () => {
+        try {
+          const votes = await dbFetchVotes(state.roomCode);
+          const pickPrefix = `__pick__${state.refinePrefix}`;
+          const partnerPicks = votes.filter(v => v.user_id !== state.myId && v.name.startsWith(pickPrefix));
+          if(partnerPicks.length > 0) {
+            clearInterval(pickPollTimer);
+            state._partnerPick = partnerPicks[0].name.slice(pickPrefix.length);
+            showFinalPickResult(state._finalPick, state._partnerPick, names);
+          }
+        } catch(e) {}
+      }, 1500);
+    };
+    btns.appendChild(b);
+  });
+
+  // también poll por si la pareja elige primero
+  const prefix = `__pick__${state.refinePrefix}`;
+  const pickPollTimer2 = setInterval(async () => {
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      const partnerPicks = votes.filter(v => v.user_id !== state.myId && v.name.startsWith(prefix));
+      if(partnerPicks.length > 0 && state._finalPick) {
+        clearInterval(pickPollTimer2);
+        clearInterval(pickPollTimer);
+        state._partnerPick = partnerPicks[0].name.slice(prefix.length);
+        showFinalPickResult(state._finalPick, state._partnerPick, names);
+      } else if(partnerPicks.length > 0 && !state._finalPick) {
+        status.textContent = '¡Tu pareja ya eligió! Ahora tú...';
+      }
+    } catch(e) {}
+  }, 2000);
+}
+
+function showFinalPickResult(myPick, partnerPick, names) {
+  const btns = document.getElementById('refine-pick-btns');
+  const status = document.getElementById('refine-pick-status');
+  btns.innerHTML = '';
+  if(myPick === partnerPick) {
+    status.innerHTML = `🏆 ¡Los dos elegís <strong>${myPick}</strong>! ¡Ese es vuestro nombre!`;
+    status.style.color = 'var(--salmon)';
+    status.style.fontSize = '1rem';
+  } else {
+    status.innerHTML = `Tú: <strong>${myPick}</strong> · Tu pareja: <strong>${partnerPick}</strong><br><span style="color:var(--text3);font-size:.8rem">No coincidisteis — los dos gustáis de nombres diferentes 💞</span>`;
+  }
 }
 
 function launchRefineConfetti() {
