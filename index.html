@@ -252,7 +252,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- SETUP -->
 <div class="screen" id="screen-setup">
   <p class="title-serif">Antes de empezar</p>
-  <p class="subtitle">Elige qué nombres quieres ver</p>
+  <p class="subtitle" id="setup-subtitle">Elige qué nombres queréis ver</p>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-bottom:.5rem">Género</p>
   <div class="pill-row" id="gender-pills">
     <div class="pill selected" data-v="all" onclick="togglePill(this,'gender')">Todos</div>
@@ -269,7 +269,16 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
   </div>
-  <button class="btn btn-primary" onclick="startSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
+  <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
+  <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
+</div>
+
+<!-- WAITING FILTERS (para el que se une) -->
+<div class="screen" id="screen-waiting-filters">
+  <div class="status-bar"><div class="status-dot"></div><span>Esperando filtros...</span></div>
+  <p class="title-serif">Tu pareja está<br>eligiendo los nombres</p>
+  <p class="subtitle" style="margin-top:.5rem">En cuanto confirme empezaréis los dos a la vez</p>
+  <div class="waiting-anim"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 </div>
 
 <!-- SWIPE -->
@@ -331,7 +340,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v1.4</div>
+<div class="version-tag">v1.6</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -541,12 +550,13 @@ const NAMES_DB = [
 
 const state = {
   roomCode: null,
+  isHost: false,
   myId: 'u_' + Math.random().toString(36).slice(2,10),
   partnerConnected: false,
   queue: [],
   currentIdx: 0,
-  myLikes: {},       // name -> liked(bool)
-  partnerLikes: {},  // name -> liked(bool)
+  myLikes: {},
+  partnerLikes: {},
   matches: [],
   filters: {gender:'all', origin:'all'},
 };
@@ -635,6 +645,7 @@ function genCode() {
 
 async function createRoom() {
   setHomeLoading(true);
+  state.isHost = true;
   const code = genCode();
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
@@ -650,6 +661,7 @@ async function joinRoom() {
   if(code.length !== 4) { document.getElementById('join-error').textContent = 'El código debe tener 4 caracteres'; return; }
   document.getElementById('join-error').textContent = '';
   setHomeLoading(true);
+  state.isHost = false;
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
 
@@ -715,23 +727,60 @@ function togglePill(el, group) {
   state.filters[group] = el.dataset.v;
 }
 
-function showSetup() { showScreen('setup'); }
+function showSetup() {
+  if(state.isHost) {
+    showScreen('setup');
+  } else {
+    // el invitado espera los filtros del creador
+    showScreen('waiting-filters');
+    startFilterPoll();
+  }
+}
 
-function startSwiping() {
+let filterPollTimer = null;
+function startFilterPoll() {
+  clearInterval(filterPollTimer);
+  filterPollTimer = setInterval(async () => {
+    if(!state.roomCode) return;
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      const filterRecord = votes.find(v => v.name === '__filters__');
+      if(filterRecord) {
+        clearInterval(filterPollTimer);
+        try {
+          const filters = JSON.parse(filterRecord.user_id); // guardamos filtros en user_id por simplicidad
+          state.filters = filters;
+        } catch(e) {}
+        startSwiping();
+      }
+    } catch(e) {}
+  }, 1500);
+}
+
+async function hostStartSwiping() {
+  try {
+    await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
+  } catch(e) {}
+  startSwiping();
+}
+
+async function startSwiping() {
   buildQueue();
   showScreen('swipe');
   renderCards();
   clearInterval(partnerPollTimer);
-  // keep syncing partner votes silently
+  clearInterval(filterPollTimer);
   setInterval(async()=>{
     if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
-    const votes = await dbFetchVotes(state.roomCode);
-    for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__')) {
-      if(state.partnerLikes[v.name] === undefined) {
-        state.partnerLikes[v.name] = v.liked;
-        if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__')) {
+        if(state.partnerLikes[v.name] === undefined) {
+          state.partnerLikes[v.name] = v.liked;
+          if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
+        }
       }
-    }
+    } catch(e) {}
   }, 5000);
 }
 
