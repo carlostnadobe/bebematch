@@ -184,7 +184,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .egg-overlay.show .egg-close{opacity:1}
 .egg-close:hover{background:rgba(255,255,255,.18)}
 .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;pointer-events:none}
-.version-tag{position:fixed;bottom:.8rem;right:1rem;font-size:.65rem;color:var(--text3);letter-spacing:.06em;font-family:'Inter',sans-serif;font-weight:400;z-index:100;pointer-events:none}
 </style>
 </head>
 <body>
@@ -304,7 +303,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <button class="btn btn-secondary" onclick="showScreen('home')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
 </div>
 
-<div class="version-tag">v1.0</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -617,7 +615,7 @@ async function createRoom() {
   const code = genCode();
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
-  await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
+  try { await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false}); } catch(e) {}
   connectRealtime(code);
   startPartnerPoll();
   setHomeLoading(false);
@@ -632,7 +630,8 @@ async function joinRoom() {
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
 
-  const existing = await dbFetchVotes(code);
+  let existing = [];
+  try { existing = await dbFetchVotes(code); } catch(e) {}
   const otherUsers = existing.filter(v => v.user_id !== state.myId);
 
   if(existing.length === 0) {
@@ -642,7 +641,7 @@ async function joinRoom() {
     return;
   }
 
-  await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
+  try { await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false}); } catch(e) {}
 
   for(const v of otherUsers.filter(v => v.name !== '__presence__')) {
     state.partnerLikes[v.name] = v.liked;
@@ -667,20 +666,22 @@ function startPartnerPoll() {
   clearInterval(partnerPollTimer);
   partnerPollTimer = setInterval(async () => {
     if(!state.roomCode || state.partnerConnected) { clearInterval(partnerPollTimer); return; }
-    const votes = await dbFetchVotes(state.roomCode);
-    const partnerRecords = votes.filter(v => v.user_id !== state.myId);
-    if(partnerRecords.length > 0) {
-      clearInterval(partnerPollTimer);
-      state.partnerConnected = true;
-      updatePartnerDot(true);
-      for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
-        state.partnerLikes[v.name] = v.liked;
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      const partnerRecords = votes.filter(v => v.user_id !== state.myId);
+      if(partnerRecords.length > 0) {
+        clearInterval(partnerPollTimer);
+        state.partnerConnected = true;
+        updatePartnerDot(true);
+        for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
+          state.partnerLikes[v.name] = v.liked;
+        }
+        if(document.getElementById('screen-waiting').classList.contains('active')) {
+          document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
+          setTimeout(()=>showSetup(), 1200);
+        }
       }
-      if(document.getElementById('screen-waiting').classList.contains('active')) {
-        document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
-        setTimeout(()=>showSetup(), 1200);
-      }
-    }
+    } catch(e) {}
   }, 2000);
 }
 
@@ -957,6 +958,8 @@ function showLiked() {
 }
 
 function backToSwipe() { showScreen('swipe'); }
+
+function continueAfterMatch() { showScreen('swipe'); }
 
 function copyCode() {
   if(navigator.clipboard) navigator.clipboard.writeText(state.roomCode);
