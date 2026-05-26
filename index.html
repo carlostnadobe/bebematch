@@ -40,7 +40,8 @@ body.light{
 body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv01'}
 
 .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center}
-.screen.active{display:flex}
+.screen.active{display:flex;animation:screenIn .3s cubic-bezier(.25,.46,.45,.94)}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* HOME */
 .logo{font-family:'Instrument Serif',serif;font-size:3rem;color:var(--text);line-height:1;font-weight:400;letter-spacing:-.02em}
@@ -134,10 +135,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .action-btn:active{transform:scale(.9)}
 .btn-no{width:52px;height:52px;font-size:1.2rem;color:var(--salmon)}
 .btn-no:hover{background:var(--surface3);border-color:rgba(232,115,90,.3)}
+.btn-no.pop{animation:popNo .35s cubic-bezier(.34,1.56,.64,1)}
 .btn-yes{width:62px;height:62px;font-size:1.5rem;background:var(--salmon);color:#fff;border-color:transparent;box-shadow:0 4px 24px rgba(232,115,90,.3)}
 .btn-yes:hover{background:var(--salmon-dark);box-shadow:0 4px 28px rgba(232,115,90,.4)}
+.btn-yes.pop{animation:popYes .35s cubic-bezier(.34,1.56,.64,1)}
 .btn-skip{width:44px;height:44px;font-size:1rem;color:var(--text3)}
 .btn-skip:hover{background:var(--surface3);color:var(--text2)}
+@keyframes popYes{0%{transform:scale(1)}40%{transform:scale(1.35);box-shadow:0 6px 32px rgba(232,115,90,.6)}100%{transform:scale(1)}}
+@keyframes popNo{0%{transform:scale(1)}40%{transform:scale(1.3);border-color:rgba(255,107,107,.8);color:#FF6B6B}100%{transform:scale(1)}}
 
 /* MATCH */
 .match-explosion{font-size:3.5rem;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
@@ -174,20 +179,21 @@ body.light .btn-secondary{background:var(--surface3);color:var(--text);border-co
 body.light .btn-secondary:hover{background:var(--surface2)}
 
 /* EASTER EGG */
-.egg-btn{position:fixed;top:1.2rem;left:1.2rem;z-index:100;width:110px;height:40px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;gap:.4rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overflow:hidden;font-family:'Inter',sans-serif;color:var(--text2);font-weight:400;letter-spacing:.01em;touch-action:none}
+.egg-btn{position:fixed;top:1.2rem;left:1.2rem;z-index:100;width:52px;height:52px;border-radius:14px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overflow:hidden;touch-action:none}
 .egg-btn:hover{border-color:rgba(56,189,248,.5)}
 .egg-btn.shake{animation:eggshake .35s ease}
-@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.04)}75%{transform:rotate(3deg) scale(1.04)}}
-.egg-fill{position:absolute;top:0;left:-5%;width:0%;height:100%;pointer-events:none;background:#38BDF8;opacity:.7}
-.egg-fill::before{content:'';position:absolute;top:0;right:-10px;width:20px;height:100%;background:inherit;filter:blur(2px)}
-.egg-fill::after{content:'';position:absolute;top:-3px;right:-6px;width:12px;height:calc(100% + 6px);background:rgba(186,230,253,.6);border-radius:40%;animation:waveH 0.9s linear infinite}
-@keyframes waveH{0%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-3px) scaleX(1.3)}100%{transform:translateY(0) scaleX(1)}}
+@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg) scale(1.08)}75%{transform:rotate(4deg) scale(1.08)}}
+.egg-fill{position:absolute;bottom:0;left:0;width:100%;height:0%;pointer-events:none;background:#38BDF8;opacity:.75}
+.egg-fill::before{content:'';position:absolute;top:-8px;left:-10%;width:120%;height:16px;background:rgba(56,189,248,.9);border-radius:45%;animation:waveV 1s linear infinite}
+.egg-fill::after{content:'';position:absolute;top:-6px;left:-10%;width:120%;height:12px;background:rgba(186,230,253,.6);border-radius:45%;animation:waveV 1.3s linear infinite reverse}
+@keyframes waveV{0%{transform:translateX(0) scaleY(1)}50%{transform:translateX(-8%) scaleY(1.3)}100%{transform:translateX(0) scaleY(1)}}
 
 .egg-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
 .egg-overlay.show{opacity:1;pointer-events:all}
 .egg-box-wrap{position:relative;display:flex;flex-direction:column;align-items:center;transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease}
 .egg-overlay.show .egg-box-wrap{transform:scale(1);opacity:1}
-.egg-gift{font-size:5rem;animation:giftbounce 1s cubic-bezier(.34,1.56,.64,1) forwards;filter:drop-shadow(0 8px 24px rgba(232,115,90,.5))}
+.egg-gift{font-size:5rem;animation:giftbounce 1s cubic-bezier(.34,1.56,.64,1) forwards;filter:drop-shadow(0 8px 24px rgba(232,115,90,.5));cursor:pointer;transition:transform .15s}
+.egg-gift:hover{transform:scale(1.1)}
 @keyframes giftbounce{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.15) rotate(5deg)}80%{transform:scale(.95) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}
 .egg-lid{font-size:3.5rem;position:absolute;top:-2rem;left:50%;transform:translateX(-50%);animation:lidfly 0.6s .5s cubic-bezier(.25,.46,.45,.94) forwards;opacity:0}
 @keyframes lidfly{0%{transform:translateX(-50%) translateY(0) rotate(0);opacity:1}100%{transform:translateX(-50%) translateY(-120px) rotate(-35deg);opacity:0}}
@@ -195,9 +201,47 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .egg-overlay.show .egg-text{opacity:1;transform:translateY(0)}
 .egg-sub{font-size:.85rem;color:rgba(255,255,255,.5);margin-top:.4rem;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:all .4s ease 1s}
 .egg-overlay.show .egg-sub{opacity:1}
-.egg-close{margin-top:2rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:.5rem 1.4rem;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;opacity:0;transition:all .3s ease 1.2s}
+.egg-tap-hint{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.8rem;letter-spacing:.04em;opacity:0;transition:all .4s ease 1.4s;animation:blink2 2s ease-in-out infinite 2s}
+.egg-overlay.show .egg-tap-hint{opacity:1}
+@keyframes blink2{0%,100%{opacity:.3}50%{opacity:.8}}
+.egg-close{margin-top:1.5rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:.5rem 1.4rem;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;opacity:0;transition:all .3s ease 1.2s}
 .egg-overlay.show .egg-close{opacity:1}
 .egg-close:hover{background:rgba(255,255,255,.18)}
+
+/* EASTER EGG 2 — LAVA */
+.egg-btn2{position:fixed;top:5rem;left:1.2rem;z-index:100;width:52px;height:52px;border-radius:14px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overflow:hidden;touch-action:none}
+.egg-btn2:hover{border-color:rgba(251,146,60,.6)}
+.egg-btn2.shake{animation:eggshake .35s ease}
+.lava-fill{position:absolute;bottom:0;left:0;width:100%;height:0%;pointer-events:none;background:#EF4444;opacity:.85}
+.lava-fill::before{content:'';position:absolute;top:-8px;left:-10%;width:120%;height:16px;background:#F97316;border-radius:45%;animation:waveV 0.7s linear infinite}
+.lava-fill::after{content:'';position:absolute;top:-5px;left:-10%;width:120%;height:12px;background:#FCA5A5;border-radius:45%;animation:waveV 1s linear infinite reverse;opacity:.7}
+
+/* BUSCAMINAS */
+.mine-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+.mine-overlay.show{opacity:1;pointer-events:all}
+.mine-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem;transform:scale(.85);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);max-width:360px;width:90%}
+.mine-overlay.show .mine-wrap{transform:scale(1);opacity:1}
+.mine-title{font-family:'Instrument Serif',serif;font-size:1.8rem;color:#fff;font-style:italic}
+.mine-info{display:flex;gap:1.2rem;font-size:.8rem;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;letter-spacing:.04em}
+.mine-grid{display:grid;gap:3px;background:rgba(255,255,255,.06);padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.1)}
+.mine-cell{width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;transition:all .12s;user-select:none;font-family:'Inter',sans-serif;font-weight:600}
+.mine-cell:hover:not(.revealed):not(.flagged){background:var(--surface3)}
+.mine-cell.revealed{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.06);cursor:default}
+.mine-cell.flagged{background:rgba(251,146,60,.15);border-color:rgba(251,146,60,.4)}
+.mine-cell.boom{background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.5);animation:boomanim .3s ease}
+@keyframes boomanim{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+.mine-msg{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;font-style:italic;text-align:center;min-height:1.8rem}
+.mine-hint{font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;letter-spacing:.04em;text-align:center}
+.n1{color:#60A5FA}.n2{color:#4ADE80}.n3{color:#F87171}.n4{color:#A78BFA}.n5{color:#FB923C}.n6{color:#34D399}.n7{color:#F5F5F5}.n8{color:#9CA3AF}
+.game-wrap{display:none;flex-direction:column;align-items:center;gap:.8rem;width:100%;max-width:380px}
+.game-wrap.show{display:flex}
+.game-arena{position:relative;width:100%;height:280px;border-radius:12px;overflow:hidden;background:#FDF8F4;border:1px solid rgba(44,31,26,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none}
+.game-ground{position:absolute;bottom:54px;left:0;right:0;height:1.5px;background:rgba(44,31,26,.2)}
+.game-baby{position:absolute;font-size:36px;line-height:1;bottom:54px;left:40px;transition:none;user-select:none}
+.game-obstacle{position:absolute;font-size:30px;line-height:1;bottom:54px;user-select:none}
+.game-score{font-size:.8rem;color:rgba(255,255,255,.7);letter-spacing:.06em;font-family:'Inter',sans-serif}
+.game-msg{font-family:'Instrument Serif',serif;font-size:1.6rem;color:#fff;font-style:italic;text-align:center;min-height:2rem}
+.game-hint{font-size:.75rem;color:rgba(255,255,255,.5);font-family:'Inter',sans-serif;letter-spacing:.04em}
 .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;pointer-events:none}
 .version-tag{position:fixed;bottom:.8rem;right:1rem;font-size:.65rem;color:var(--text3);letter-spacing:.06em;font-family:'Inter',sans-serif;font-weight:400;z-index:100;pointer-events:none}
 </style>
@@ -206,20 +250,56 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
 <button class="egg-btn" id="egg-btn" title="">
   <div class="egg-fill" id="egg-fill"></div>
-  <span id="egg-baby" style="position:absolute;z-index:1;font-size:1.1rem;left:8px;transition:left .05s linear">👶</span>
+  <span id="egg-baby" style="position:relative;z-index:1">👶</span>
 </button>
+<button class="egg-btn2" id="egg-btn2" title="">
+  <div class="lava-fill" id="lava-fill"></div>
+  <span style="position:relative;z-index:1">👶🏾</span>
+</button>
+
+<!-- BUSCAMINAS OVERLAY -->
+<div class="mine-overlay" id="mine-overlay" onclick="closeMines()">
+  <div class="mine-wrap" onclick="event.stopPropagation()">
+    <div class="mine-title">👶🏾 Bebéminas</div>
+    <div class="mine-info">
+      <span>👶🏾 <span id="mine-count-left">0</span> bebés</span>
+      <span>⏱ <span id="mine-timer">0</span>s</span>
+      <span>🚩 click largo = bandera</span>
+    </div>
+    <div class="mine-grid" id="mine-grid"></div>
+    <div class="mine-msg" id="mine-msg"></div>
+    <div class="mine-hint">Encuentra todas las celdas seguras</div>
+    <div style="display:flex;gap:.5rem;margin-top:.3rem">
+      <button class="egg-close" onclick="startMines()" style="margin-top:0">Nueva partida</button>
+      <button class="egg-close" onclick="closeMines()" style="margin-top:0">cerrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- EASTER EGG OVERLAY -->
 <div class="egg-overlay" id="egg-overlay" onclick="closeEgg()">
-  <div class="egg-box-wrap" onclick="event.stopPropagation()">
+  <div class="egg-box-wrap" id="egg-box-wrap" onclick="event.stopPropagation()">
     <div style="position:relative;display:inline-block">
       <div class="egg-lid">🎀</div>
-      <div class="egg-gift" id="egg-gift">🎁</div>
+      <div class="egg-gift" id="egg-gift" onclick="openGift()">🎁</div>
     </div>
     <div class="egg-text">Martinsillo bebé!</div>
     <div class="egg-sub">el más especial del universo 🌟</div>
+    <div class="egg-tap-hint">toca el regalo para abrirlo ↑</div>
     <button class="egg-close" onclick="closeEgg()">cerrar</button>
   </div>
+
+  <div class="game-wrap" id="game-wrap" onclick="event.stopPropagation()">
+    <div class="game-msg" id="game-msg">¡Salta los obstáculos!</div>
+    <div class="game-score">puntos: <span id="game-score">0</span> &nbsp;·&nbsp; récord: <span id="game-best">0</span></div>
+    <div class="game-arena" id="game-arena">
+      <div class="game-ground"></div>
+      <div class="game-baby" id="game-baby">👶</div>
+    </div>
+    <div class="game-hint" id="game-hint">pulsa / toca para saltar</div>
+    <button class="egg-close" onclick="closeEgg()" style="margin-top:.5rem">cerrar</button>
+  </div>
+
   <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
 </div>
 
@@ -247,6 +327,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <button class="btn btn-outline" onclick="copyCode()" style="margin-bottom:1rem">📋 Copiar código</button>
   <div class="waiting-anim"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
   <p class="subtitle" style="margin-top:1rem">Comparte el código con tu pareja<br>para empezar juntos</p>
+  <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:1.5rem;width:100%;max-width:300px;justify-content:center;font-size:.82rem">← Volver al inicio</button>
 </div>
 
 <!-- SETUP -->
@@ -269,6 +350,19 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
   </div>
+  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Longitud del nombre</p>
+  <div class="pill-row" id="length-pills">
+    <div class="pill selected" data-v="all" onclick="togglePill(this,'length')">Todos</div>
+    <div class="pill" data-v="short" onclick="togglePill(this,'length')">Corto ≤4</div>
+    <div class="pill" data-v="medium" onclick="togglePill(this,'length')">Medio 5–7</div>
+    <div class="pill" data-v="long" onclick="togglePill(this,'length')">Largo 8+</div>
+  </div>
+  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
+  <div class="pill-row" id="count-pills">
+    <div class="pill" data-v="20" onclick="togglePill(this,'count')">Corto · 20</div>
+    <div class="pill selected" data-v="40" onclick="togglePill(this,'count')">Medio · 40</div>
+    <div class="pill" data-v="80" onclick="togglePill(this,'count')">Largo · 80</div>
+  </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
 </div>
@@ -290,8 +384,8 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="progress" style="max-width:400px;width:100%"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
   <div class="card-stack" id="card-stack"></div>
   <div class="action-btns">
-    <button class="action-btn btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
-    <button class="action-btn btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
+    <button class="action-btn btn-no" id="btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
+    <button class="action-btn btn-yes" id="btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
     <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
   </div>
   <button class="btn" style="font-size:.8rem;color:var(--text2);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
@@ -320,12 +414,15 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 </div>
 
 <!-- SUMMARY -->
-<div class="screen" id="screen-summary">
-  <p class="title-serif" id="summary-title">¡Habéis terminado! 🎉</p>
-  <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
-  <div class="liked-list" id="summary-list" style="max-height:55vh"></div>
-  <button class="btn btn-primary" onclick="restartFromSetup()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
-  <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
+<div class="screen" id="screen-summary" style="position:relative;overflow:hidden">
+  <canvas id="summary-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%">
+    <p class="title-serif" id="summary-title">¡Habéis terminado! 🎉</p>
+    <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
+    <div class="liked-list" id="summary-list" style="max-height:55vh"></div>
+    <button class="btn btn-primary" onclick="restartFromSetup()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
+    <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
+  </div>
 </div>
 
 <!-- CONFIRM HOME MODAL -->
@@ -340,7 +437,20 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v1.8</div>
+<!-- RESUME SALA MODAL -->
+<div id="resume-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem 1.5rem;max-width:300px;width:90%;text-align:center">
+    <p style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--text);margin-bottom:.5rem">¿Volver a tu sala?</p>
+    <p style="font-size:.82rem;color:var(--text2);margin-bottom:.3rem;line-height:1.6">Tenías una sala activa:</p>
+    <p id="resume-code" style="font-family:'Instrument Serif',serif;font-size:2rem;color:var(--salmon);letter-spacing:.2em;margin-bottom:1.5rem"></p>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn btn-secondary" onclick="closeResume()" style="flex:1">Nueva sala</button>
+      <button class="btn btn-primary" onclick="resumeRoom()" style="flex:1">Volver →</button>
+    </div>
+  </div>
+</div>
+
+<div class="version-tag">v3.8</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -349,64 +459,23 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
 /* ── EASTER EGG ── */
-let eggPressing = false, eggProgress = 0, eggRaf = null;
-const EGG_DURATION = 1500;
-let eggStart = null;
-
-function eggDown(e){
-  e.preventDefault();
-  eggPressing = true;
-  eggStart = performance.now();
-  eggRaf = requestAnimationFrame(eggFrame);
-  document.getElementById('egg-btn').classList.add('loading');
-}
-function eggUp(){
-  if(!eggPressing) return;
-  eggPressing = false;
-  cancelAnimationFrame(eggRaf);
-  if(eggProgress < 100){
-    eggProgress = 0;
-    document.getElementById('egg-fill').style.width = '0%';
-    const baby = document.getElementById('egg-baby');
-    baby.style.left = '8px';
-    baby.style.transform = '';
-    document.getElementById('egg-btn').classList.remove('loading','done');
-  }
-}
-function eggFrame(now){
-  if(!eggPressing) return;
-  eggProgress = Math.min(((now - eggStart) / EGG_DURATION) * 100, 100);
-  const fill = document.getElementById('egg-fill');
-  const baby = document.getElementById('egg-baby');
-  const btn = document.getElementById('egg-btn');
-  const btnW = btn.offsetWidth;
-  fill.style.width = eggProgress + '%';
-  const fillPx = (eggProgress / 100) * btnW;
-  const bobY = Math.sin(now * 0.008) * 2;
-  baby.style.left = Math.max(4, fillPx - 20) + 'px';
-  baby.style.transform = `translateY(${bobY}px)`;
-  if(eggProgress >= 100){
-    eggPressing = false;
-    document.getElementById('egg-btn').classList.add('done','shake');
-    setTimeout(()=>{
-      document.getElementById('egg-btn').classList.remove('loading','done','shake');
-      fill.style.width = '0%';
-      baby.style.left = '8px';
-      baby.style.transform = '';
-      eggProgress = 0;
-      openEgg();
-    }, 350);
-    return;
-  }
-  eggRaf = requestAnimationFrame(eggFrame);
-}
-
 const eggBtn = document.getElementById('egg-btn');
-eggBtn.addEventListener('mousedown', eggDown);
-eggBtn.addEventListener('touchstart', eggDown, {passive:false});
-eggBtn.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('mouseup', eggUp);
-document.addEventListener('touchend', eggUp);
+eggBtn.addEventListener('click', () => {
+  const fill = document.getElementById('egg-fill');
+  const btn = document.getElementById('egg-btn');
+  fill.style.transition = 'none';
+  fill.style.height = '0%';
+  void fill.offsetWidth;
+  fill.style.transition = 'height .6s cubic-bezier(.4,0,.2,1)';
+  fill.style.height = '100%';
+  btn.classList.add('shake');
+  setTimeout(()=>{
+    btn.classList.remove('shake');
+    fill.style.transition = 'none';
+    fill.style.height = '0%';
+    openEgg();
+  }, 650);
+});
 function openEgg(){
   const overlay = document.getElementById('egg-overlay');
   overlay.classList.add('show');
@@ -415,9 +484,18 @@ function openEgg(){
   document.getElementById('egg-gift').style.animation='';
   setTimeout(()=>launchConfetti(), 500);
 }
-function closeEgg(){
+function closeEgg() {
   document.getElementById('egg-overlay').classList.remove('show');
   stopConfetti();
+  stopGame();
+  // resetear para la próxima vez
+  setTimeout(()=>{
+    document.getElementById('egg-box-wrap').style.display = '';
+    document.getElementById('game-wrap').classList.remove('show');
+    document.getElementById('game-msg').textContent = '¡Salta los obstáculos!';
+    document.getElementById('game-score').textContent = '0';
+    document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
+  }, 300);
 }
 
 let confettiAnim = null, confettiActive = false;
@@ -470,6 +548,294 @@ function stopConfetti(){
   if(confettiAnim) cancelAnimationFrame(confettiAnim);
   const canvas = document.getElementById('confetti-canvas');
   canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+function openGift() {
+  document.getElementById('egg-box-wrap').style.display = 'none';
+  stopConfetti();
+  const gw = document.getElementById('game-wrap');
+  gw.classList.add('show');
+  initGame();
+}
+
+/* ── MINIJUEGO (DOM-based, sin canvas) ── */
+let gameLoop = null, gameOver = false;
+let babyY, babyVY, babyOnGround;
+let obstacles, gameFrame, gameSpd, gameBest = 0, gamePoints;
+let lastTime = 0;
+const ARENA_H = 220, GROUND_Y = 90, BABY_SIZE = 36, OBS_SIZE = 30;
+
+const OBS_EMOJIS = ['🧸','🍼','🧷','💩'];
+
+function initGame() {
+  const arena = document.getElementById('game-arena');
+  // limpiar obstáculos anteriores
+  arena.querySelectorAll('.game-obstacle').forEach(e=>e.remove());
+  resetGame();
+  arena.onclick = jump;
+  arena.addEventListener('touchstart', e=>{ e.preventDefault(); jump(); }, {passive:false});
+  document.addEventListener('keydown', onGameKey);
+  document.getElementById('game-msg').textContent = '¡Salta los obstáculos!';
+  document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
+  lastTime = performance.now();
+  gameLoop = requestAnimationFrame(gameStep);
+}
+
+function onGameKey(e) {
+  if(e.code==='Space'||e.code==='ArrowUp') { e.preventDefault(); jump(); }
+}
+
+function resetGame() {
+  babyY = 0;
+  babyVY = 0;
+  babyOnGround = true;
+  obstacles = [];
+  gameFrame = 0;
+  gameSpd = 4;
+  gamePoints = 0;
+  gameOver = false;
+  const baby = document.getElementById('game-baby');
+  if(baby){ baby.style.bottom = GROUND_Y + 'px'; baby.style.opacity = '1'; }
+  const arena = document.getElementById('game-arena');
+  if(arena) arena.querySelectorAll('.game-obstacle').forEach(e=>e.remove());
+  document.getElementById('game-score').textContent = '0';
+}
+
+function jump() {
+  if(gameOver) {
+    resetGame();
+    document.getElementById('game-msg').textContent = '';
+    document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
+    return;
+  }
+  if(babyOnGround) { babyVY = 12; babyOnGround = false; }
+}
+
+function gameStep(ts) {
+  if(!document.getElementById('game-wrap').classList.contains('show')) return;
+  if(gameOver) { gameLoop = requestAnimationFrame(gameStep); return; }
+
+  const dt = Math.min((ts - lastTime) / 16, 3);
+  lastTime = ts;
+
+  gameSpd = 4 + gamePoints * 0.005;
+
+  // baby physics
+  babyVY -= 0.7 * dt;
+  babyY += babyVY * dt;
+  if(babyY <= 0) { babyY = 0; babyVY = 0; babyOnGround = true; }
+
+  const baby = document.getElementById('game-baby');
+  if(baby) baby.style.bottom = (GROUND_Y + babyY) + 'px';
+
+  // spawn obstacles
+  gameFrame++;
+  const gap = Math.max(50, 90 - gamePoints * 0.3);
+  if(gameFrame % Math.floor(gap) === 0) {
+    const arena = document.getElementById('game-arena');
+    const el = document.createElement('div');
+    el.className = 'game-obstacle';
+    el.textContent = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)];
+    el.style.right = '-40px';
+    el.style.bottom = GROUND_Y + 'px';
+    arena.appendChild(el);
+    obstacles.push({el, x: arena.offsetWidth + 40});
+  }
+
+  // move & collision
+  const arena = document.getElementById('game-arena');
+  const arenaW = arena.offsetWidth || 360;
+  const BABY_LEFT = 40;
+
+  obstacles.forEach(o => {
+    o.x -= gameSpd * dt;
+    o.el.style.left = o.x + 'px';
+    o.el.style.right = 'auto';
+  });
+  obstacles = obstacles.filter(o => {
+    if(o.x < -50) { o.el.remove(); return false; }
+    return true;
+  });
+
+  // collision check
+  for(const o of obstacles) {
+    const bLeft = BABY_LEFT, bRight = BABY_LEFT + BABY_SIZE - 8;
+    const bBottom = babyY, bTop = babyY + BABY_SIZE;
+    const oLeft = o.x + 4, oRight = o.x + OBS_SIZE - 4;
+    const oBottom = 0, oTop = OBS_SIZE;
+    if(bRight > oLeft && bLeft < oRight && bTop > oBottom && bBottom < oTop) {
+      gameOver = true;
+      if(baby) baby.style.opacity = '0.4';
+      const sc = Math.floor(gamePoints / 6);
+      if(sc > gameBest) { gameBest = sc; document.getElementById('game-best').textContent = gameBest; }
+      document.getElementById('game-msg').textContent = sc > 10 ? '¡Imparable Martinsillo! 🏆' : '¡Auch! Inténtalo de nuevo 😅';
+      document.getElementById('game-hint').textContent = 'toca para reiniciar';
+      break;
+    }
+  }
+
+  gamePoints++;
+  if(gamePoints % 6 === 0) document.getElementById('game-score').textContent = Math.floor(gamePoints/6);
+
+  gameLoop = requestAnimationFrame(gameStep);
+}
+
+function stopGame() {
+  if(gameLoop) cancelAnimationFrame(gameLoop);
+  gameLoop = null;
+  gameOver = false;
+  document.removeEventListener('keydown', onGameKey);
+}
+
+/* ── EASTER EGG 2 — LAVA + BUSCAMINAS ── */
+const eggBtn2 = document.getElementById('egg-btn2');
+eggBtn2.addEventListener('click', () => {
+  const fill = document.getElementById('lava-fill');
+  const btn = document.getElementById('egg-btn2');
+  fill.style.transition = 'none';
+  fill.style.height = '0%';
+  void fill.offsetWidth;
+  fill.style.transition = 'height .6s cubic-bezier(.4,0,.2,1)';
+  fill.style.height = '100%';
+  btn.classList.add('shake');
+  setTimeout(()=>{
+    btn.classList.remove('shake');
+    fill.style.transition = 'none';
+    fill.style.height = '0%';
+    openMines();
+  }, 650);
+});
+
+/* ── BUSCAMINAS ── */
+const MINE_ROWS = 9, MINE_COLS = 9, MINE_COUNT = 10;
+let mineBoard = [], mineRevealed = [], mineFlagged = [], mineGameOver = false;
+let mineFirstClick = true, mineTimerInt = null, mineSeconds = 0, mineLeft = MINE_COUNT;
+
+function openMines() {
+  document.getElementById('mine-overlay').classList.add('show');
+  startMines();
+}
+
+function closeMines() {
+  document.getElementById('mine-overlay').classList.remove('show');
+  clearInterval(mineTimerInt);
+}
+
+function startMines() {
+  clearInterval(mineTimerInt);
+  mineGameOver = false;
+  mineFirstClick = true;
+  mineSeconds = 0;
+  mineLeft = MINE_COUNT;
+  mineBoard = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(0));
+  mineRevealed = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(false));
+  mineFlagged = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(false));
+  document.getElementById('mine-msg').textContent = '';
+  document.getElementById('mine-count-left').textContent = MINE_COUNT;
+  document.getElementById('mine-timer').textContent = '0';
+  renderMineGrid();
+}
+
+function placeMines(safeR, safeC) {
+  let placed = 0;
+  while(placed < MINE_COUNT) {
+    const r = Math.floor(Math.random()*MINE_ROWS);
+    const c = Math.floor(Math.random()*MINE_COLS);
+    if(mineBoard[r][c] === -1) continue;
+    if(Math.abs(r-safeR)<=1 && Math.abs(c-safeC)<=1) continue;
+    mineBoard[r][c] = -1;
+    placed++;
+  }
+  for(let r=0;r<MINE_ROWS;r++) for(let c=0;c<MINE_COLS;c++) {
+    if(mineBoard[r][c]===-1) continue;
+    let count=0;
+    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+      const nr=r+dr,nc=c+dc;
+      if(nr>=0&&nr<MINE_ROWS&&nc>=0&&nc<MINE_COLS&&mineBoard[nr][nc]===-1) count++;
+    }
+    mineBoard[r][c]=count;
+  }
+}
+
+function renderMineGrid() {
+  const grid = document.getElementById('mine-grid');
+  grid.style.gridTemplateColumns = `repeat(${MINE_COLS},34px)`;
+  grid.innerHTML = '';
+  for(let r=0;r<MINE_ROWS;r++) for(let c=0;c<MINE_COLS;c++){
+    const cell = document.createElement('div');
+    cell.className = 'mine-cell';
+    cell.dataset.r = r; cell.dataset.c = c;
+    if(mineRevealed[r][c]) {
+      cell.classList.add('revealed');
+      if(mineBoard[r][c]===-1) { cell.classList.add('boom'); cell.textContent='👶🏾'; }
+      else if(mineBoard[r][c]>0) { cell.textContent=mineBoard[r][c]; cell.classList.add('n'+mineBoard[r][c]); }
+    } else if(mineFlagged[r][c]) {
+      cell.classList.add('flagged'); cell.textContent='🚩';
+    }
+    cell.addEventListener('click', onMineClick);
+    cell.addEventListener('contextmenu', onMineFlag);
+    let pressTimer = null;
+    cell.addEventListener('touchstart', e=>{ pressTimer=setTimeout(()=>{ onMineFlag(e,r,c); pressTimer=null; },400); },{passive:true});
+    cell.addEventListener('touchend', ()=>{ if(pressTimer){ clearTimeout(pressTimer); } });
+    grid.appendChild(cell);
+  }
+}
+
+function onMineClick(e) {
+  if(mineGameOver) return;
+  const r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c;
+  if(mineFlagged[r][c]||mineRevealed[r][c]) return;
+  if(mineFirstClick) {
+    mineFirstClick=false;
+    placeMines(r,c);
+    mineTimerInt=setInterval(()=>{
+      mineSeconds++;
+      document.getElementById('mine-timer').textContent=mineSeconds;
+    },1000);
+  }
+  revealCell(r,c);
+  renderMineGrid();
+  checkMineWin();
+}
+
+function onMineFlag(e,r,c) {
+  e.preventDefault();
+  if(mineGameOver) return;
+  const row=r!==undefined?r:+e.currentTarget.dataset.r;
+  const col=c!==undefined?c:+e.currentTarget.dataset.c;
+  if(mineRevealed[row][col]) return;
+  mineFlagged[row][col]=!mineFlagged[row][col];
+  mineLeft+=mineFlagged[row][col]?-1:1;
+  document.getElementById('mine-count-left').textContent=mineLeft;
+  renderMineGrid();
+}
+
+function revealCell(r,c) {
+  if(r<0||r>=MINE_ROWS||c<0||c>=MINE_COLS) return;
+  if(mineRevealed[r][c]||mineFlagged[r][c]) return;
+  mineRevealed[r][c]=true;
+  if(mineBoard[r][c]===-1) {
+    mineGameOver=true;
+    clearInterval(mineTimerInt);
+    for(let rr=0;rr<MINE_ROWS;rr++) for(let cc=0;cc<MINE_COLS;cc++)
+      if(mineBoard[rr][cc]===-1) mineRevealed[rr][cc]=true;
+    document.getElementById('mine-msg').textContent='👶🏾 ¡Te encontraron! Inténtalo de nuevo';
+    return;
+  }
+  if(mineBoard[r][c]===0)
+    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) revealCell(r+dr,c+dc);
+}
+
+function checkMineWin() {
+  if(mineGameOver) return;
+  let unrevealed=0;
+  for(let r=0;r<MINE_ROWS;r++) for(let c=0;c<MINE_COLS;c++)
+    if(!mineRevealed[r][c]&&mineBoard[r][c]!==-1) unrevealed++;
+  if(unrevealed===0) {
+    mineGameOver=true;
+    clearInterval(mineTimerInt);
+    document.getElementById('mine-msg').textContent=`🏆 ¡Ganaste en ${mineSeconds}s!`;
+  }
 }
 
 function toggleTheme(){
@@ -558,7 +924,7 @@ const state = {
   myLikes: {},
   partnerLikes: {},
   matches: [],
-  filters: {gender:'all', origin:'all'},
+  filters: {gender:'all', origin:'all', length:'all', count:40},
 };
 
 let realtimeWs = null;
@@ -573,6 +939,13 @@ async function dbInsert(row) {
     body: JSON.stringify(row)
   });
   if(!r.ok) console.error('Insert error', await r.text());
+}
+
+async function dbDelete(roomCode, name) {
+  await fetch(SUPABASE_URL + '/rest/v1/votes?room_code=eq.' + encodeURIComponent(roomCode) + '&name=eq.' + encodeURIComponent(name), {
+    method:'DELETE',
+    headers: HEADERS
+  });
 }
 
 async function dbFetchVotes(roomCode) {
@@ -724,7 +1097,7 @@ function startPartnerPoll() {
 function togglePill(el, group) {
   document.getElementById(group+'-pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
-  state.filters[group] = el.dataset.v;
+  state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
 }
 
 function showSetup() {
@@ -759,6 +1132,7 @@ function startFilterPoll() {
 
 async function hostStartSwiping() {
   try {
+    await dbDelete(state.roomCode, '__filters__');
     await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
   } catch(e) {}
   startSwiping();
@@ -789,9 +1163,13 @@ function buildQueue() {
   let pool = [...NAMES_DB];
   if(state.filters.gender !== 'all') pool = pool.filter(n=>n.g===state.filters.gender);
   if(state.filters.origin !== 'all') pool = pool.filter(n=>n.o===state.filters.origin || n.o.includes(state.filters.origin));
+  if(state.filters.length === 'short') pool = pool.filter(n=>n.n.length <= 4);
+  else if(state.filters.length === 'medium') pool = pool.filter(n=>n.n.length >= 5 && n.n.length <= 7);
+  else if(state.filters.length === 'long') pool = pool.filter(n=>n.n.length >= 8);
   if(pool.length < 8) pool = [...NAMES_DB];
   pool.sort(()=>Math.random()-.5);
-  state.queue = pool;
+  const count = state.filters.count || 40;
+  state.queue = pool.slice(0, count);
   state.currentIdx = 0;
 }
 
@@ -921,6 +1299,17 @@ async function swipeCard(liked) {
   if(state.currentIdx >= state.queue.length) return;
   const nm = state.queue[state.currentIdx];
 
+  // animación del botón
+  if(liked === true) {
+    const b = document.getElementById('btn-yes');
+    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    setTimeout(()=>b.classList.remove('pop'), 400);
+  } else if(liked === false) {
+    const b = document.getElementById('btn-no');
+    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    setTimeout(()=>b.classList.remove('pop'), 400);
+  }
+
   let isMatch = false;
   if(liked !== null) {
     state.myLikes[nm.n] = liked;
@@ -1033,21 +1422,63 @@ function showSummary() {
     });
   }
   showScreen('summary');
+  if(state.matches.length >= 3) {
+    setTimeout(()=>launchSummaryConfetti(), 400);
+  }
+}
+
+function launchSummaryConfetti() {
+  const canvas = document.getElementById('summary-confetti');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const COLORS = ['#E8735A','#F4A261','#E9C46A','#2A9D8F','#A8DADC','#FFB4A2','#B5838D','#6D6875'];
+  const pieces = Array.from({length:80},()=>({
+    x:Math.random()*canvas.width, y:-20,
+    w:5+Math.random()*7, h:7+Math.random()*6,
+    r:Math.random()*Math.PI*2, dr:(Math.random()-.5)*.12,
+    vy:2+Math.random()*3, vx:(Math.random()-.5)*1.5,
+    color:COLORS[Math.floor(Math.random()*COLORS.length)], alpha:.9
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.y+=p.vy; p.x+=p.vx; p.r+=p.dr; p.alpha-=0.004;
+      if(p.alpha<=0) return;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.globalAlpha=p.alpha; ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,2); ctx.fill();
+      ctx.restore();
+    });
+    frame++;
+    if(frame<200) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
 }
 
 function restartFromSetup() {
-  // mantiene roomCode, partnerConnected y matches — solo resetea la ronda
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all'};
+  state.filters = {gender:'all', origin:'all', length:'all', count:40};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
-  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill, #length-pills .pill').forEach(p => p.classList.remove('selected'));
   document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
-  showScreen('setup');
+  document.querySelector('#length-pills .pill[data-v="all"]').classList.add('selected');
+  document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
+  document.querySelector('#count-pills .pill[data-v="40"]').classList.add('selected');
+  if(state.isHost) {
+    showScreen('setup');
+  } else {
+    showScreen('waiting-filters');
+    startFilterPoll();
+  }
 }
 
 function confirmGoHome() {
@@ -1073,6 +1504,7 @@ function goHome() {
   document.getElementById('match-count').innerHTML = '💞 0 matches';
   document.getElementById('join-code').value = '';
   document.getElementById('join-error').textContent = '';
+  localStorage.removeItem('bm_room');
   showScreen('home');
 }
 
@@ -1119,8 +1551,37 @@ function setHomeLoading(on) {
 
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
+  const screen = document.getElementById('screen-'+name);
+  screen.classList.add('active');
+  // guardar sala activa en localStorage
+  if(name === 'waiting' || name === 'setup' || name === 'swipe') {
+    if(state.roomCode) localStorage.setItem('bm_room', state.roomCode);
+  }
+  if(name === 'home') localStorage.removeItem('bm_room');
 }
+
+/* ── RESUME SALA ── */
+function checkResumeRoom() {
+  const saved = localStorage.getItem('bm_room');
+  if(saved && !state.roomCode) {
+    document.getElementById('resume-code').textContent = saved;
+    document.getElementById('resume-overlay').style.display = 'flex';
+  }
+}
+function closeResume() {
+  document.getElementById('resume-overlay').style.display = 'none';
+  localStorage.removeItem('bm_room');
+}
+async function resumeRoom() {
+  const code = localStorage.getItem('bm_room');
+  closeResume();
+  if(!code) return;
+  document.getElementById('join-code').value = code;
+  await joinRoom();
+}
+
+// comprobar al cargar
+checkResumeRoom();
 </script>
 </body>
 </html>
