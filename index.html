@@ -385,8 +385,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="inglés" onclick="togglePill(this,'origin')">Inglés</div>
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
-    <div class="pill" data-v="calorro" onclick="togglePill(this,'origin')">🔥 Calorro</div>
-    <div class="pill" data-v="sudamerica" onclick="togglePill(this,'origin')">🌎 Sudamérica Fusión</div>
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Longitud del nombre</p>
   <div class="pill-row" id="length-pills">
@@ -403,7 +401,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Extras</p>
   <div class="pill-row" id="super-pills">
-    <div class="pill" data-v="on" onclick="togglePillSuper(this)">⭐ SuperLikes</div>
+    <div class="pill" data-v="calorro" onclick="togglePillExtra(this,'calorro')">🔥 Calorro</div>
+    <div class="pill" data-v="sudamerica" onclick="togglePillExtra(this,'sudamerica')">🌎 Sudamérica Fusión</div>
+    <div class="pill" data-v="superlike" onclick="togglePillExtra(this,'superlike')">⭐ SuperLikes</div>
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
@@ -562,7 +562,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v8.7</div>
+<div class="version-tag">v9.1</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -1400,7 +1400,7 @@ const state = {
   superlikesLeft: 2,
   matches: [],
   superlikes: [],    // nombres que son superlike (míos o de pareja)
-  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false},
+  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false},
   streak: 0,
   streakType: null,
 };
@@ -1578,10 +1578,46 @@ function togglePill(el, group) {
   state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
 }
 
-function togglePillSuper(el) {
+function togglePillExtra(el, key) {
   const on = !el.classList.contains('selected');
   el.classList.toggle('selected', on);
-  state.filters.superlike = on;
+
+  if(key === 'superlike') {
+    state.filters.superlike = on;
+  } else if(key === 'calorro') {
+    state.filters.calorro = on;
+    if(on) {
+      // excluir sudamerica y resetear origen
+      state.filters.sudamerica = false;
+      state.filters.origin = 'all';
+      document.querySelector('#super-pills .pill[data-v="sudamerica"]').classList.remove('selected');
+      document.querySelectorAll('#origin-pills .pill').forEach(p => p.classList.remove('selected'));
+      document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
+    }
+  } else if(key === 'sudamerica') {
+    state.filters.sudamerica = on;
+    if(on) {
+      // excluir calorro y resetear origen
+      state.filters.calorro = false;
+      state.filters.origin = 'all';
+      document.querySelector('#super-pills .pill[data-v="calorro"]').classList.remove('selected');
+      document.querySelectorAll('#origin-pills .pill').forEach(p => p.classList.remove('selected'));
+      document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
+    }
+  }
+}
+
+function togglePill(el, group) {
+  document.getElementById(group+'-pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
+  // si se selecciona un origen específico, desactivar calorro y sudamerica
+  if(group === 'origin' && el.dataset.v !== 'all') {
+    state.filters.calorro = false;
+    state.filters.sudamerica = false;
+    document.querySelector('#super-pills .pill[data-v="calorro"]').classList.remove('selected');
+    document.querySelector('#super-pills .pill[data-v="sudamerica"]').classList.remove('selected');
+  }
 }
 
 function showSetup() {
@@ -1681,19 +1717,28 @@ async function startSwiping() {
 
 /* ── QUEUE ── */
 function buildQueue() {
-  let pool = [...NAMES_DB];
+  let pool;
 
-  // filtro género
+  // calorro y sudamerica son modos exclusivos
+  if(state.filters.calorro) {
+    pool = NAMES_DB.filter(n => n.o === 'calorro');
+  } else if(state.filters.sudamerica) {
+    pool = NAMES_DB.filter(n => n.o === 'sudamerica');
+  } else {
+    // pool normal sin calorro ni sudamerica
+    pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
+    // filtro origen estándar
+    if(state.filters.origin !== 'all') {
+      pool = pool.filter(n => n.o === state.filters.origin);
+    }
+  }
+
+  // filtro género (aplica siempre)
   if(state.filters.gender !== 'all') {
     pool = pool.filter(n => n.g === state.filters.gender);
   }
 
-  // filtro origen — comparación exacta
-  if(state.filters.origin !== 'all') {
-    pool = pool.filter(n => n.o === state.filters.origin);
-  }
-
-  // filtro longitud — normalizar Unicode para contar correctamente
+  // filtro longitud
   const nameLen = n => [...n.n.normalize('NFC')].length;
   if(state.filters.length === 'short') {
     pool = pool.filter(n => nameLen(n) <= 4);
@@ -1703,15 +1748,20 @@ function buildQueue() {
     pool = pool.filter(n => nameLen(n) >= 8);
   }
 
-  // si combinación de filtros deja muy pocos, relajar solo longitud
-  if(pool.length < 5) pool = [...NAMES_DB].filter(n => {
-    if(state.filters.gender !== 'all' && n.g !== state.filters.gender) return false;
-    if(state.filters.origin !== 'all' && n.o !== state.filters.origin) return false;
-    return true;
-  });
+  // fallback si quedan muy pocos — relajar longitud pero mantener modo
+  if(pool.length < 5) {
+    if(state.filters.calorro) {
+      pool = NAMES_DB.filter(n => n.o === 'calorro');
+    } else if(state.filters.sudamerica) {
+      pool = NAMES_DB.filter(n => n.o === 'sudamerica');
+    } else {
+      pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
+      if(state.filters.origin !== 'all') pool = pool.filter(n => n.o === state.filters.origin);
+    }
+    if(state.filters.gender !== 'all') pool = pool.filter(n => n.g === state.filters.gender);
+  }
 
-  // si sigue siendo vacío, usar todo
-  if(pool.length === 0) pool = [...NAMES_DB];
+  if(pool.length === 0) pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
 
   // ordenar con seed determinista para que ambos jugadores vean los mismos nombres
   const seed = state.filters._seed;
@@ -1750,7 +1800,7 @@ function renderCards() {
 
 let donePollTimer = null;
 async function finishSwiping() {
-  if(state.isSolo && state.isRefining) { finishRefine(); return; }
+  if(state.isRefining) { finishRefine(); return; }
   if(state.isSolo) { finishSolo(); return; }
   // insertar __done__ para avisar a la pareja
   try { await dbInsert({room_code: state.roomCode, user_id: state.myId, name: '__done__', liked: false}); } catch(e) {}
@@ -2134,30 +2184,44 @@ function showSummary() {
     try {
       const votes = await dbFetchVotes(state.roomCode);
       // sincronizar votos de la pareja
+      state.partnerLikes = {};
+      state.partnerSuperlikes = {};
       for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
         state.partnerLikes[v.name] = v.liked;
         if(v.liked === 'super') state.partnerSuperlikes[v.name] = true;
       }
-      // recalcular matches y superlikes completos
-      state.matches = [];
-      state.superlikes = [];
-      // mis superlikes
-      for(const [name] of Object.entries(state.mySuperlikes)) {
-        if(!state.superlikes.includes(name)) state.superlikes.push(name);
-        if(!state.matches.includes(name)) state.matches.push(name);
-      }
-      // superlikes de la pareja
-      for(const [name] of Object.entries(state.partnerSuperlikes)) {
-        if(!state.superlikes.includes(name)) state.superlikes.push(name);
-        if(!state.matches.includes(name)) state.matches.push(name);
-      }
-      // matches normales (ambos dieron like, no superlike)
-      for(const [name, liked] of Object.entries(state.myLikes)) {
-        if(liked && state.partnerLikes[name] && !state.matches.includes(name)) {
-          state.matches.push(name);
-        }
-      }
     } catch(e) {}
+
+    // recalcular todo desde cero
+    state.matches = [];
+    state.superlikes = [];
+
+    const allNames = new Set([
+      ...Object.keys(state.myLikes),
+      ...Object.keys(state.partnerLikes)
+    ]);
+
+    for(const name of allNames) {
+      const myVote = state.myLikes[name];       // true, 'super', o undefined
+      const partnerVote = state.partnerLikes[name]; // true, 'super', o undefined
+      const iMySuper = myVote === 'super' || state.mySuperlikes[name];
+      const iPartnerSuper = partnerVote === 'super' || state.partnerSuperlikes[name];
+      const iMyLiked = !!myVote;
+      const iPartnerLiked = !!partnerVote;
+
+      // superlike de uno → match automático (con o sin el otro)
+      if(iMySuper || iPartnerSuper) {
+        if(!state.matches.includes(name)) state.matches.push(name);
+        if(!state.superlikes.includes(name)) state.superlikes.push(name);
+        // registrar superlikes para el display
+        if(iMySuper) state.mySuperlikes[name] = true;
+        if(iPartnerSuper) state.partnerSuperlikes[name] = true;
+      } else if(iMyLiked && iPartnerLiked) {
+        // match normal
+        if(!state.matches.includes(name)) state.matches.push(name);
+      }
+    }
+
     renderSummary();
   })();
 }
@@ -2175,31 +2239,39 @@ function renderSummary() {
     .filter(([name, liked]) => liked && !state.myLikes[name])
     .map(([name]) => name);
 
-  // superlikes arriba del todo
+  // superlikes arriba del todo — separados en 3 categorías
   if(state.superlikes.length > 0) {
-    const sl = document.createElement('div');
-    sl.style.cssText = 'width:100%;margin-bottom:.8rem';
-    sl.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;font-family:'Inter',sans-serif;font-weight:600">⭐ SuperLikes</p>`;
-    state.superlikes.forEach(name => {
-      const isMine = state.mySuperlikes[name];
-      const isPartner = state.partnerSuperlikes[name];
-      const who = isMine && isPartner ? 'SuperLike de los dos 🤩' : isMine ? 'Tu SuperLike ⭐' : 'SuperLike de tu pareja ⭐';
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.style.borderColor = 'rgba(34,197,94,.35)';
-      d.style.background = 'rgba(34,197,94,.06)';
-      d.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <span style="font-size:1rem">⭐</span>
-          <div>
-            <div class="liked-item-name" style="color:#22C55E">${name}</div>
-            <div class="liked-item-sub">${who}</div>
+    const mutual = state.superlikes.filter(n => state.mySuperlikes[n] && state.partnerSuperlikes[n]);
+    const onlyMeSuper = state.superlikes.filter(n => state.mySuperlikes[n] && !state.partnerSuperlikes[n]);
+    const onlyPartnerSuper = state.superlikes.filter(n => !state.mySuperlikes[n] && state.partnerSuperlikes[n]);
+
+    const addSuperSection = (names, label, sub, icon) => {
+      if(names.length === 0) return;
+      const sl = document.createElement('div');
+      sl.style.cssText = 'width:100%;margin-bottom:.7rem';
+      sl.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif;font-weight:600">${icon} ${label}</p>`;
+      names.forEach(name => {
+        const d = document.createElement('div');
+        d.className = 'liked-item';
+        d.style.borderColor = 'rgba(34,197,94,.35)';
+        d.style.background = 'rgba(34,197,94,.06)';
+        d.innerHTML = `
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <span style="font-size:1rem">${icon}</span>
+            <div>
+              <div class="liked-item-name" style="color:#22C55E">${name}</div>
+              <div class="liked-item-sub">${sub}</div>
+            </div>
           </div>
-        </div>
-        <span class="superlike-badge">⭐ Super</span>`;
-      sl.appendChild(d);
-    });
-    list.appendChild(sl);
+          <span class="superlike-badge">${icon} Super</span>`;
+        sl.appendChild(d);
+      });
+      list.appendChild(sl);
+    };
+
+    addSuperSection(mutual, 'SuperMatch mutuo', 'Los dos dais ⭐ — clarísimo 🤩', '⭐');
+    addSuperSection(onlyMeSuper, 'Tu SuperLike', 'Tú diste ⭐ — tu pareja no', '💚');
+    addSuperSection(onlyPartnerSuper, 'SuperLike de tu pareja', 'Tu pareja dio ⭐ — tú no', '🌟');
   }
 
   const normalMatches = state.matches.filter(n => !state.superlikes.includes(n));
@@ -2294,7 +2366,7 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false};
+  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
@@ -2409,52 +2481,98 @@ function startRefineMode() {
     showToast('Necesitas al menos 2 matches para afinar');
     return;
   }
-  // guardar el queue original y resetear para jugar solo con matches
-  state._prevQueue = state.queue;
-  state._prevIdx = state.currentIdx;
-  state._prevMyLikes = {...state.myLikes};
+  // resetear estado para ronda de afinado
   state.isRefining = true;
+  state.isSolo = false; // juego de 2 jugadores
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
   state.superlikes = [];
   state.mySuperlikes = {};
+  state.partnerSuperlikes = {};
   state.streak = 0;
   state.streakType = null;
-  // construir queue solo con los matches
+  // cola = solo los matches anteriores
   state.queue = matches.map(n => NAMES_DB.find(x=>x.n===n) || {n, g:'neutral', o:'', m:''});
   state.currentIdx = 0;
-  state.isSolo = true;
+  // desactivar superlikes en afinado
   state.superlikesLeft = 0;
+  const superBtn = document.getElementById('btn-super');
+  if(superBtn) superBtn.style.display = 'none';
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('partner-progress-bar').style.width = '0%';
-  const superBtn = document.getElementById('btn-super');
-  if(superBtn) superBtn.style.display = 'none';
+  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  // insertar señal de nueva ronda de afinado en Supabase para sincronizar
+  if(state.roomCode) {
+    dbDelete(state.roomCode, '__done__').catch(()=>{});
+  }
   showScreen('swipe');
-  const ps = document.querySelector('.partner-status');
-  if(ps) ps.style.display = 'none';
   renderCards();
   showToast(`Afinando ${matches.length} nombres 🎯`);
 }
 
-function finishRefine() {
-  const liked = Object.entries(state.myLikes).filter(([,v])=>v).map(([k])=>k);
+async function finishRefine() {
+  // mismo flujo que finishSwiping normal — esperar a la pareja
+  if(state.roomCode) {
+    try { await dbInsert({room_code: state.roomCode, user_id: state.myId, name: '__done__', liked: false}); } catch(e) {}
+    let partnerDone = false;
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      partnerDone = votes.some(v => v.user_id !== state.myId && v.name === '__done__');
+    } catch(e) {}
+    if(!partnerDone) {
+      showScreen('waiting-summary');
+      clearInterval(donePollTimer);
+      donePollTimer = setInterval(async () => {
+        try {
+          const votes = await dbFetchVotes(state.roomCode);
+          if(votes.some(v => v.user_id !== state.myId && v.name === '__done__')) {
+            clearInterval(donePollTimer);
+            renderRefineResult();
+          }
+        } catch(e) {}
+      }, 2000);
+      return;
+    }
+  }
+  renderRefineResult();
+}
+
+async function renderRefineResult() {
+  // sincronizar votos de pareja igual que showSummary
+  if(state.roomCode) {
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      state.partnerLikes = {};
+      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
+        state.partnerLikes[v.name] = v.liked;
+      }
+    } catch(e) {}
+  }
+  // calcular nuevos matches (solo los que hicieron match en esta ronda de afinado)
+  const refined = [];
+  for(const [name, liked] of Object.entries(state.myLikes)) {
+    if(liked && state.partnerLikes[name]) refined.push(name);
+  }
+  // actualizar state.matches con los afinados para próxima ronda
+  state.matches = refined;
+
   const list = document.getElementById('refine-summary-list');
   list.innerHTML = '';
   const title = document.getElementById('refine-summary-title');
   const sub = document.getElementById('refine-summary-sub');
   const refineAgainBtn = document.getElementById('btn-refine-again');
 
-  if(liked.length === 0) {
-    title.textContent = '¡Afinado! 😅';
-    sub.textContent = 'Ninguno superó el corte esta vez';
-    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem;text-align:center">Prueba de nuevo con los matches originales.</p>';
+  if(refined.length === 0) {
+    title.textContent = 'Sin matches nuevos 😅';
+    sub.textContent = 'No coincidisteis en esta ronda';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem;text-align:center">Inténtalo de nuevo con los nombres anteriores.</p>';
     if(refineAgainBtn) refineAgainBtn.style.display = 'none';
   } else {
-    title.textContent = `${liked.length} favorito${liked.length>1?'s':''} afinado${liked.length>1?'s':''}! 🎯`;
-    sub.textContent = liked.length > 1 ? 'Los que más os gustan' : '¡El elegido!';
-    liked.forEach((name, i) => {
+    title.textContent = refined.length === 1 ? '¡El elegido! 🎯' : `${refined.length} afinados 🎯`;
+    sub.textContent = refined.length === 1 ? '¡Habéis encontrado vuestro nombre!' : 'Los que os gustan a los dos en esta ronda';
+    refined.forEach((name, i) => {
       const d = document.createElement('div');
       d.className = 'liked-item';
       d.innerHTML = `
@@ -2465,15 +2583,11 @@ function finishRefine() {
         <span style="font-size:1rem">🎯</span>`;
       list.appendChild(d);
     });
-    // actualizar matches para la siguiente ronda de afinado
-    state.matches = liked;
-    if(refineAgainBtn) refineAgainBtn.style.display = liked.length >= 2 ? '' : 'none';
+    if(refineAgainBtn) refineAgainBtn.style.display = refined.length >= 2 ? '' : 'none';
   }
-  // restaurar estado
-  state.isSolo = false;
   state.isRefining = false;
   showScreen('summary-refine');
-  if(liked.length >= 2) setTimeout(()=>launchRefineConfetti(), 400);
+  if(refined.length >= 1) setTimeout(()=>launchRefineConfetti(), 400);
 }
 
 function launchRefineConfetti() {
@@ -2488,7 +2602,7 @@ function launchRefineConfetti() {
   draw();
 }
 
-function continueAfterMatch() { showScreen(state.isRefining ? 'swipe' : 'swipe'); }
+function continueAfterMatch() { showScreen('swipe'); }
 
 function copyCode() {
   if(navigator.clipboard) navigator.clipboard.writeText(state.roomCode);
