@@ -304,7 +304,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <button class="btn btn-secondary" onclick="showScreen('home')" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
 </div>
 
-<div class="version-tag">v1.0</div>
+<div class="version-tag">v1.2</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -546,44 +546,38 @@ async function dbFetchVotes(roomCode) {
 
 /* ── SUPABASE REALTIME ── */
 function connectRealtime(roomCode) {
-  const wsUrl = 'wss://myakshqgodbvwnbnvjjn.supabase.co/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
-  realtimeWs = new WebSocket(wsUrl);
+  try {
+    const wsUrl = 'wss://myakshqgodbvwnbnvjjn.supabase.co/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
+    realtimeWs = new WebSocket(wsUrl);
 
-  realtimeWs.onopen = () => {
-    realtimeWs.send(JSON.stringify({
-      topic: 'realtime:public:votes:room_code=eq.' + roomCode,
-      event: 'phx_join',
-      payload: {config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'INSERT',schema:'public',table:'votes',filter:'room_code=eq.'+roomCode}]}},
-      ref: '1'
-    }));
-    // heartbeat
-    setInterval(()=>{
-      if(realtimeWs && realtimeWs.readyState===1)
-        realtimeWs.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'}));
-    }, 25000);
-  };
+    realtimeWs.onopen = () => {
+      realtimeWs.send(JSON.stringify({
+        topic: 'realtime:public:votes:room_code=eq.' + roomCode,
+        event: 'phx_join',
+        payload: {config:{broadcast:{self:false},presence:{key:''},postgres_changes:[{event:'INSERT',schema:'public',table:'votes',filter:'room_code=eq.'+roomCode}]}},
+        ref: '1'
+      }));
+      setInterval(()=>{
+        if(realtimeWs && realtimeWs.readyState===1)
+          realtimeWs.send(JSON.stringify({topic:'phoenix',event:'heartbeat',payload:{},ref:'hb'}));
+      }, 25000);
+    };
 
-  realtimeWs.onmessage = (e) => {
-    try {
-      const msg = JSON.parse(e.data);
-      if(msg.event === 'postgres_changes' || (msg.payload && msg.payload.data && msg.payload.data.record)) {
-        const record = msg.payload.data?.record || msg.payload.record;
-        if(record && record.user_id !== state.myId) {
-          onPartnerVote(record);
+    realtimeWs.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if(msg.event === 'postgres_changes' || (msg.payload && msg.payload.data && msg.payload.data.record)) {
+          const record = msg.payload.data?.record || msg.payload.record;
+          if(record && record.user_id !== state.myId) onPartnerVote(record);
         }
-      }
-      // detect partner presence by any activity
-      if(msg.event === 'phx_reply' && msg.payload && msg.payload.status === 'ok') {
-        // joined channel successfully
-      }
-    } catch(err) {}
-  };
+      } catch(err) {}
+    };
 
-  realtimeWs.onerror = () => console.warn('Realtime WS error');
-  realtimeWs.onclose = () => {
-    // reconnect after 3s
-    setTimeout(()=>{ if(state.roomCode) connectRealtime(state.roomCode); }, 3000);
-  };
+    realtimeWs.onerror = () => {};
+    realtimeWs.onclose = () => {
+      setTimeout(()=>{ if(state.roomCode) { try { connectRealtime(state.roomCode); } catch(e) {} } }, 5000);
+    };
+  } catch(e) {}
 }
 
 function onPartnerVote(record) {
@@ -824,12 +818,15 @@ async function swipeCard(liked) {
   if(state.currentIdx >= state.queue.length) return;
   const nm = state.queue[state.currentIdx];
 
+  let isMatch = false;
   if(liked !== null) {
     state.myLikes[nm.n] = liked;
     if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
-    // persist to Supabase
     dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked});
-    if(liked) checkMatch(nm.n);
+    if(liked && state.myLikes[nm.n] && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
+      isMatch = true;
+      state.matches.push(nm.n);
+    }
   }
 
   const top = document.querySelector('.name-card.active');
@@ -838,10 +835,15 @@ async function swipeCard(liked) {
     top.style.transition = 'transform .4s ease, opacity .3s ease';
     top.style.transform = dir!==0 ? `translateX(${dir*450}px) rotate(${dir*20}deg)` : 'translateY(-80px)';
     top.style.opacity = '0';
-    setTimeout(()=>{ state.currentIdx++; renderCards(); }, 360);
+    setTimeout(()=>{
+      state.currentIdx++;
+      renderCards();
+      if(isMatch) triggerMatch(nm.n);
+    }, 400);
   } else {
     state.currentIdx++;
     renderCards();
+    if(isMatch) triggerMatch(nm.n);
   }
 }
 
@@ -849,7 +851,12 @@ function checkMatch(name) {
   if(state.myLikes[name] && state.partnerLikes[name]) {
     if(!state.matches.includes(name)) {
       state.matches.push(name);
-      triggerMatch(name);
+      const top = document.querySelector('.name-card.active');
+      if(top && top.style.opacity === '0') {
+        setTimeout(()=>triggerMatch(name), 420);
+      } else {
+        triggerMatch(name);
+      }
     }
   }
 }
