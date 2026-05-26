@@ -4,140 +4,216 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BebéMatch</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --rose:#E8847A;--rose-light:#F5C5C1;--rose-dark:#C25E54;
-  --cream:#FDF8F4;--cream-dark:#F0E8DF;
-  --sage:#7A9E8E;--sage-light:#B5CFCA;
-  --gold:#C9A96E;--gold-light:#E8D4B0;
-  --ink:#2C1F1A;--ink-muted:#6B5147;
-  --bg:#FDF8F4;
-  --radius:20px;
+  --salmon:#E8735A;--salmon-light:rgba(232,115,90,.12);--salmon-dark:#C85A42;
+  --bg:#0A0A0A;
+  --surface:#141414;
+  --surface2:#1C1C1C;
+  --surface3:#242424;
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.14);
+  --text:#F5F5F5;
+  --text2:#A0A0A0;
+  --text3:#606060;
+  --green:#4ADE80;
+  --glass:rgba(255,255,255,.04);
+  --glass2:rgba(255,255,255,.07);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;color:var(--ink);overflow-x:hidden}
+body.light{
+  --salmon:#D4694F;--salmon-light:rgba(212,105,79,.1);--salmon-dark:#B8503A;
+  --bg:#FDF8F4;
+  --surface:#FFFFFF;
+  --surface2:#F5EDE6;
+  --surface3:#EDE0D8;
+  --border:rgba(44,31,26,.08);
+  --border2:rgba(44,31,26,.15);
+  --text:#2C1F1A;
+  --text2:#7A6058;
+  --text3:#B09488;
+  --green:#2E9E5B;
+  --glass:rgba(44,31,26,.03);
+  --glass2:rgba(44,31,26,.05);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv01'}
 
-/* SCREENS */
 .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center}
 .screen.active{display:flex}
 
 /* HOME */
-.logo{font-family:'Playfair Display',serif;font-size:3rem;color:var(--rose);line-height:1}
-.logo span{font-style:italic;color:var(--gold)}
-.tagline{font-size:1rem;color:var(--ink-muted);margin:.5rem 0 2.5rem;font-weight:300;letter-spacing:.05em}
-.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;border:none;transition:all .25s ease;text-decoration:none}
-.btn-primary{background:var(--rose);color:#fff;box-shadow:0 4px 20px rgba(232,132,122,.4)}
-.btn-primary:hover{background:var(--rose-dark);transform:translateY(-2px)}
-.btn-secondary{background:var(--cream-dark);color:var(--ink);border:1.5px solid var(--gold-light)}
-.btn-secondary:hover{background:var(--gold-light);transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--rose);border:1.5px solid var(--rose)}
-.btn-outline:hover{background:var(--rose-light)}
-.divider{display:flex;align-items:center;gap:1rem;width:100%;max-width:300px;margin:1.5rem 0;color:var(--ink-muted);font-size:.85rem}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cream-dark)}
-.room-input{width:100%;max-width:300px;padding:.8rem 1rem;border-radius:12px;border:1.5px solid var(--cream-dark);background:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);outline:none;transition:border .2s;text-align:center;letter-spacing:.15em;text-transform:uppercase;margin:.5rem 0}
-.room-input:focus{border-color:var(--rose)}
-.room-input::placeholder{text-transform:none;letter-spacing:0;color:#ccc}
+.logo{font-family:'Instrument Serif',serif;font-size:3rem;color:var(--text);line-height:1;font-weight:400;letter-spacing:-.02em}
+.logo span{color:var(--salmon);font-style:italic}
+.byline{font-size:.68rem;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:.4rem 0 0;font-weight:400}
+.tagline{font-size:.875rem;color:var(--text2);margin:.9rem 0 2.5rem;font-weight:300;letter-spacing:.01em}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1.8rem;border-radius:10px;font-family:'Inter',sans-serif;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:all .18s cubic-bezier(.4,0,.2,1);text-decoration:none;letter-spacing:-.01em}
+.btn-primary{background:var(--salmon);color:#fff}
+.btn-primary:hover{background:var(--salmon-dark)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border2)}
+.btn-secondary:hover{background:var(--glass2);border-color:rgba(255,255,255,.22)}
+.btn-secondary:active{transform:scale(.97)}
+.btn-outline{background:transparent;color:var(--salmon);border:1px solid rgba(232,115,90,.4)}
+.btn-outline:hover{background:var(--salmon-light);border-color:var(--salmon)}
+.btn-ghost{background:transparent;color:var(--text2);border:none;font-size:.8rem;padding:.5rem 1rem}
+.btn-ghost:hover{color:var(--text)}
+
+.divider{display:flex;align-items:center;gap:1rem;width:100%;max-width:300px;margin:1.2rem 0;color:var(--text3);font-size:.75rem;letter-spacing:.04em}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.room-input{width:100%;max-width:300px;padding:.8rem 1rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--text);outline:none;transition:all .18s;text-align:center;letter-spacing:.3em;text-transform:uppercase;margin:.4rem 0;-webkit-appearance:none;font-weight:500}
+.room-input:focus{border-color:rgba(232,115,90,.5);background:var(--surface3);box-shadow:0 0 0 3px rgba(232,115,90,.1)}
+.room-input::placeholder{text-transform:none;letter-spacing:0;color:var(--text3);font-weight:300;font-size:.875rem}
 
 /* WAITING */
-.room-code{font-family:'Playfair Display',serif;font-size:3.5rem;letter-spacing:.25em;color:var(--rose);margin:1rem 0}
+.room-code{font-family:'Instrument Serif',serif;font-size:4rem;letter-spacing:.3em;color:var(--text);margin:1rem 0;font-weight:400}
 .waiting-anim{display:flex;gap:.5rem;margin:1.5rem 0}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--rose-light);animation:pulse 1.2s ease-in-out infinite}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--salmon);animation:pulse 1.4s ease-in-out infinite;opacity:.3}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.3);opacity:1}}
-.status-bar{display:flex;align-items:center;gap:.5rem;padding:.5rem 1rem;border-radius:50px;background:var(--cream-dark);font-size:.85rem;color:var(--ink-muted);margin-bottom:1.5rem}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--sage);animation:blink 1.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+.status-bar{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .9rem;border-radius:6px;background:var(--surface2);border:1px solid var(--border);font-size:.75rem;color:var(--text2);margin-bottom:1.5rem}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 
 /* SETUP */
-.pill-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1rem 0}
-.pill{padding:.35rem .9rem;border-radius:50px;font-size:.8rem;cursor:pointer;border:1.5px solid var(--cream-dark);color:var(--ink-muted);background:#fff;transition:all .2s}
-.pill.selected{background:var(--rose);color:#fff;border-color:var(--rose)}
+.pill-row{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;margin:.6rem 0}
+.pill{padding:.3rem .8rem;border-radius:6px;font-size:.775rem;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:var(--surface2);transition:all .15s;font-weight:400;letter-spacing:.01em}
+.pill:hover{border-color:var(--border2);color:var(--text)}
+.pill.selected{background:var(--surface3);color:var(--text);border-color:var(--border2)}
 
 /* SWIPE */
-.swipe-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:400px;padding:.5rem 0 1rem}
-.partner-status{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--ink-muted)}
-.partner-dot{width:7px;height:7px;border-radius:50%;background:#ccc;transition:background .3s}
-.partner-dot.online{background:var(--sage)}
-.score-badge{display:flex;align-items:center;gap:.3rem;background:var(--rose-light);padding:.3rem .7rem;border-radius:50px;font-size:.8rem;color:var(--rose-dark);font-weight:500}
-.progress{width:100%;max-width:400px;height:4px;background:var(--cream-dark);border-radius:2px;margin:.5rem 0}
-.progress-bar{height:100%;border-radius:2px;background:var(--rose);transition:width .3s ease}
+.swipe-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;padding:.5rem 0 .8rem}
+.partner-status{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--text3)}
+.partner-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background .3s}
+.partner-dot.online{background:var(--green)}
+.score-badge{display:flex;align-items:center;gap:.3rem;background:var(--surface2);border:1px solid var(--border);padding:.3rem .7rem;border-radius:6px;font-size:.75rem;color:var(--text2);font-weight:500}
+.progress{width:100%;max-width:380px;height:2px;background:var(--surface3);border-radius:1px;margin:.4rem 0}
+.progress-bar{height:100%;border-radius:1px;background:var(--salmon);transition:width .35s ease}
 
 /* CARDS */
-.card-stack{position:relative;width:320px;height:420px;margin:1rem 0}
-.name-card{position:absolute;inset:0;background:#fff;border-radius:var(--radius);box-shadow:0 8px 40px rgba(44,31,26,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;cursor:grab;user-select:none;transform-origin:center bottom}
-.name-card.behind{transform:scale(.94) translateY(12px);z-index:0}
-.name-card.behind2{transform:scale(.88) translateY(24px);z-index:-1}
+.card-stack{position:relative;width:320px;height:420px;margin:.8rem 0}
+.name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset}
+.name-card.behind{transform:scale(.95) translateY(10px);z-index:0;border-color:rgba(255,255,255,.05)}
+.name-card.behind2{transform:scale(.90) translateY(20px);z-index:-1;border-color:rgba(255,255,255,.03)}
 .name-card.active{z-index:2}
 .name-card.dragging{cursor:grabbing}
-.card-accent{width:40px;height:3px;border-radius:3px;background:var(--rose-light);margin-bottom:1.5rem}
-.card-name{font-family:'Playfair Display',serif;font-size:3rem;color:var(--ink);line-height:1;margin-bottom:.5rem}
-.card-origin{font-size:.85rem;color:var(--ink-muted);font-weight:300;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
-.card-meaning{font-size:.9rem;color:var(--ink-muted);line-height:1.6;max-width:220px;text-align:center;font-style:italic}
-.card-gender{margin-top:1.2rem;padding:.25rem .75rem;border-radius:50px;font-size:.75rem;font-weight:500}
-.gender-girl{background:var(--rose-light);color:var(--rose-dark)}
-.gender-boy{background:#DCEBF5;color:#3A6B8A}
-.gender-neutral{background:var(--gold-light);color:#7A5A20}
-.vote-hint{position:absolute;top:1.2rem;padding:.3rem .8rem;border-radius:50px;font-size:.85rem;font-weight:700;opacity:0;transition:opacity .15s;border:2.5px solid}
-.vote-yes{right:1.2rem;color:#4CAF50;border-color:#4CAF50}
-.vote-no{left:1.2rem;color:#F44336;border-color:#F44336}
-.partner-voted-indicator{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.75rem;color:var(--sage);display:flex;align-items:center;gap:.3rem;opacity:0;transition:opacity .3s;white-space:nowrap}
+.card-accent{width:28px;height:1.5px;border-radius:1px;background:var(--surface3);margin-bottom:1.8rem}
+.card-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:var(--text);line-height:1;margin-bottom:.5rem;font-weight:400;letter-spacing:-.02em}
+.card-origin{font-size:.7rem;color:var(--text3);font-weight:400;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem}
+.card-meaning{font-size:.85rem;color:var(--text2);line-height:1.65;max-width:210px;text-align:center;font-weight:300;font-style:italic}
+.card-gender{margin-top:1.4rem;padding:.22rem .7rem;border-radius:5px;font-size:.7rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.gender-girl{background:rgba(232,115,90,.12);color:var(--salmon)}
+.gender-boy{background:rgba(96,165,250,.1);color:#60A5FA}
+.gender-neutral{background:rgba(167,139,250,.1);color:#A78BFA}
+.vote-hint{position:absolute;top:1.2rem;padding:.25rem .7rem;border-radius:6px;font-size:.75rem;font-weight:600;opacity:0;transition:opacity .12s;border:1.5px solid;letter-spacing:.04em;text-transform:uppercase}
+.vote-yes{right:1.2rem;color:#4ADE80;border-color:#4ADE80}
+.vote-no{left:1.2rem;color:var(--salmon);border-color:var(--salmon)}
+.partner-voted-indicator{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--green);display:flex;align-items:center;gap:.35rem;opacity:0;transition:opacity .3s;white-space:nowrap}
 .partner-voted-indicator.show{opacity:1}
 
 /* ACTION BUTTONS */
-.action-btns{display:flex;gap:1.2rem;margin:.5rem 0 1rem}
-.action-btn{width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:all .2s ease;box-shadow:0 4px 15px rgba(0,0,0,.1)}
-.btn-no{background:#fff;color:#F44336;border:2px solid #FFCDD2}
-.btn-no:hover{background:#FFEBEE;transform:scale(1.1)}
-.btn-yes{background:var(--rose);color:#fff;width:68px;height:68px;font-size:1.8rem}
-.btn-yes:hover{background:var(--rose-dark);transform:scale(1.1)}
-.btn-skip{background:#fff;color:var(--gold);border:2px solid var(--gold-light);font-size:1.2rem}
-.btn-skip:hover{background:var(--gold-light);transform:scale(1.05)}
+.action-btns{display:flex;gap:1rem;margin:.5rem 0 .8rem;align-items:center}
+.action-btn{border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s cubic-bezier(.4,0,.2,1);background:var(--surface2);border:1px solid var(--border)}
+.action-btn:active{transform:scale(.9)}
+.btn-no{width:52px;height:52px;font-size:1.2rem;color:var(--salmon)}
+.btn-no:hover{background:var(--surface3);border-color:rgba(232,115,90,.3)}
+.btn-yes{width:62px;height:62px;font-size:1.5rem;background:var(--salmon);color:#fff;border-color:transparent;box-shadow:0 4px 24px rgba(232,115,90,.3)}
+.btn-yes:hover{background:var(--salmon-dark);box-shadow:0 4px 28px rgba(232,115,90,.4)}
+.btn-skip{width:44px;height:44px;font-size:1rem;color:var(--text3)}
+.btn-skip:hover{background:var(--surface3);color:var(--text2)}
 
 /* MATCH */
-.match-explosion{font-size:4rem;animation:pop .5s ease}
-@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
-.match-name{font-family:'Playfair Display',serif;font-size:3.5rem;color:var(--rose);margin:1rem 0;font-style:italic}
-.match-hearts{display:flex;justify-content:center;gap:.3rem;font-size:1.5rem;margin:.5rem 0 2rem;animation:float 2s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.match-explosion{font-size:3.5rem;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.match-name{font-family:'Instrument Serif',serif;font-size:3.5rem;color:var(--text);margin:.8rem 0;font-weight:400;font-style:italic;letter-spacing:-.02em}
+.match-hearts{display:flex;justify-content:center;gap:.3rem;font-size:1.3rem;margin:.5rem 0 2rem;animation:float 2.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .hearts-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.heart-fall{position:absolute;font-size:1.5rem;animation:fall linear forwards;top:-50px;opacity:.7}
+.heart-fall{position:absolute;font-size:1.2rem;animation:fall linear forwards;top:-50px;opacity:.5}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}
 
 /* LIKED LIST */
-.liked-list{width:100%;max-width:400px;max-height:50vh;overflow-y:auto;margin:1rem 0}
-.liked-item{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;border-radius:12px;background:#fff;border:1px solid var(--cream-dark);margin-bottom:.5rem}
-.liked-item-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink)}
-.liked-item-sub{font-size:.75rem;color:var(--ink-muted);font-weight:300}
-.match-badge{padding:.2rem .5rem;border-radius:50px;background:var(--rose-light);color:var(--rose-dark);font-size:.7rem;font-weight:500}
+.liked-list{width:100%;max-width:380px;max-height:50vh;overflow-y:auto;margin:1rem 0}
+.liked-item{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-radius:10px;background:var(--surface);border:1px solid var(--border);margin-bottom:.3rem;transition:border-color .15s}
+.liked-item:hover{border-color:var(--border2)}
+.liked-item-name{font-family:'Instrument Serif',serif;font-size:1.15rem;color:var(--text);font-weight:400}
+.liked-item-sub{font-size:.7rem;color:var(--text3);font-weight:300;margin-top:.1rem}
+.match-badge{padding:.18rem .55rem;border-radius:4px;background:var(--salmon-light);color:var(--salmon);font-size:.65rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
 
 /* HELPERS */
-.title-serif{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:.3rem}
-.subtitle{font-size:.9rem;color:var(--ink-muted);margin-bottom:1.5rem;font-weight:300}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.5rem 1.2rem;border-radius:50px;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.title-serif{font-family:'Instrument Serif',serif;font-size:1.6rem;margin-bottom:.3rem;font-weight:400;letter-spacing:-.02em;color:var(--text)}
+.subtitle{font-size:.825rem;color:var(--text2);margin-bottom:1.5rem;font-weight:300}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(28,28,28,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border2);color:var(--text);padding:.45rem 1.1rem;border-radius:8px;font-size:.78rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;font-weight:400}
 .toast.show{opacity:1}
-.error-msg{color:#F44336;font-size:.85rem;margin:.5rem 0;min-height:1.2rem}
-
-/* LOADING */
-.loading-spinner{width:32px;height:32px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;margin:1rem auto}
+.error-msg{color:var(--salmon);font-size:.78rem;margin:.4rem 0;min-height:1.1rem;font-weight:400}
+.loading-spinner{width:24px;height:24px;border:2px solid var(--surface3);border-top-color:var(--salmon);border-radius:50%;animation:spin .7s linear infinite;margin:1rem auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* THEME TOGGLE */
+.theme-toggle{position:fixed;top:1.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;color:var(--text2)}
+.theme-toggle:hover{background:var(--surface3);color:var(--text)}
+body.light .toast{background:rgba(255,255,255,.92);color:var(--text)}
+body.light .btn-secondary{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+body.light .btn-secondary:hover{background:var(--surface2)}
+
+/* EASTER EGG */
+.egg-btn{background:none;border:none;cursor:pointer;font-size:1.4rem;margin-top:.6rem;opacity:.35;transition:all .2s;display:block;padding:.3rem;-webkit-tap-highlight-color:transparent;user-select:none}
+.egg-btn:hover{opacity:.6;transform:scale(1.15)}
+.egg-btn.shake{animation:eggshake .3s ease}
+@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg) scale(1.2)}75%{transform:rotate(12deg) scale(1.2)}}
+
+.egg-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
+.egg-overlay.show{opacity:1;pointer-events:all}
+.egg-box-wrap{position:relative;display:flex;flex-direction:column;align-items:center;transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .4s ease}
+.egg-overlay.show .egg-box-wrap{transform:scale(1);opacity:1}
+.egg-gift{font-size:5rem;animation:giftbounce 1s cubic-bezier(.34,1.56,.64,1) forwards;filter:drop-shadow(0 8px 24px rgba(232,115,90,.5))}
+@keyframes giftbounce{0%{transform:scale(0) rotate(-15deg)}60%{transform:scale(1.15) rotate(5deg)}80%{transform:scale(.95) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}
+.egg-lid{font-size:3.5rem;position:absolute;top:-2rem;left:50%;transform:translateX(-50%);animation:lidfly 0.6s .5s cubic-bezier(.25,.46,.45,.94) forwards;opacity:0}
+@keyframes lidfly{0%{transform:translateX(-50%) translateY(0) rotate(0);opacity:1}100%{transform:translateX(-50%) translateY(-120px) rotate(-35deg);opacity:0}}
+.egg-text{font-family:'Instrument Serif',serif;font-size:2.4rem;font-style:italic;font-weight:400;letter-spacing:-.02em;color:#fff;margin-top:1.5rem;text-align:center;opacity:0;transform:translateY(20px);transition:all .5s ease .7s;text-shadow:0 2px 20px rgba(232,115,90,.6)}
+.egg-overlay.show .egg-text{opacity:1;transform:translateY(0)}
+.egg-sub{font-size:.85rem;color:rgba(255,255,255,.5);margin-top:.4rem;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:all .4s ease 1s}
+.egg-overlay.show .egg-sub{opacity:1}
+.egg-close{margin-top:2rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:.5rem 1.4rem;border-radius:8px;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;opacity:0;transition:all .3s ease 1.2s}
+.egg-overlay.show .egg-close{opacity:1}
+.egg-close:hover{background:rgba(255,255,255,.18)}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
+<button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
+
+<!-- EASTER EGG OVERLAY -->
+<div class="egg-overlay" id="egg-overlay" onclick="closeEgg()">
+  <div class="egg-box-wrap" onclick="event.stopPropagation()">
+    <div style="position:relative;display:inline-block">
+      <div class="egg-lid">🎀</div>
+      <div class="egg-gift" id="egg-gift">🎁</div>
+    </div>
+    <div class="egg-text">Martinsillo bebé!</div>
+    <div class="egg-sub">el más especial del universo 🌟</div>
+    <button class="egg-close" onclick="closeEgg()">cerrar</button>
+  </div>
+  <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+</div>
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
   <div class="logo">bebé<span>match</span></div>
+  <p class="byline">by Carlos Tn</p>
+  <button class="egg-btn" id="egg-btn" onclick="eggTap()" title="">👶</button>
   <p class="tagline">encontrad juntos el nombre perfecto ✨</p>
-  <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--ink-muted)">Conectando...</p></div>
+  <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--text2)">Conectando...</p></div>
   <div id="home-content">
     <button class="btn btn-primary" onclick="createRoom()" style="width:100%;max-width:300px;justify-content:center;margin-bottom:.75rem">✦ Crear sala nueva</button>
     <div class="divider">o únete a una sala</div>
-    <input class="room-input" id="join-code" placeholder="Código de 4 letras" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+    <input class="room-input" id="join-code" placeholder="Código de sala" maxlength="4" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
     <p class="error-msg" id="join-error"></p>
     <button class="btn btn-secondary" onclick="joinRoom()" style="width:100%;max-width:300px;justify-content:center">Unirse →</button>
   </div>
-  <p style="font-size:.75rem;color:var(--ink-muted);margin-top:2rem;max-width:280px;line-height:1.6">Dos personas pueden conectarse desde cualquier dispositivo usando el mismo código de sala</p>
+  <p style="font-size:.75rem;color:var(--text2);margin-top:2rem;max-width:280px;line-height:1.6">Dos personas pueden conectarse desde cualquier dispositivo usando el mismo código de sala</p>
 </div>
 
 <!-- WAITING -->
@@ -154,14 +230,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;colo
 <div class="screen" id="screen-setup">
   <p class="title-serif">Antes de empezar</p>
   <p class="subtitle">Elige qué nombres quieres ver</p>
-  <p style="font-size:.85rem;color:var(--ink-muted);font-weight:500;margin-bottom:.5rem">Género</p>
+  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-bottom:.5rem">Género</p>
   <div class="pill-row" id="gender-pills">
     <div class="pill selected" data-v="all" onclick="togglePill(this,'gender')">Todos</div>
     <div class="pill" data-v="girl" onclick="togglePill(this,'gender')">Niña ♀</div>
     <div class="pill" data-v="boy" onclick="togglePill(this,'gender')">Niño ♂</div>
     <div class="pill" data-v="neutral" onclick="togglePill(this,'gender')">Neutro ⚥</div>
   </div>
-  <p style="font-size:.85rem;color:var(--ink-muted);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Origen</p>
+  <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Origen</p>
   <div class="pill-row" id="origin-pills">
     <div class="pill selected" data-v="all" onclick="togglePill(this,'origin')">Todos</div>
     <div class="pill" data-v="español" onclick="togglePill(this,'origin')">Español</div>
@@ -186,7 +262,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;colo
     <button class="action-btn btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
     <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
   </div>
-  <button class="btn" style="font-size:.8rem;color:var(--ink-muted);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
+  <button class="btn" style="font-size:.8rem;color:var(--text2);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
 </div>
 
 <!-- MATCH -->
@@ -194,10 +270,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;colo
   <div class="hearts-bg" id="hearts-bg"></div>
   <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center">
     <div class="match-explosion">🎉</div>
-    <p class="title-serif" style="font-size:1.2rem;color:var(--ink-muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:0">¡Es un match!</p>
+    <p class="title-serif" style="font-size:1.2rem;color:var(--text2);letter-spacing:.15em;text-transform:uppercase;margin-bottom:0">¡Es un match!</p>
     <div class="match-name" id="match-name-display">—</div>
     <div class="match-hearts">💗 💗 💗</div>
-    <p style="font-size:.9rem;color:var(--ink-muted);max-width:260px;margin-bottom:2rem">¡Los dos adoráis este nombre para vuestro bebé!</p>
+    <p style="font-size:.9rem;color:var(--text2);max-width:260px;margin-bottom:2rem">¡Los dos adoráis este nombre para vuestro bebé!</p>
     <button class="btn btn-primary" onclick="continueAfterMatch()" style="width:280px;justify-content:center;margin-bottom:.75rem">Seguir explorando ✨</button>
     <button class="btn btn-outline" onclick="showLiked()" style="width:280px;justify-content:center">Ver todos los matches</button>
   </div>
@@ -217,6 +293,98 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;colo
 const SUPABASE_URL = 'https://myakshqgodbvwnbnvjjn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15YWtzaHFnb2RidnduYm52ampuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NjI5MTcsImV4cCI6MjA5NTMzODkxN30._yHuiEPiyve3bxSgQvpOuc_--uwSq2RTiuPKPgmRZHc';
 const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+
+/* ── EASTER EGG ── */
+let eggTaps = 0, eggTimer = null;
+function eggTap(){
+  const btn = document.getElementById('egg-btn');
+  btn.classList.remove('shake');
+  void btn.offsetWidth;
+  btn.classList.add('shake');
+  eggTaps++;
+  clearTimeout(eggTimer);
+  eggTimer = setTimeout(()=>{ eggTaps=0; },2000);
+  if(eggTaps >= 5){
+    eggTaps = 0;
+    openEgg();
+  }
+}
+function openEgg(){
+  const overlay = document.getElementById('egg-overlay');
+  overlay.classList.add('show');
+  document.getElementById('egg-gift').style.animation='none';
+  void document.getElementById('egg-gift').offsetWidth;
+  document.getElementById('egg-gift').style.animation='';
+  setTimeout(()=>launchConfetti(), 500);
+}
+function closeEgg(){
+  document.getElementById('egg-overlay').classList.remove('show');
+  stopConfetti();
+}
+
+let confettiAnim = null, confettiActive = false;
+const CONFETTI_COLORS = ['#E8735A','#F4A261','#E9C46A','#2A9D8F','#A8DADC','#FFB4A2','#B5838D','#6D6875'];
+function launchConfetti(){
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const pieces = Array.from({length:120},()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height - canvas.height,
+    w: 6+Math.random()*6,
+    h: 8+Math.random()*6,
+    r: Math.random()*Math.PI*2,
+    dr: (Math.random()-.5)*.15,
+    vy: 2+Math.random()*4,
+    vx: (Math.random()-.5)*2,
+    color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+    alpha: .8+Math.random()*.2
+  }));
+  confettiActive = true;
+  let frame = 0;
+  function draw(){
+    if(!confettiActive) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.y += p.vy;
+      p.x += p.vx;
+      p.r += p.dr;
+      if(p.y > canvas.height) { p.y = -12; p.x = Math.random()*canvas.width; }
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.r);
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.roundRect(-p.w/2,-p.h/2,p.w,p.h,2);
+      ctx.fill();
+      ctx.restore();
+    });
+    frame++;
+    if(frame < 300) confettiAnim = requestAnimationFrame(draw);
+    else stopConfetti();
+  }
+  draw();
+}
+function stopConfetti(){
+  confettiActive = false;
+  if(confettiAnim) cancelAnimationFrame(confettiAnim);
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('theme-btn').textContent = isLight ? '🌑' : '🌙';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+}
+(function(){
+  if(localStorage.getItem('theme')==='light'){
+    document.body.classList.add('light');
+    document.getElementById('theme-btn').textContent='🌑';
+  }
+})();
 
 const NAMES_DB = [
   {n:"Sofía",g:"girl",o:"griego",m:"sabiduría divina"},
@@ -359,6 +527,14 @@ function connectRealtime(roomCode) {
 function onPartnerVote(record) {
   state.partnerConnected = true;
   updatePartnerDot(true);
+  if(record.name === '__presence__') {
+    // solo marcar presencia, no votar
+    if(document.getElementById('screen-waiting').classList.contains('active')) {
+      document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
+      setTimeout(()=>showSetup(), 1200);
+    }
+    return;
+  }
   state.partnerLikes[record.name] = record.liked;
   if(record.liked) {
     showPartnerVotedHint(record.name);
@@ -374,8 +550,9 @@ async function createRoom() {
   const code = genCode();
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
+  // insertar presencia propia
+  await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
   connectRealtime(code);
-  // poll for partner (check if any other user voted in this room)
   startPartnerPoll();
   setHomeLoading(false);
   showScreen('waiting');
@@ -389,21 +566,24 @@ async function joinRoom() {
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
 
-  // load existing votes for this room
+  // insertar presencia propia para que el creador nos detecte
+  await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
+
+  // cargar registros existentes para detectar si ya hay pareja
   const existing = await dbFetchVotes(code);
-  for(const v of existing) {
-    if(v.user_id !== state.myId) {
-      state.partnerLikes[v.name] = v.liked;
-      if(v.liked) state.partnerConnected = true;
-    }
+  const partnerRecords = existing.filter(v => v.user_id !== state.myId && v.name !== '__presence__');
+  for(const v of partnerRecords) {
+    state.partnerLikes[v.name] = v.liked;
   }
+  const partnerPresent = existing.some(v => v.user_id !== state.myId);
+  if(partnerPresent) state.partnerConnected = true;
 
   connectRealtime(code);
   startPartnerPoll();
   setHomeLoading(false);
   showScreen('waiting');
   if(state.partnerConnected) {
-    document.getElementById('waiting-status').textContent = '¡Pareja detectada! ✓';
+    document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
     setTimeout(()=>showSetup(), 1200);
   }
 }
@@ -414,8 +594,8 @@ function startPartnerPoll() {
   partnerPollTimer = setInterval(async () => {
     if(!state.roomCode) return;
     const votes = await dbFetchVotes(state.roomCode);
-    const partnerVotes = votes.filter(v => v.user_id !== state.myId);
-    if(partnerVotes.length > 0 && !state.partnerConnected) {
+    const partnerRecords = votes.filter(v => v.user_id !== state.myId);
+    if(partnerRecords.length > 0 && !state.partnerConnected) {
       state.partnerConnected = true;
       updatePartnerDot(true);
       document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
@@ -423,11 +603,11 @@ function startPartnerPoll() {
         setTimeout(()=>showSetup(), 1200);
       }
     }
-    // sync partner likes
-    for(const v of partnerVotes) {
+    // sync partner likes (ignorar presencia)
+    for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
       state.partnerLikes[v.name] = v.liked;
     }
-  }, 4000);
+  }, 2000);
 }
 
 /* ── SETUP ── */
@@ -448,7 +628,7 @@ function startSwiping() {
   setInterval(async()=>{
     if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
     const votes = await dbFetchVotes(state.roomCode);
-    for(const v of votes.filter(x=>x.user_id!==state.myId)) {
+    for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__')) {
       if(state.partnerLikes[v.name] === undefined) {
         state.partnerLikes[v.name] = v.liked;
         if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
@@ -642,7 +822,7 @@ function showLiked() {
   document.getElementById('liked-subtitle').textContent =
     state.matches.length>0 ? `${state.matches.length} match${state.matches.length>1?'es':''}` : 'Aún sin matches con tu pareja';
   if(liked.length===0) {
-    list.innerHTML = '<p style="color:var(--ink-muted);font-size:.9rem;padding:1rem">Aún no has dado ♥ a ningún nombre</p>';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem">Aún no has dado ♥ a ningún nombre</p>';
   } else {
     liked.forEach(name=>{
       const isMatch = state.matches.includes(name);
