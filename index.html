@@ -146,6 +146,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .btn-yes.pop{animation:popYes .35s cubic-bezier(.34,1.56,.64,1)}
 .btn-skip{width:44px;height:44px;font-size:1rem;color:var(--text3)}
 .btn-skip:hover{background:var(--surface3);color:var(--text2)}
+.btn-super{width:50px;height:50px;font-size:1.3rem;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#22C55E;position:relative}
+.btn-super:hover{background:rgba(34,197,94,.25);border-color:rgba(34,197,94,.7)}
+.btn-super.pop{animation:popYes .35s cubic-bezier(.34,1.56,.64,1)}
+.btn-super.used{opacity:.35;cursor:not-allowed}
+.btn-super .super-count{position:absolute;top:-4px;right:-4px;background:#22C55E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;line-height:1}
+.superlike-badge{background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border-radius:6px;padding:.2rem .55rem;font-size:.7rem;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:.02em}
+@keyframes superPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
 @keyframes popYes{0%{transform:scale(1)}40%{transform:scale(1.35);box-shadow:0 6px 32px rgba(232,115,90,.6)}100%{transform:scale(1)}}
 @keyframes popNo{0%{transform:scale(1)}40%{transform:scale(1.3);border-color:rgba(255,107,107,.8);color:#FF6B6B}100%{transform:scale(1)}}
 
@@ -438,6 +445,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="action-btns">
     <button class="action-btn btn-no" id="btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
     <button class="action-btn btn-yes" id="btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
+    <button class="action-btn btn-super" id="btn-super" onclick="swipeCard('super')" title="SuperLike ⭐">⭐<span class="super-count" id="super-count">2</span></button>
     <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
   </div>
   <button class="btn" style="font-size:.8rem;color:var(--text2);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
@@ -516,9 +524,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v8.1</div>
+<div class="version-tag">v8.2</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
+<div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
 
 <script>
 const SUPABASE_URL = 'https://myakshqgodbvwnbnvjjn.supabase.co';
@@ -1347,7 +1356,11 @@ const state = {
   currentIdx: 0,
   myLikes: {},
   partnerLikes: {},
+  mySuperlikes: {},   // nombres a los que di superlike
+  partnerSuperlikes: {}, // nombres a los que la pareja dio superlike
+  superlikesLeft: 2,
   matches: [],
+  superlikes: [],    // nombres que son superlike (míos o de pareja)
   filters: {gender:'all', origin:'all', length:'all', count:20},
   streak: 0,
   streakType: null,
@@ -1583,6 +1596,10 @@ async function hostStartSwiping() {
 }
 
 async function startSwiping() {
+  state.superlikesLeft = 2;
+  state.mySuperlikes = {};
+  state.superlikes = [];
+  updateSuperBtn();
   buildQueue();
   showScreen('swipe');
   // ocultar elementos de pareja en modo solo
@@ -1838,9 +1855,19 @@ function onDragEnd() {
 async function swipeCard(liked) {
   if(state.currentIdx >= state.queue.length) return;
   const nm = state.queue[state.currentIdx];
+  const isSuper = liked === 'super';
 
-  // animación del botón
-  if(liked === true) {
+  // superlike: comprobar usos restantes
+  if(isSuper) {
+    if(state.superlikesLeft <= 0) return;
+    state.superlikesLeft--;
+    updateSuperBtn();
+    const b = document.getElementById('btn-super');
+    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+    setTimeout(()=>b.classList.remove('pop'), 400);
+    triggerSuperLike(nm.n);
+    liked = true; // cuenta como like para el flujo normal
+  } else if(liked === true) {
     const b = document.getElementById('btn-yes');
     b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     setTimeout(()=>b.classList.remove('pop'), 400);
@@ -1854,24 +1881,28 @@ async function swipeCard(liked) {
   let isMatch = false;
   if(liked !== null) {
     state.myLikes[nm.n] = liked;
+    if(isSuper) state.mySuperlikes[nm.n] = true;
     if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
-    if(!state.isSolo) dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked});
-    if(!state.isSolo && liked && state.myLikes[nm.n] && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
+    if(!state.isSolo) dbInsert({room_code: state.roomCode, user_id: state.myId, name: nm.n, liked: isSuper ? 'super' : liked});
+    // superlike = match automático sin importar la pareja
+    if(isSuper && !state.matches.includes(nm.n)) {
+      isMatch = true;
+      state.matches.push(nm.n);
+      if(!state.superlikes.includes(nm.n)) state.superlikes.push(nm.n);
+    } else if(!state.isSolo && liked && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
       isMatch = true;
       state.matches.push(nm.n);
     }
     // racha
-    if(liked !== null) {
-      const wasMatch = isMatch;
-      if(wasMatch) {
-        if(state.streakType === 'match') state.streak++;
-        else { state.streak = 1; state.streakType = 'match'; }
-      } else {
-        if(state.streakType === 'nomatch') state.streak++;
-        else { state.streak = 1; state.streakType = 'nomatch'; }
-      }
-      updateStreakBadge();
+    const wasMatch = isMatch;
+    if(wasMatch) {
+      if(state.streakType === 'match') state.streak++;
+      else { state.streak = 1; state.streakType = 'match'; }
+    } else {
+      if(state.streakType === 'nomatch') state.streak++;
+      else { state.streak = 1; state.streakType = 'nomatch'; }
     }
+    updateStreakBadge();
   }
 
   const top = document.querySelector('.name-card.active');
@@ -1883,26 +1914,74 @@ async function swipeCard(liked) {
     setTimeout(()=>{
       state.currentIdx++;
       renderCards();
-      if(isMatch) triggerMatch(nm.n);
+      if(isMatch && !isSuper) triggerMatch(nm.n);
     }, 400);
   } else {
     state.currentIdx++;
     renderCards();
-    if(isMatch) triggerMatch(nm.n);
+    if(isMatch && !isSuper) triggerMatch(nm.n);
   }
 }
 
+function updateSuperBtn() {
+  const btn = document.getElementById('btn-super');
+  const cnt = document.getElementById('super-count');
+  if(!btn) return;
+  if(cnt) cnt.textContent = state.superlikesLeft;
+  if(state.superlikesLeft <= 0) btn.classList.add('used');
+  else btn.classList.remove('used');
+}
+
+function triggerSuperLike(name) {
+  // animación de fuegos artificiales / confeti verde
+  const canvas = document.getElementById('summary-confetti') || document.createElement('canvas');
+  // usar partículas en pantalla
+  const COLORS = ['#22C55E','#86EFAC','#4ADE80','#BBF7D0','#FFD700','#FFF'];
+  for(let i=0;i<24;i++){
+    setTimeout(()=>{
+      const p = document.createElement('span');
+      p.style.cssText = `position:fixed;pointer-events:none;z-index:9999;font-size:${.8+Math.random()*.8}rem;opacity:1`;
+      p.textContent = ['⭐','💚','✨','🌟','💫'][Math.floor(Math.random()*5)];
+      const sx = 20 + Math.random()*60;
+      const sy = 20 + Math.random()*60;
+      p.style.left = sx + 'vw';
+      p.style.top = sy + 'vh';
+      const dx = (Math.random()-.5)*200;
+      const dy = (Math.random()-.5)*200 - 60;
+      p.style.transition = `transform ${.6+Math.random()*.4}s cubic-bezier(.25,.46,.45,.94), opacity .5s ease .3s`;
+      document.body.appendChild(p);
+      requestAnimationFrame(()=>{
+        p.style.transform = `translate(${dx}px,${dy}px) rotate(${Math.random()*360}deg) scale(.3)`;
+        p.style.opacity = '0';
+      });
+      setTimeout(()=>p.remove(), 1200);
+    }, i*35);
+  }
+  // toast superlike
+  const toast = document.getElementById('super-toast');
+  toast.textContent = `⭐ ${name}`;
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 1000);
+}
+
 function checkMatch(name) {
-  if(state.myLikes[name] && state.partnerLikes[name]) {
-    if(!state.matches.includes(name)) {
-      state.matches.push(name);
-      const top = document.querySelector('.name-card.active');
-      if(top && top.style.opacity === '0') {
-        setTimeout(()=>triggerMatch(name), 420);
-      } else {
-        triggerMatch(name);
-      }
-    }
+  const iPartnerSuper = state.partnerLikes[name] === 'super';
+  const iMySuper = state.mySuperlikes[name];
+  const normalMatch = state.myLikes[name] && state.partnerLikes[name];
+  if(iPartnerSuper && !state.matches.includes(name)) {
+    // pareja dio superlike → match automático
+    state.matches.push(name);
+    if(!state.superlikes.includes(name)) state.superlikes.push(name);
+    const top = document.querySelector('.name-card.active');
+    if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
+    else triggerMatch(name);
+  } else if(normalMatch && !state.matches.includes(name)) {
+    state.matches.push(name);
+    const top = document.querySelector('.name-card.active');
+    if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
+    else triggerMatch(name);
   }
 }
 
@@ -1998,16 +2077,38 @@ function renderSummary() {
   const title = document.getElementById('summary-title');
   const sub = document.getElementById('summary-sub');
 
-  // nombres que solo me gustaron a mí
   const onlyMe = Object.entries(state.myLikes)
     .filter(([name, liked]) => liked && !state.partnerLikes[name])
     .map(([name]) => name);
-
-  // nombres que solo le gustaron a mi pareja
   const onlyPartner = Object.entries(state.partnerLikes)
     .filter(([name, liked]) => liked && !state.myLikes[name])
     .map(([name]) => name);
 
+  // superlikes arriba del todo
+  if(state.superlikes.length > 0) {
+    const sl = document.createElement('div');
+    sl.style.cssText = 'width:100%;margin-bottom:.8rem';
+    sl.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;font-family:'Inter',sans-serif;font-weight:600">⭐ SuperLikes</p>`;
+    state.superlikes.forEach(name => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.style.borderColor = 'rgba(34,197,94,.35)';
+      d.style.background = 'rgba(34,197,94,.06)';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:1rem">⭐</span>
+          <div>
+            <div class="liked-item-name" style="color:#22C55E">${name}</div>
+            <div class="liked-item-sub">SuperLike automático</div>
+          </div>
+        </div>
+        <span class="superlike-badge">⭐ Super</span>`;
+      sl.appendChild(d);
+    });
+    list.appendChild(sl);
+  }
+
+  const normalMatches = state.matches.filter(n => !state.superlikes.includes(n));
   if(state.matches.length === 0) {
     title.textContent = 'Habéis terminado 🙈';
     sub.textContent = 'Ningún match esta vez... ¡seguid explorando!';
@@ -2015,7 +2116,7 @@ function renderSummary() {
   } else {
     title.textContent = `${state.matches.length} match${state.matches.length>1?'es':''} encontrado${state.matches.length>1?'s':''}! 💞`;
     sub.textContent = 'Los nombres que os gustan a los dos';
-    state.matches.forEach((name, i) => {
+    normalMatches.forEach((name, i) => {
       const d = document.createElement('div');
       d.className = 'liked-item';
       d.innerHTML = `
@@ -2133,6 +2234,10 @@ function goHome() {
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
+  state.superlikes = [];
+  state.mySuperlikes = {};
+  state.partnerSuperlikes = {};
+  state.superlikesLeft = 2;
   state.streak = 0;
   state.streakType = null;
   clearInterval(partnerPollTimer);
