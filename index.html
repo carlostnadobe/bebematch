@@ -221,6 +221,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .mine-overlay.show{opacity:1;pointer-events:all}
 .mine-wrap{display:flex;flex-direction:column;align-items:center;gap:.8rem;transform:scale(.85);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);max-width:360px;width:90%}
 .mine-overlay.show .mine-wrap{transform:scale(1);opacity:1}
+.mine-overlay.show .egg-close{opacity:1}
 .mine-title{font-family:'Instrument Serif',serif;font-size:1.8rem;color:#fff;font-style:italic}
 .mine-info{display:flex;gap:1.2rem;font-size:.8rem;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;letter-spacing:.04em}
 .mine-grid{display:grid;gap:3px;background:rgba(255,255,255,.06);padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.1)}
@@ -270,8 +271,8 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="mine-msg" id="mine-msg"></div>
     <div class="mine-hint">Encuentra todas las celdas seguras</div>
     <div style="display:flex;gap:.5rem;margin-top:.3rem">
-      <button class="egg-close" onclick="startMines()" style="margin-top:0">Nueva partida</button>
-      <button class="egg-close" onclick="closeMines()" style="margin-top:0">cerrar</button>
+      <button class="egg-close" onclick="startMines()" style="margin-top:0;opacity:1">Nueva partida</button>
+      <button class="egg-close" onclick="closeMines()" style="margin-top:0;opacity:1">cerrar</button>
     </div>
   </div>
 </div>
@@ -450,7 +451,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v3.8</div>
+<div class="version-tag">v4.4</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1104,24 +1105,35 @@ function showSetup() {
   if(state.isHost) {
     showScreen('setup');
   } else {
-    // el invitado espera los filtros del creador
     showScreen('waiting-filters');
-    startFilterPoll();
+    // pre-cargar el id del __filters__ actual para ignorarlo
+    (async()=>{
+      try {
+        const votes = await dbFetchVotes(state.roomCode);
+        const existing = votes.find(v => v.name === '__filters__');
+        if(existing) lastFilterId = existing.id;
+      } catch(e) {}
+      startFilterPoll();
+    })();
   }
 }
 
 let filterPollTimer = null;
+let lastFilterId = null;
 function startFilterPoll() {
   clearInterval(filterPollTimer);
+  // guardar el id del __filters__ actual para ignorarlo
+  // y solo arrancar cuando aparezca uno nuevo
   filterPollTimer = setInterval(async () => {
     if(!state.roomCode) return;
     try {
       const votes = await dbFetchVotes(state.roomCode);
       const filterRecord = votes.find(v => v.name === '__filters__');
-      if(filterRecord) {
+      if(filterRecord && filterRecord.id !== lastFilterId) {
         clearInterval(filterPollTimer);
+        lastFilterId = filterRecord.id;
         try {
-          const filters = JSON.parse(filterRecord.user_id); // guardamos filtros en user_id por simplicidad
+          const filters = JSON.parse(filterRecord.user_id);
           state.filters = filters;
         } catch(e) {}
         startSwiping();
@@ -1135,6 +1147,7 @@ async function hostStartSwiping() {
     await dbDelete(state.roomCode, '__filters__');
     await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
   } catch(e) {}
+  lastFilterId = null; // reset para que el invitado detecte el nuevo
   startSwiping();
 }
 
@@ -1553,6 +1566,10 @@ function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const screen = document.getElementById('screen-'+name);
   screen.classList.add('active');
+  // mostrar easter eggs solo en home
+  const showEggs = name === 'home';
+  document.getElementById('egg-btn').style.display = showEggs ? '' : 'none';
+  document.getElementById('egg-btn2').style.display = showEggs ? '' : 'none';
   // guardar sala activa en localStorage
   if(name === 'waiting' || name === 'setup' || name === 'swipe') {
     if(state.roomCode) localStorage.setItem('bm_room', state.roomCode);
