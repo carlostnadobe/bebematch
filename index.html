@@ -159,10 +159,14 @@ body.light .btn-secondary{background:var(--surface3);color:var(--text);border-co
 body.light .btn-secondary:hover{background:var(--surface2)}
 
 /* EASTER EGG */
-.egg-btn{background:none;border:none;cursor:pointer;font-size:1.4rem;margin-top:.6rem;opacity:.35;transition:all .2s;display:block;padding:.3rem;-webkit-tap-highlight-color:transparent;user-select:none}
-.egg-btn:hover{opacity:.6;transform:scale(1.15)}
-.egg-btn.shake{animation:eggshake .3s ease}
-@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg) scale(1.2)}75%{transform:rotate(12deg) scale(1.2)}}
+.egg-btn{position:fixed;top:4.4rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;user-select:none;overflow:hidden}
+.egg-btn:hover{border-color:rgba(56,189,248,.5)}
+.egg-btn.shake{animation:eggshake .35s ease}
+@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.15)}75%{transform:rotate(14deg) scale(1.15)}}
+.egg-fill{position:absolute;bottom:0;left:-20%;width:140%;height:0%;pointer-events:none;background:#38BDF8;transition:none}
+.egg-fill::before{content:'';position:absolute;top:-6px;left:0;width:100%;height:12px;background:inherit;border-radius:40%;animation:wave 1s linear infinite}
+.egg-fill::after{content:'';position:absolute;top:-4px;left:0;width:100%;height:10px;background:rgba(56,189,248,.6);border-radius:40%;animation:wave 1.4s linear infinite reverse}
+@keyframes wave{0%{transform:translateX(0) scaleY(1)}50%{transform:translateX(-8px) scaleY(1.2)}100%{transform:translateX(0) scaleY(1)}}
 
 .egg-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
 .egg-overlay.show{opacity:1;pointer-events:all}
@@ -184,6 +188,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 </head>
 <body>
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
+<button class="egg-btn" id="egg-btn" title="">
+  <div class="egg-fill" id="egg-fill"></div>
+  <span style="position:relative;z-index:1">👶</span>
+</button>
 
 <!-- EASTER EGG OVERLAY -->
 <div class="egg-overlay" id="egg-overlay" onclick="closeEgg()">
@@ -203,7 +211,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <div class="screen active" id="screen-home">
   <div class="logo">bebé<span>match</span></div>
   <p class="byline">by Carlos Tn</p>
-  <button class="egg-btn" id="egg-btn" onclick="eggTap()" title="">👶</button>
   <p class="tagline">encontrad juntos el nombre perfecto ✨</p>
   <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--text2)">Conectando...</p></div>
   <div id="home-content">
@@ -295,20 +302,50 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const HEADERS = {'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
 
 /* ── EASTER EGG ── */
-let eggTaps = 0, eggTimer = null;
-function eggTap(){
-  const btn = document.getElementById('egg-btn');
-  btn.classList.remove('shake');
-  void btn.offsetWidth;
-  btn.classList.add('shake');
-  eggTaps++;
-  clearTimeout(eggTimer);
-  eggTimer = setTimeout(()=>{ eggTaps=0; },2000);
-  if(eggTaps >= 5){
-    eggTaps = 0;
-    openEgg();
+let eggPressing = false, eggProgress = 0, eggRaf = null;
+const EGG_DURATION = 1500;
+let eggStart = null;
+
+function eggDown(){
+  eggPressing = true;
+  eggStart = performance.now();
+  eggRaf = requestAnimationFrame(eggFrame);
+  document.getElementById('egg-btn').classList.add('loading');
+}
+function eggUp(){
+  if(!eggPressing) return;
+  eggPressing = false;
+  cancelAnimationFrame(eggRaf);
+  if(eggProgress < 100){
+    eggProgress = 0;
+    document.getElementById('egg-fill').style.height = '0%';
+    document.getElementById('egg-btn').classList.remove('loading','done');
   }
 }
+function eggFrame(now){
+  if(!eggPressing) return;
+  eggProgress = Math.min(((now - eggStart) / EGG_DURATION) * 100, 100);
+  document.getElementById('egg-fill').style.height = eggProgress + '%';
+  if(eggProgress >= 100){
+    eggPressing = false;
+    document.getElementById('egg-btn').classList.add('done');
+    document.getElementById('egg-btn').classList.add('shake');
+    setTimeout(()=>{
+      document.getElementById('egg-btn').classList.remove('loading','done','shake');
+      document.getElementById('egg-fill').style.height = '0%';
+      eggProgress = 0;
+      openEgg();
+    }, 350);
+    return;
+  }
+  eggRaf = requestAnimationFrame(eggFrame);
+}
+
+const eggBtn = document.getElementById('egg-btn');
+eggBtn.addEventListener('mousedown', eggDown);
+eggBtn.addEventListener('touchstart', eggDown, {passive:true});
+document.addEventListener('mouseup', eggUp);
+document.addEventListener('touchend', eggUp);
 function openEgg(){
   const overlay = document.getElementById('egg-overlay');
   overlay.classList.add('show');
