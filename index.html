@@ -630,7 +630,6 @@ async function joinRoom() {
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
 
-  // primero comprobar si la sala existe
   const existing = await dbFetchVotes(code);
   const otherUsers = existing.filter(v => v.user_id !== state.myId);
 
@@ -641,10 +640,8 @@ async function joinRoom() {
     return;
   }
 
-  // insertar presencia propia
   await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
 
-  // cargar votos reales del compañero
   for(const v of otherUsers.filter(v => v.name !== '__presence__')) {
     state.partnerLikes[v.name] = v.liked;
   }
@@ -654,13 +651,11 @@ async function joinRoom() {
   showScreen('waiting');
 
   if(otherUsers.length > 0) {
-    // ya había alguien en la sala
     state.partnerConnected = true;
     updatePartnerDot(true);
     document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
     setTimeout(()=>showSetup(), 1200);
   } else {
-    // nadie aún, arrancar polling
     startPartnerPoll();
   }
 }
@@ -670,23 +665,20 @@ function startPartnerPoll() {
   clearInterval(partnerPollTimer);
   partnerPollTimer = setInterval(async () => {
     if(!state.roomCode || state.partnerConnected) { clearInterval(partnerPollTimer); return; }
-    try {
-      const votes = await dbFetchVotes(state.roomCode);
-      const partnerRecords = votes.filter(v => v.user_id !== state.myId);
-      if(partnerRecords.length > 0) {
-        clearInterval(partnerPollTimer);
-        state.partnerConnected = true;
-        updatePartnerDot(true);
-        // cargar votos reales del compañero
-        for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
-          state.partnerLikes[v.name] = v.liked;
-        }
-        if(document.getElementById('screen-waiting').classList.contains('active')) {
-          document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
-          setTimeout(()=>showSetup(), 1200);
-        }
+    const votes = await dbFetchVotes(state.roomCode);
+    const partnerRecords = votes.filter(v => v.user_id !== state.myId);
+    if(partnerRecords.length > 0) {
+      clearInterval(partnerPollTimer);
+      state.partnerConnected = true;
+      updatePartnerDot(true);
+      for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
+        state.partnerLikes[v.name] = v.liked;
       }
-    } catch(e) { console.warn('Poll error', e); }
+      if(document.getElementById('screen-waiting').classList.contains('active')) {
+        document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
+        setTimeout(()=>showSetup(), 1200);
+      }
+    }
   }, 2000);
 }
 
@@ -908,7 +900,7 @@ function showSummary() {
     sub.textContent = 'Ningún match esta vez... ¡seguid explorando!';
     list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1.5rem 1rem;text-align:center">No hay matches aún. Prueba con otros filtros.</p>';
   } else {
-    title.textContent = `${state.matches.length} match${state.matches.length>1?'es'} encontrado${state.matches.length>1?'s':''}! 💞`;
+    title.textContent = `${state.matches.length} match${state.matches.length>1?'es':''} encontrado${state.matches.length>1?'s':''}! 💞`;
     sub.textContent = 'Los nombres que os gustan a los dos';
     state.matches.forEach((name, i) => {
       const d = document.createElement('div');
