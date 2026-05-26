@@ -44,8 +44,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 @keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* HOME */
-.logo{font-family:'Instrument Serif',serif;font-size:3rem;color:var(--text);line-height:1;font-weight:400;letter-spacing:-.02em}
+.logo{font-family:'Instrument Serif',serif;font-size:3rem;color:var(--text);line-height:1;font-weight:400;letter-spacing:-.02em;position:relative;display:inline-block}
 .logo span{color:var(--salmon);font-style:italic}
+
+/* PARTÍCULAS ♥ */
+.heart-particle{position:fixed;pointer-events:none;font-size:1rem;opacity:1;z-index:9999;animation:heartPop .7s ease-out forwards}
+@keyframes heartPop{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
 .byline{font-size:.68rem;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:.4rem 0 0;font-weight:400}
 .tagline{font-size:.875rem;color:var(--text2);margin:.9rem 0 2.5rem;font-weight:300;letter-spacing:.01em}
 
@@ -61,7 +65,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .btn-ghost{background:transparent;color:var(--text2);border:none;font-size:.8rem;padding:.5rem 1rem}
 .btn-ghost:hover{color:var(--text)}
 
-.divider{display:flex;align-items:center;gap:1rem;width:100%;max-width:300px;margin:1.2rem 0;color:var(--text3);font-size:.75rem;letter-spacing:.04em}
+.divider{display:flex;align-items:center;gap:1rem;width:100%;max-width:300px;margin:1.2rem auto;color:var(--text3);font-size:.75rem;letter-spacing:.04em}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
 .room-input{width:100%;max-width:300px;padding:.8rem 1rem;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-family:'Inter',sans-serif;font-size:1.1rem;color:var(--text);outline:none;transition:all .18s;text-align:center;letter-spacing:.3em;text-transform:uppercase;margin:.4rem 0;-webkit-appearance:none;font-weight:500}
@@ -306,7 +310,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
-  <div class="logo">bebé<span>match</span></div>
+  <div style="position:relative;display:inline-block">
+    <div class="logo" id="logo">bebé<span>match</span></div>
+  </div>
   <p class="byline">by Carlos Tn</p>
   <p class="tagline">encontrad juntos el nombre perfecto ✨</p>
   <div id="home-loading" style="display:none"><div class="loading-spinner"></div><p style="font-size:.85rem;color:var(--text2)">Conectando...</p></div>
@@ -486,7 +492,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v5.9</div>
+<div class="version-tag">v6.6</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -939,6 +945,58 @@ function shareSoloMatches() {
   const text = `👶 Mis nombres favoritos son ${formatted}! Elegidos con BebéMatch ♥`;
   if(navigator.share) navigator.share({text}).catch(()=>{});
   else if(navigator.clipboard) { navigator.clipboard.writeText(text); showToast('¡Copiado!'); }
+}
+
+/* ── PARTÍCULAS TÍTULO ── */
+function spawnTitleParticles() {
+  const logo = document.getElementById('logo');
+  if(!logo || !document.getElementById('screen-home').classList.contains('active')) return;
+  const rect = logo.getBoundingClientRect();
+  const count = 3;
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const p = document.createElement('span');
+      p.className = 'heart-particle';
+      p.textContent = '🩷';
+      // posición aleatoria alrededor del título
+      const cx = rect.left + Math.random() * rect.width;
+      const cy = rect.top + Math.random() * rect.height;
+      const angle = -Math.PI/2 + (Math.random()-.5)*1.5;
+      const dist = 18 + Math.random()*18;
+      p.style.left = cx + 'px';
+      p.style.top = cy + 'px';
+      p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle)*dist - 12 + 'px');
+      p.style.animationDuration = (.5 + Math.random()*.3) + 's';
+      p.style.fontSize = '.6rem';
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(), 800);
+    }, i * 120);
+  }
+}
+setInterval(spawnTitleParticles, 3000);
+
+/* ── PARTÍCULAS BOTÓN ♥ ── */
+function spawnHeartParticles(btn) {
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  const count = 4;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'heart-particle';
+    p.textContent = '🩷';
+    const angle = (i/count)*Math.PI*2;
+    const dist = 20 + Math.random()*15;
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--dx', Math.cos(angle)*dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle)*dist - 15 + 'px');
+    p.style.animationDuration = (.25 + Math.random()*.15) + 's';
+    p.style.fontSize = '.55rem';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 400);
+  }
 }
 
 function toggleTheme(){
@@ -1462,13 +1520,14 @@ function buildQueue() {
     pool = pool.filter(n => n.o === state.filters.origin);
   }
 
-  // filtro longitud
+  // filtro longitud — normalizar Unicode para contar correctamente
+  const nameLen = n => [...n.n.normalize('NFC')].length;
   if(state.filters.length === 'short') {
-    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length <= 4);
+    pool = pool.filter(n => nameLen(n) <= 4);
   } else if(state.filters.length === 'medium') {
-    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length >= 5 && n.n.replace(/[áéíóúüñ]/gi, 'x').length <= 7);
+    pool = pool.filter(n => nameLen(n) >= 5 && nameLen(n) <= 7);
   } else if(state.filters.length === 'long') {
-    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length >= 8);
+    pool = pool.filter(n => nameLen(n) >= 8);
   }
 
   // si combinación de filtros deja muy pocos, relajar solo longitud
@@ -1650,6 +1709,7 @@ async function swipeCard(liked) {
     const b = document.getElementById('btn-yes');
     b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
     setTimeout(()=>b.classList.remove('pop'), 400);
+    spawnHeartParticles(b);
   } else if(liked === false) {
     const b = document.getElementById('btn-no');
     b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
