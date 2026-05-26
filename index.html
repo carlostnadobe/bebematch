@@ -99,7 +99,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .progress-bar{height:100%;border-radius:1px;background:var(--salmon);transition:width .35s ease}
 
 /* CARDS */
-.card-stack{position:relative;width:320px;height:420px;margin:.8rem 0}
+.card-stack{position:relative;width:320px;height:420px;margin:.8rem 0;touch-action:none}
 .name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;transition:border-color .1s;touch-action:none}
 .name-card.behind{transform:scale(.95) translateY(10px);z-index:0;border-color:rgba(255,255,255,.05)}
 .name-card.behind2{transform:scale(.90) translateY(20px);z-index:-1;border-color:rgba(255,255,255,.03)}
@@ -395,7 +395,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 </div>
 
 <!-- SWIPE -->
-<div class="screen" id="screen-swipe" style="padding-top:1rem">
+<div class="screen" id="screen-swipe" style="padding-top:1rem;overflow:hidden;touch-action:pan-y">
   <div class="swipe-header">
     <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
     <div style="display:flex;align-items:center;gap:.5rem">
@@ -495,7 +495,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v6.8</div>
+<div class="version-tag">v6.9</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1622,6 +1622,9 @@ function createCard(nm) {
   return div;
 }
 
+let startY = 0;
+let dragLocked = false;
+
 function setupDrag() {
   const top = document.querySelector('.name-card.active');
   if(!top) return;
@@ -1631,10 +1634,11 @@ function setupDrag() {
 }
 
 function onDragStart(e) {
-  if(e.cancelable) e.preventDefault();
   isDragging = true;
+  dragLocked = false;
   const p = e.touches ? e.touches[0] : e;
   startX = p.clientX;
+  startY = p.clientY;
   activeCard.classList.add('dragging');
   activeCard.style.transition = 'none';
   document.addEventListener('mousemove', onDragMove);
@@ -1645,9 +1649,24 @@ function onDragStart(e) {
 
 function onDragMove(e) {
   if(!isDragging||!activeCard) return;
-  if(e.cancelable) e.preventDefault();
   const p = e.touches ? e.touches[0] : e;
-  currentX = p.clientX - startX;
+  const dx = p.clientX - startX;
+  const dy = p.clientY - startY;
+  // bloquear si el gesto es claramente horizontal
+  if(!dragLocked) {
+    if(Math.abs(dx) > Math.abs(dy) + 4) {
+      dragLocked = true;
+    } else if(Math.abs(dy) > Math.abs(dx) + 4) {
+      // gesto vertical — cancelar drag
+      isDragging = false;
+      activeCard.classList.remove('dragging');
+      activeCard.style.transition = '';
+      activeCard.style.transform = '';
+      return;
+    }
+  }
+  if(dragLocked && e.cancelable) e.preventDefault();
+  currentX = dx;
   const rot = currentX * 0.08;
   activeCard.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
   const yes = activeCard.querySelector('.vote-yes');
