@@ -159,7 +159,7 @@ body.light .btn-secondary{background:var(--surface3);color:var(--text);border-co
 body.light .btn-secondary:hover{background:var(--surface2)}
 
 /* EASTER EGG */
-.egg-btn{position:fixed;top:1.2rem;left:1.2rem;z-index:100;width:110px;height:40px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;gap:.4rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;user-select:none;overflow:hidden;font-family:'Inter',sans-serif;color:var(--text2);font-weight:400;letter-spacing:.01em}
+.egg-btn{position:fixed;top:1.2rem;left:1.2rem;z-index:100;width:110px;height:40px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;gap:.4rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overflow:hidden;font-family:'Inter',sans-serif;color:var(--text2);font-weight:400;letter-spacing:.01em;touch-action:none}
 .egg-btn:hover{border-color:rgba(56,189,248,.5)}
 .egg-btn.shake{animation:eggshake .35s ease}
 @keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.04)}75%{transform:rotate(3deg) scale(1.04)}}
@@ -306,7 +306,8 @@ let eggPressing = false, eggProgress = 0, eggRaf = null;
 const EGG_DURATION = 1500;
 let eggStart = null;
 
-function eggDown(){
+function eggDown(e){
+  e.preventDefault();
   eggPressing = true;
   eggStart = performance.now();
   eggRaf = requestAnimationFrame(eggFrame);
@@ -355,7 +356,8 @@ function eggFrame(now){
 
 const eggBtn = document.getElementById('egg-btn');
 eggBtn.addEventListener('mousedown', eggDown);
-eggBtn.addEventListener('touchstart', eggDown, {passive:true});
+eggBtn.addEventListener('touchstart', eggDown, {passive:false});
+eggBtn.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('mouseup', eggUp);
 document.addEventListener('touchend', eggUp);
 function openEgg(){
