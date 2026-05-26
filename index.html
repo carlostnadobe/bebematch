@@ -95,7 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 
 /* CARDS */
 .card-stack{position:relative;width:320px;height:420px;margin:.8rem 0}
-.name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;transition:border-color .1s}
+.name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;transition:border-color .1s;touch-action:none}
 .name-card.behind{transform:scale(.95) translateY(10px);z-index:0;border-color:rgba(255,255,255,.05)}
 .name-card.behind2{transform:scale(.90) translateY(20px);z-index:-1;border-color:rgba(255,255,255,.03)}
 .name-card.active{z-index:2}
@@ -348,7 +348,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill selected" data-v="all" onclick="togglePill(this,'origin')">Todos</div>
     <div class="pill" data-v="español" onclick="togglePill(this,'origin')">Español</div>
     <div class="pill" data-v="inglés" onclick="togglePill(this,'origin')">Inglés</div>
-    <div class="pill" data-v="latino" onclick="togglePill(this,'origin')">Latino</div>
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
     <div class="pill" data-v="calorro" onclick="togglePill(this,'origin')">🔥 Calorro</div>
@@ -362,9 +361,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
   <div class="pill-row" id="count-pills">
-    <div class="pill selected" data-v="20" onclick="togglePill(this,'count')">Corto · 20</div>
-    <div class="pill" data-v="40" onclick="togglePill(this,'count')">Medio · 40</div>
-    <div class="pill" data-v="80" onclick="togglePill(this,'count')">Largo · 80</div>
+    <div class="pill selected" data-v="20" onclick="togglePill(this,'count')">Corto</div>
+    <div class="pill" data-v="40" onclick="togglePill(this,'count')">Medio</div>
+    <div class="pill" data-v="80" onclick="togglePill(this,'count')">Largo</div>
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
@@ -392,7 +391,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
     <div style="display:flex;align-items:center;gap:.5rem">
       <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
-      <button onclick="confirmGoHome()" style="background:none;border:none;font-size:.72rem;color:var(--text3);cursor:pointer;padding:.2rem .4rem;font-family:'Inter',sans-serif">← inicio</button>
+      <button onclick="confirmGoHome()" style="background:var(--surface2);border:1px solid var(--border2);font-size:.72rem;color:var(--text2);cursor:pointer;padding:.3rem .7rem;font-family:'Inter',sans-serif;border-radius:7px;font-weight:500;transition:all .15s" onmouseover="this.style.borderColor='var(--salmon)';this.style.color='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← inicio</button>
       <div class="score-badge" id="match-count">💞 0 matches</div>
     </div>
   </div>
@@ -487,7 +486,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v5.6</div>
+<div class="version-tag">v5.9</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1566,23 +1565,25 @@ function setupDrag() {
   if(!top) return;
   activeCard = top;
   top.addEventListener('mousedown', onDragStart);
-  top.addEventListener('touchstart', onDragStart, {passive:true});
+  top.addEventListener('touchstart', onDragStart, {passive:false});
 }
 
 function onDragStart(e) {
+  if(e.cancelable) e.preventDefault();
   isDragging = true;
   const p = e.touches ? e.touches[0] : e;
   startX = p.clientX;
   activeCard.classList.add('dragging');
   activeCard.style.transition = 'none';
   document.addEventListener('mousemove', onDragMove);
-  document.addEventListener('touchmove', onDragMove, {passive:true});
+  document.addEventListener('touchmove', onDragMove, {passive:false});
   document.addEventListener('mouseup', onDragEnd);
   document.addEventListener('touchend', onDragEnd);
 }
 
 function onDragMove(e) {
   if(!isDragging||!activeCard) return;
+  if(e.cancelable) e.preventDefault();
   const p = e.touches ? e.touches[0] : e;
   currentX = p.clientX - startX;
   const rot = currentX * 0.08;
