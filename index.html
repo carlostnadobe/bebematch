@@ -471,7 +471,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v5.1</div>
+<div class="version-tag">v5.2</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1198,15 +1198,39 @@ async function startSwiping() {
 /* ── QUEUE ── */
 function buildQueue() {
   let pool = [...NAMES_DB];
-  if(state.filters.gender !== 'all') pool = pool.filter(n=>n.g===state.filters.gender);
-  if(state.filters.origin !== 'all') pool = pool.filter(n=>n.o===state.filters.origin || n.o.includes(state.filters.origin));
-  if(state.filters.length === 'short') pool = pool.filter(n=>n.n.length <= 4);
-  else if(state.filters.length === 'medium') pool = pool.filter(n=>n.n.length >= 5 && n.n.length <= 7);
-  else if(state.filters.length === 'long') pool = pool.filter(n=>n.n.length >= 8);
-  if(pool.length < 8) pool = [...NAMES_DB];
-  pool.sort(()=>Math.random()-.5);
-  const count = state.filters.count || 40;
-  state.queue = pool.slice(0, count);
+
+  // filtro género
+  if(state.filters.gender !== 'all') {
+    pool = pool.filter(n => n.g === state.filters.gender);
+  }
+
+  // filtro origen — comparación exacta
+  if(state.filters.origin !== 'all') {
+    pool = pool.filter(n => n.o === state.filters.origin);
+  }
+
+  // filtro longitud
+  if(state.filters.length === 'short') {
+    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length <= 4);
+  } else if(state.filters.length === 'medium') {
+    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length >= 5 && n.n.replace(/[áéíóúüñ]/gi, 'x').length <= 7);
+  } else if(state.filters.length === 'long') {
+    pool = pool.filter(n => n.n.replace(/[áéíóúüñ]/gi, 'x').length >= 8);
+  }
+
+  // si combinación de filtros deja muy pocos, relajar solo longitud
+  if(pool.length < 5) pool = [...NAMES_DB].filter(n => {
+    if(state.filters.gender !== 'all' && n.g !== state.filters.gender) return false;
+    if(state.filters.origin !== 'all' && n.o !== state.filters.origin) return false;
+    return true;
+  });
+
+  // si sigue siendo vacío, usar todo
+  if(pool.length === 0) pool = [...NAMES_DB];
+
+  pool.sort(() => Math.random() - .5);
+  const count = state.filters.count || 20;
+  state.queue = pool.slice(0, Math.min(count, pool.length));
   state.currentIdx = 0;
 }
 
