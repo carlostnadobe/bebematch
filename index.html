@@ -396,9 +396,11 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="pill-row" id="super-pills">
     <div class="pill" data-v="calorro" onclick="togglePillExtra(this,'calorro')">🔥 Calorro</div>
     <div class="pill" data-v="sudamerica" onclick="togglePillExtra(this,'sudamerica')">🌎 Sudamérica Fusión</div>
+    <div class="pill" data-v="reyes" onclick="togglePillExtra(this,'reyes')">👑 Reyes y Emperadores</div>
     <div class="pill" data-v="superlike" onclick="togglePillExtra(this,'superlike')">⭐ SuperLikes</div>
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
+  <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;font-size:.82rem">← Volver al inicio</button>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
 </div>
 
@@ -508,6 +510,16 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
+<!-- TARJETA MODAL -->
+<div id="card-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:1rem" onclick="closeCard()">
+  <canvas id="match-card-canvas" style="border-radius:16px;max-width:90vw;max-height:70vh;box-shadow:0 8px 40px rgba(0,0,0,.5)"></canvas>
+  <div style="display:flex;gap:.6rem" onclick="event.stopPropagation()">
+    <button class="egg-close" style="opacity:1" onclick="downloadCard()">⬇ Descargar</button>
+    <button class="egg-close" style="opacity:1" onclick="shareCard()">📤 Compartir</button>
+    <button class="egg-close" style="opacity:1" onclick="closeCard()">cerrar</button>
+  </div>
+</div>
+
 <!-- SUMMARY SOLO -->
 <div class="screen" id="screen-summary-solo" style="position:relative;overflow:hidden">
   <canvas id="summary-solo-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
@@ -529,7 +541,8 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
     <div class="liked-list" id="summary-list" style="max-height:48vh"></div>
     <button class="btn btn-primary" onclick="shareMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir matches 💞</button>
-    <button class="btn btn-primary" id="btn-refine" onclick="startRefineMode()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;background:var(--surface2);color:var(--text);border:1px solid var(--border2)">🎯 Afinar — votar solo los matches</button>
+    <button class="btn btn-secondary" onclick="generateMatchCard()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">🎨 Generar tarjeta</button>
+    <button class="btn btn-secondary" id="btn-refine" onclick="startRefineMode()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;background:var(--surface2);color:var(--text);border:1px solid var(--border2)">🎯 Afinar — votar solo los matches</button>
     <button class="btn btn-secondary" onclick="restartFromSetup()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
     <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
   </div>
@@ -560,7 +573,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v9.7</div>
+<div class="version-tag">v9.9</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 <div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
@@ -950,7 +963,135 @@ function checkMineWin() {
   }
 }
 
-/* ── MODO SOLO ── */
+/* ── TARJETA DE MATCHES ── */
+async function generateMatchCard() {
+  const matches = state.matches.filter(n => !state.superlikes.includes(n));
+  const superlikes = state.superlikes || [];
+  const allNames = [...superlikes, ...matches];
+  if(allNames.length === 0) { showToast('No hay matches que mostrar'); return; }
+
+  const canvas = document.getElementById('match-card-canvas');
+  const W = 420, H = Math.max(540, 200 + allNames.length * 44 + (superlikes.length > 0 ? 40 : 0));
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const isDark = !document.body.classList.contains('light');
+
+  // fondo
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  if(isDark) { bg.addColorStop(0, '#0f0f0f'); bg.addColorStop(1, '#1a0f0d'); }
+  else { bg.addColorStop(0, '#FDF8F4'); bg.addColorStop(1, '#F5EDE6'); }
+  ctx.fillStyle = bg;
+  ctx.beginPath(); ctx.roundRect(0, 0, W, H, 20); ctx.fill();
+
+  // borde decorativo
+  ctx.strokeStyle = isDark ? 'rgba(232,115,90,.25)' : 'rgba(232,115,90,.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(8, 8, W-16, H-16, 16); ctx.stroke();
+
+  // logo
+  const textColor = isDark ? '#F5F5F5' : '#1a1a1a';
+  const salmonColor = '#E8735A';
+  const mutedColor = isDark ? '#808080' : '#9a8a82';
+
+  ctx.font = 'italic 700 26px serif';
+  ctx.fillStyle = textColor;
+  ctx.fillText('bebé', 30, 52);
+  ctx.fillStyle = salmonColor;
+  ctx.fillText('match', 30 + ctx.measureText('bebé').width, 52);
+
+  // corazón decorativo
+  ctx.font = '18px serif';
+  ctx.fillText('🩷', W - 54, 52);
+
+  // línea separadora
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(30, 68); ctx.lineTo(W-30, 68); ctx.stroke();
+
+  // título
+  ctx.font = '500 13px Inter, sans-serif';
+  ctx.fillStyle = mutedColor;
+  ctx.letterSpacing = '0.08em';
+  ctx.fillText('NUESTROS NOMBRES FAVORITOS', 30, 95);
+
+  let y = 120;
+
+  // superlikes
+  if(superlikes.length > 0) {
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.fillStyle = '#22C55E';
+    ctx.fillText('⭐  SUPERLIKES', 30, y);
+    y += 8;
+    for(const name of superlikes) {
+      y += 36;
+      ctx.fillStyle = isDark ? 'rgba(34,197,94,.12)' : 'rgba(34,197,94,.1)';
+      ctx.beginPath(); ctx.roundRect(30, y - 24, W - 60, 34, 8); ctx.fill();
+      ctx.font = 'italic 600 20px serif';
+      ctx.fillStyle = '#22C55E';
+      ctx.fillText(name, 50, y - 2);
+      ctx.font = '11px serif'; ctx.fillText('⭐', W - 56, y - 2);
+    }
+    y += 20;
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(W-30, y); ctx.stroke();
+    y += 16;
+  }
+
+  // matches normales
+  if(matches.length > 0) {
+    if(superlikes.length > 0) {
+      ctx.font = '600 11px Inter, sans-serif';
+      ctx.fillStyle = mutedColor;
+      ctx.fillText('💞  MATCHES', 30, y);
+      y += 8;
+    }
+    for(let i = 0; i < matches.length; i++) {
+      y += 36;
+      ctx.fillStyle = isDark ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.04)';
+      ctx.beginPath(); ctx.roundRect(30, y - 24, W - 60, 34, 8); ctx.fill();
+      ctx.font = '500 12px Inter, sans-serif';
+      ctx.fillStyle = mutedColor;
+      ctx.fillText(`#${i+1}`, 44, y - 4);
+      ctx.font = 'italic 600 20px serif';
+      ctx.fillStyle = textColor;
+      ctx.fillText(matches[i], 72, y - 2);
+      ctx.font = '12px serif'; ctx.fillText('💞', W - 56, y - 2);
+    }
+  }
+
+  // footer
+  y = H - 28;
+  ctx.font = '11px Inter, sans-serif';
+  ctx.fillStyle = mutedColor;
+  ctx.fillText('bebématch.carlostn-adobe.workers.dev', 30, y);
+
+  // mostrar modal
+  document.getElementById('card-overlay').style.display = 'flex';
+}
+
+function closeCard() {
+  document.getElementById('card-overlay').style.display = 'none';
+}
+
+function downloadCard() {
+  const canvas = document.getElementById('match-card-canvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'bebematch-nombres.png';
+  a.click();
+}
+
+async function shareCard() {
+  const canvas = document.getElementById('match-card-canvas');
+  canvas.toBlob(async blob => {
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],'bebematch.png',{type:'image/png'})]})) {
+      await navigator.share({files:[new File([blob],'bebematch.png',{type:'image/png'})], title:'Nuestros nombres favoritos'}).catch(()=>{});
+    } else {
+      downloadCard();
+    }
+  }, 'image/png');
+}
 function startSolo() {
   state.isSolo = true;
   state.isHost = true;
@@ -1364,6 +1505,34 @@ const NAMES_DB = [
   {n:"Versache",g:"girl",o:"sudamerica",m:"Versace con h extra — más exclusivo aún que el original"},
   {n:"Chanel María",g:"girl",o:"sudamerica",m:"la perfumería francesa + María — glamour con fe"},
   {n:"Dolche",g:"girl",o:"sudamerica",m:"Dolce de Dolce & Gabbana, sin el ampersand — más fácil de escribir"},
+  // ── REYES Y EMPERADORES 👑 ──
+  {n:"Constantino",g:"boy",o:"reyes",m:"Constantino el Grande — primer emperador cristiano"},
+  {n:"Maximiliano",g:"boy",o:"reyes",m:"Maximiliano I — emperador del Sacro Imperio Romano"},
+  {n:"Leonidas",g:"boy",o:"reyes",m:"Leonidas I — rey espartano que defendió las Termópilas"},
+  {n:"Carlomagno",g:"boy",o:"reyes",m:"Carlomagno — rey de los francos y padre de Europa"},
+  {n:"Napoleón",g:"boy",o:"reyes",m:"Napoleón Bonaparte — emperador de los franceses"},
+  {n:"Adriano",g:"boy",o:"reyes",m:"Adriano — emperador romano constructor del Panteón"},
+  {n:"Trajano",g:"boy",o:"reyes",m:"Trajano — mejor emperador romano según el Senado"},
+  {n:"Ciro",g:"boy",o:"reyes",m:"Ciro el Grande — fundador del Imperio Persa"},
+  {n:"Dario",g:"boy",o:"reyes",m:"Darío I — rey persa que amplió el mayor imperio del mundo"},
+  {n:"Atila",g:"boy",o:"reyes",m:"Atila — el Flagelo de Dios, rey de los hunos"},
+  {n:"Alarico",g:"boy",o:"reyes",m:"Alarico I — rey visigodo que saqueó Roma"},
+  {n:"Federico",g:"boy",o:"reyes",m:"Federico el Grande — rey de Prusia, genio militar"},
+  {n:"Solimán",g:"boy",o:"reyes",m:"Solimán el Magnífico — sultán del Imperio Otomano"},
+  {n:"Tamerlán",g:"boy",o:"reyes",m:"Tamerlán — conquistador que reunificó el Imperio Mongol"},
+  {n:"Augusto",g:"boy",o:"reyes",m:"Octavio Augusto — primer emperador del Imperio Romano"},
+  {n:"Alejandro",g:"boy",o:"reyes",m:"Alejandro Magno — conquistador del mundo conocido"},
+  {n:"Cleopatra",g:"girl",o:"reyes",m:"Cleopatra VII — última reina del Egipto ptolemaico"},
+  {n:"Nefertiti",g:"girl",o:"reyes",m:"Nefertiti — reina egipcia, 'la bella ha llegado'"},
+  {n:"Zenobia",g:"girl",o:"reyes",m:"Zenobia — reina de Palmira que desafió a Roma"},
+  {n:"Boadicea",g:"girl",o:"reyes",m:"Boadicea — reina bretona que lideró la revuelta contra Roma"},
+  {n:"Teodora",g:"girl",o:"reyes",m:"Teodora — emperatriz de Bizancio, de actriz a emperatriz"},
+  {n:"Hatshepsut",g:"girl",o:"reyes",m:"Hatshepsut — faraona más poderosa del Antiguo Egipto"},
+  {n:"Isabela",g:"girl",o:"reyes",m:"Isabel la Católica — reina que financió el viaje de Colón"},
+  {n:"Catalina",g:"girl",o:"reyes",m:"Catalina la Grande — emperatriz de Rusia"},
+  {n:"Artemisa",g:"girl",o:"reyes",m:"Artemisia I — reina de Halicarnaso que luchó en Salamina"},
+  {n:"Roxana",g:"girl",o:"reyes",m:"Roxana — esposa de Alejandro Magno, princesa bactriana"},
+  {n:"Matilda",g:"girl",o:"reyes",m:"Matilda — primera mujer en reclamar el trono inglés"},
 ];
 
 
@@ -1385,7 +1554,7 @@ const state = {
   superlikesLeft: 2,
   matches: [],
   superlikes: [],    // nombres que son superlike (míos o de pareja)
-  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false},
+  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false, reyes: false},
   streak: 0,
   streakType: null,
 };
@@ -1561,47 +1730,36 @@ function togglePill(el, group) {
   document.getElementById(group+'-pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
   state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
+  // si se selecciona un origen específico, desactivar modos exclusivos
+  if(group === 'origin' && el.dataset.v !== 'all') {
+    ['calorro','sudamerica','reyes'].forEach(k => {
+      state.filters[k] = false;
+      const pill = document.querySelector(`#super-pills .pill[data-v="${k}"]`);
+      if(pill) pill.classList.remove('selected');
+    });
+  }
 }
 
 function togglePillExtra(el, key) {
   const on = !el.classList.contains('selected');
   el.classList.toggle('selected', on);
-
+  const exclusiveKeys = ['calorro', 'sudamerica', 'reyes'];
   if(key === 'superlike') {
     state.filters.superlike = on;
-  } else if(key === 'calorro') {
-    state.filters.calorro = on;
+  } else if(exclusiveKeys.includes(key)) {
+    // desactivar los otros modos exclusivos
     if(on) {
-      // excluir sudamerica y resetear origen
-      state.filters.sudamerica = false;
+      exclusiveKeys.filter(k=>k!==key).forEach(k => {
+        state.filters[k] = false;
+        const pill = document.querySelector(`#super-pills .pill[data-v="${k}"]`);
+        if(pill) pill.classList.remove('selected');
+      });
+      // resetear origen
       state.filters.origin = 'all';
-      document.querySelector('#super-pills .pill[data-v="sudamerica"]').classList.remove('selected');
       document.querySelectorAll('#origin-pills .pill').forEach(p => p.classList.remove('selected'));
       document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
     }
-  } else if(key === 'sudamerica') {
-    state.filters.sudamerica = on;
-    if(on) {
-      // excluir calorro y resetear origen
-      state.filters.calorro = false;
-      state.filters.origin = 'all';
-      document.querySelector('#super-pills .pill[data-v="calorro"]').classList.remove('selected');
-      document.querySelectorAll('#origin-pills .pill').forEach(p => p.classList.remove('selected'));
-      document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
-    }
-  }
-}
-
-function togglePill(el, group) {
-  document.getElementById(group+'-pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
-  el.classList.add('selected');
-  state.filters[group] = group === 'count' ? parseInt(el.dataset.v) : el.dataset.v;
-  // si se selecciona un origen específico, desactivar calorro y sudamerica
-  if(group === 'origin' && el.dataset.v !== 'all') {
-    state.filters.calorro = false;
-    state.filters.sudamerica = false;
-    document.querySelector('#super-pills .pill[data-v="calorro"]').classList.remove('selected');
-    document.querySelector('#super-pills .pill[data-v="sudamerica"]').classList.remove('selected');
+    state.filters[key] = on;
   }
 }
 
@@ -1709,9 +1867,11 @@ function buildQueue() {
     pool = NAMES_DB.filter(n => n.o === 'calorro');
   } else if(state.filters.sudamerica) {
     pool = NAMES_DB.filter(n => n.o === 'sudamerica');
+  } else if(state.filters.reyes) {
+    pool = NAMES_DB.filter(n => n.o === 'reyes');
   } else {
     // pool normal sin calorro ni sudamerica
-    pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
+    pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
     // filtro origen estándar
     if(state.filters.origin !== 'all') {
       pool = pool.filter(n => n.o === state.filters.origin);
@@ -1735,18 +1895,17 @@ function buildQueue() {
 
   // fallback si quedan muy pocos — relajar longitud pero mantener modo
   if(pool.length < 5) {
-    if(state.filters.calorro) {
-      pool = NAMES_DB.filter(n => n.o === 'calorro');
-    } else if(state.filters.sudamerica) {
-      pool = NAMES_DB.filter(n => n.o === 'sudamerica');
-    } else {
-      pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
+    if(state.filters.calorro) pool = NAMES_DB.filter(n => n.o === 'calorro');
+    else if(state.filters.sudamerica) pool = NAMES_DB.filter(n => n.o === 'sudamerica');
+    else if(state.filters.reyes) pool = NAMES_DB.filter(n => n.o === 'reyes');
+    else {
+      pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
       if(state.filters.origin !== 'all') pool = pool.filter(n => n.o === state.filters.origin);
     }
     if(state.filters.gender !== 'all') pool = pool.filter(n => n.g === state.filters.gender);
   }
 
-  if(pool.length === 0) pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica');
+  if(pool.length === 0) pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
 
   // ordenar con seed determinista para que ambos jugadores vean los mismos nombres
   const seed = state.filters._seed;
@@ -2356,7 +2515,7 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false};
+  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false, reyes: false};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
