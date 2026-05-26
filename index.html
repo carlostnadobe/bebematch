@@ -376,6 +376,14 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="waiting-anim"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 </div>
 
+<!-- WAITING SUMMARY -->
+<div class="screen" id="screen-waiting-summary">
+  <div class="status-bar"><div class="status-dot"></div><span>Casi listos...</span></div>
+  <p class="title-serif">¡Ya has terminado! 🎉</p>
+  <p class="subtitle" style="margin-top:.5rem">Esperando a que tu pareja termine de votar...<br>El resumen saldrá cuando acabéis los dos.</p>
+  <div class="waiting-anim"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
 <!-- SWIPE -->
 <div class="screen" id="screen-swipe" style="padding-top:1rem">
   <div class="swipe-header">
@@ -451,7 +459,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v4.4</div>
+<div class="version-tag">v4.6</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1145,9 +1153,11 @@ function startFilterPoll() {
 async function hostStartSwiping() {
   try {
     await dbDelete(state.roomCode, '__filters__');
+    await dbDelete(state.roomCode, '__done__');
     await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
   } catch(e) {}
-  lastFilterId = null; // reset para que el invitado detecte el nuevo
+  lastFilterId = null;
+  clearInterval(donePollTimer);
   startSwiping();
 }
 
@@ -1161,7 +1171,7 @@ async function startSwiping() {
     if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
     try {
       const votes = await dbFetchVotes(state.roomCode);
-      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__')) {
+      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
         if(state.partnerLikes[v.name] === undefined) {
           state.partnerLikes[v.name] = v.liked;
           if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
@@ -1191,7 +1201,7 @@ function renderCards() {
   const stack = document.getElementById('card-stack');
   stack.innerHTML = '';
   if(state.currentIdx >= state.queue.length) {
-    showSummary();
+    finishSwiping();
     return;
   }
   for(let i=Math.min(state.currentIdx+2, state.queue.length-1); i>=state.currentIdx; i--) {
@@ -1205,6 +1215,35 @@ function renderCards() {
   }
   updateProgress();
   setupDrag();
+}
+
+let donePollTimer = null;
+async function finishSwiping() {
+  // insertar __done__ para avisar a la pareja
+  try { await dbInsert({room_code: state.roomCode, user_id: state.myId, name: '__done__', liked: false}); } catch(e) {}
+  // comprobar si la pareja ya terminó
+  let partnerDone = false;
+  try {
+    const votes = await dbFetchVotes(state.roomCode);
+    partnerDone = votes.some(v => v.user_id !== state.myId && v.name === '__done__');
+  } catch(e) {}
+
+  if(partnerDone) {
+    showSummary();
+  } else {
+    showScreen('waiting-summary');
+    clearInterval(donePollTimer);
+    donePollTimer = setInterval(async () => {
+      try {
+        const votes = await dbFetchVotes(state.roomCode);
+        const done = votes.some(v => v.user_id !== state.myId && v.name === '__done__');
+        if(done) {
+          clearInterval(donePollTimer);
+          showSummary();
+        }
+      } catch(e) {}
+    }, 2000);
+  }
 }
 
 function createCard(nm) {
@@ -1407,6 +1446,24 @@ function updateProgress() {
 }
 
 function showSummary() {
+  // sincronizar votos de la pareja antes de calcular matches
+  (async()=>{
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
+        state.partnerLikes[v.name] = v.liked;
+      }
+      // recalcular matches completos
+      state.matches = [];
+      for(const [name, liked] of Object.entries(state.myLikes)) {
+        if(liked && state.partnerLikes[name]) state.matches.push(name);
+      }
+    } catch(e) {}
+    renderSummary();
+  })();
+}
+
+function renderSummary() {
   const list = document.getElementById('summary-list');
   list.innerHTML = '';
   const title = document.getElementById('summary-title');
