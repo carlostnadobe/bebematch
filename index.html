@@ -94,11 +94,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 
 /* CARDS */
 .card-stack{position:relative;width:320px;height:420px;margin:.8rem 0}
-.name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset}
+.name-card{position:absolute;inset:0;background:var(--surface);border-radius:20px;border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.2rem;cursor:grab;user-select:none;transform-origin:center bottom;box-shadow:0 0 0 1px rgba(255,255,255,.03) inset;transition:border-color .1s}
 .name-card.behind{transform:scale(.95) translateY(10px);z-index:0;border-color:rgba(255,255,255,.05)}
 .name-card.behind2{transform:scale(.90) translateY(20px);z-index:-1;border-color:rgba(255,255,255,.03)}
 .name-card.active{z-index:2}
 .name-card.dragging{cursor:grabbing}
+.card-color-overlay{position:absolute;inset:0;border-radius:18px;opacity:0;pointer-events:none;transition:opacity .1s}
 .card-accent{width:28px;height:1.5px;border-radius:1px;background:var(--surface3);margin-bottom:1.8rem}
 .card-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:var(--text);line-height:1;margin-bottom:.5rem;font-weight:400;letter-spacing:-.02em}
 .card-origin{font-size:.7rem;color:var(--text3);font-weight:400;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem}
@@ -107,9 +108,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .gender-girl{background:rgba(232,115,90,.12);color:var(--salmon)}
 .gender-boy{background:rgba(96,165,250,.1);color:#60A5FA}
 .gender-neutral{background:rgba(167,139,250,.1);color:#A78BFA}
-.vote-hint{position:absolute;top:1.2rem;padding:.25rem .7rem;border-radius:6px;font-size:.75rem;font-weight:600;opacity:0;transition:opacity .12s;border:1.5px solid;letter-spacing:.04em;text-transform:uppercase}
-.vote-yes{right:1.2rem;color:#4ADE80;border-color:#4ADE80}
-.vote-no{left:1.2rem;color:var(--salmon);border-color:var(--salmon)}
+.vote-hint{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  padding:.5rem 1.4rem;
+  border-radius:10px;
+  font-size:1.6rem;
+  font-weight:800;
+  opacity:0;
+  transition:opacity .1s, transform .1s;
+  border:3px solid;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  pointer-events:none;
+}
+.vote-yes{color:#4ADE80;border-color:#4ADE80;text-shadow:0 0 20px rgba(74,222,128,.5)}
+.vote-no{color:#FF6B6B;border-color:#FF6B6B;text-shadow:0 0 20px rgba(255,107,107,.5)}
 .partner-voted-indicator{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--green);display:flex;align-items:center;gap:.35rem;opacity:0;transition:opacity .3s;white-space:nowrap}
 .partner-voted-indicator.show{opacity:1}
 
@@ -316,7 +331,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v1.3</div>
+<div class="version-tag">v1.4</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -759,15 +774,16 @@ function createCard(nm) {
   const gc = nm.g==='girl'?'gender-girl':nm.g==='boy'?'gender-boy':'gender-neutral';
   const gl = nm.g==='girl'?'♀ Niña':nm.g==='boy'?'♂ Niño':'⚥ Neutro';
   div.innerHTML = `
-    <div class="vote-hint vote-yes">¡SÍ! ♥</div>
-    <div class="vote-hint vote-no">Nope ✕</div>
+    <div class="card-color-overlay" id="cco-${nm.n}"></div>
+    <div class="vote-hint vote-yes">SÍ ♥</div>
+    <div class="vote-hint vote-no">NOP ✕</div>
     <div class="card-accent"></div>
     <div class="card-name">${nm.n}</div>
     <div class="card-origin">${nm.o}</div>
     <div class="card-meaning">"${nm.m}"</div>
     <div class="card-gender ${gc}">${gl}</div>
     <div class="partner-voted-indicator" id="pvi-${nm.n}">
-      <span style="width:6px;height:6px;border-radius:50%;background:var(--sage);display:inline-block"></span>
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
       Tu pareja también lo valoró
     </div>`;
   return div;
@@ -801,9 +817,32 @@ function onDragMove(e) {
   activeCard.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
   const yes = activeCard.querySelector('.vote-yes');
   const no = activeCard.querySelector('.vote-no');
-  if(currentX>30){yes.style.opacity=Math.min((currentX-30)/60,1);no.style.opacity=0;}
-  else if(currentX<-30){no.style.opacity=Math.min((-currentX-30)/60,1);yes.style.opacity=0;}
-  else{yes.style.opacity=0;no.style.opacity=0;}
+  const overlay = activeCard.querySelector('.card-color-overlay');
+  const threshold = 30;
+  const maxDrag = 100;
+
+  if(currentX > threshold) {
+    const t = Math.min((currentX - threshold) / maxDrag, 1);
+    yes.style.opacity = t;
+    yes.style.transform = `translate(-50%,-50%) scale(${0.6 + t * 0.5})`;
+    no.style.opacity = 0;
+    overlay.style.background = `rgba(74,222,128,${t * 0.15})`;
+    overlay.style.opacity = 1;
+    activeCard.style.borderColor = `rgba(74,222,128,${t * 0.8})`;
+  } else if(currentX < -threshold) {
+    const t = Math.min((-currentX - threshold) / maxDrag, 1);
+    no.style.opacity = t;
+    no.style.transform = `translate(-50%,-50%) scale(${0.6 + t * 0.5})`;
+    yes.style.opacity = 0;
+    overlay.style.background = `rgba(255,107,107,${t * 0.15})`;
+    overlay.style.opacity = 1;
+    activeCard.style.borderColor = `rgba(255,107,107,${t * 0.8})`;
+  } else {
+    yes.style.opacity = 0;
+    no.style.opacity = 0;
+    overlay.style.opacity = 0;
+    activeCard.style.borderColor = '';
+  }
 }
 
 function onDragEnd() {
@@ -817,10 +856,13 @@ function onDragEnd() {
   if(currentX>80) swipeCard(true);
   else if(currentX<-80) swipeCard(false);
   else {
-    activeCard.style.transition = 'transform .3s ease';
+    activeCard.style.transition = 'transform .3s ease, border-color .2s';
     activeCard.style.transform = '';
-    activeCard.querySelector('.vote-yes').style.opacity=0;
-    activeCard.querySelector('.vote-no').style.opacity=0;
+    activeCard.style.borderColor = '';
+    activeCard.querySelector('.vote-yes').style.opacity = 0;
+    activeCard.querySelector('.vote-no').style.opacity = 0;
+    const overlay = activeCard.querySelector('.card-color-overlay');
+    if(overlay) overlay.style.opacity = 0;
     setTimeout(()=>{ if(activeCard) activeCard.style.transition=''; },300);
   }
   currentX = 0;
