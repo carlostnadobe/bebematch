@@ -394,6 +394,11 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     </div>
   </div>
   <div class="progress" style="max-width:400px;width:100%"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;margin:.2rem 0 .1rem">
+    <span id="cards-left" style="font-size:.7rem;color:var(--text3);font-family:'Inter',sans-serif"></span>
+    <span style="font-size:.7rem;color:var(--text3);font-family:'Inter',sans-serif">pareja</span>
+  </div>
+  <div class="progress" style="max-width:400px;width:100%;margin-top:0"><div class="progress-bar" id="partner-progress-bar" style="width:0%;background:var(--text3);opacity:.35"></div></div>
   <div class="card-stack" id="card-stack"></div>
   <div class="action-btns">
     <button class="action-btn btn-no" id="btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
@@ -431,8 +436,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%">
     <p class="title-serif" id="summary-title">¡Habéis terminado! 🎉</p>
     <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
-    <div class="liked-list" id="summary-list" style="max-height:55vh"></div>
-    <button class="btn btn-primary" onclick="restartFromSetup()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
+    <div class="liked-list" id="summary-list" style="max-height:48vh"></div>
+    <button class="btn btn-primary" onclick="shareMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir matches 💞</button>
+    <button class="btn btn-secondary" onclick="restartFromSetup()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
     <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
   </div>
 </div>
@@ -462,7 +468,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v4.9</div>
+<div class="version-tag">v5.0</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1174,12 +1180,14 @@ async function startSwiping() {
     if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
     try {
       const votes = await dbFetchVotes(state.roomCode);
-      for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
+      const partnerVotes = votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__');
+      for(const v of partnerVotes) {
         if(state.partnerLikes[v.name] === undefined) {
           state.partnerLikes[v.name] = v.liked;
           if(v.liked) { showPartnerVotedHint(v.name); checkMatch(v.name); }
         }
       }
+      updatePartnerProgress(partnerVotes.length);
     } catch(e) {}
   }, 5000);
 }
@@ -1444,8 +1452,19 @@ function updatePartnerDot(online) {
 }
 
 function updateProgress() {
-  const pct = Math.min((state.currentIdx/Math.max(state.queue.length,1))*100,100);
-  document.getElementById('progress-bar').style.width = pct+'%';
+  const total = Math.max(state.queue.length, 1);
+  const pct = Math.min((state.currentIdx / total) * 100, 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  const remaining = Math.max(total - state.currentIdx, 0);
+  const el = document.getElementById('cards-left');
+  if(el) el.textContent = remaining > 0 ? `${remaining} nombre${remaining>1?'s':''} restante${remaining>1?'s':''}` : '';
+}
+
+function updatePartnerProgress(votedCount) {
+  const total = Math.max(state.queue.length, 1);
+  const pct = Math.min((votedCount / total) * 100, 100);
+  const bar = document.getElementById('partner-progress-bar');
+  if(bar) bar.style.width = pct + '%';
 }
 
 function showSummary() {
@@ -1599,6 +1618,24 @@ function showLiked() {
     });
   }
   showScreen('liked');
+}
+
+function shareMatches() {
+  if(state.matches.length === 0) {
+    showToast('No hay matches que compartir aún');
+    return;
+  }
+  const names = state.matches.join(', ');
+  const last = state.matches[state.matches.length - 1];
+  const rest = state.matches.slice(0, -1);
+  const formatted = rest.length > 0 ? rest.join(', ') + ' y ' + last : last;
+  const text = `👶 ¡Nuestros nombres favoritos son ${formatted}! Elegidos con BebéMatch 💞`;
+  if(navigator.share) {
+    navigator.share({ text }).catch(()=>{});
+  } else if(navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+    showToast('¡Texto copiado al portapapeles!');
+  }
 }
 
 function backToSwipe() { showScreen('swipe'); }
