@@ -82,7 +82,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .pill-row{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;margin:.6rem 0}
 .pill{padding:.3rem .8rem;border-radius:6px;font-size:.775rem;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:var(--surface2);transition:all .15s;font-weight:400;letter-spacing:.01em}
 .pill:hover{border-color:var(--border2);color:var(--text)}
-.pill.selected{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.pill.selected{background:var(--salmon-light);color:var(--salmon);border-color:var(--salmon);font-weight:500}
 
 /* SWIPE */
 .swipe-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;padding:.5rem 0 .8rem}
@@ -360,8 +360,8 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
   <div class="pill-row" id="count-pills">
-    <div class="pill" data-v="20" onclick="togglePill(this,'count')">Corto · 20</div>
-    <div class="pill selected" data-v="40" onclick="togglePill(this,'count')">Medio · 40</div>
+    <div class="pill selected" data-v="20" onclick="togglePill(this,'count')">Corto · 20</div>
+    <div class="pill" data-v="40" onclick="togglePill(this,'count')">Medio · 40</div>
     <div class="pill" data-v="80" onclick="togglePill(this,'count')">Largo · 80</div>
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
@@ -459,7 +459,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v4.6</div>
+<div class="version-tag">v4.7</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -933,7 +933,7 @@ const state = {
   myLikes: {},
   partnerLikes: {},
   matches: [],
-  filters: {gender:'all', origin:'all', length:'all', count:40},
+  filters: {gender:'all', origin:'all', length:'all', count:20},
 };
 
 let realtimeWs = null;
@@ -1533,7 +1533,7 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:40};
+  state.filters = {gender:'all', origin:'all', length:'all', count:20};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
@@ -1542,7 +1542,7 @@ function restartFromSetup() {
   document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelector('#length-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
-  document.querySelector('#count-pills .pill[data-v="40"]').classList.add('selected');
+  document.querySelector('#count-pills .pill[data-v="20"]').classList.add('selected');
   if(state.isHost) {
     showScreen('setup');
   } else {
