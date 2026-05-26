@@ -159,14 +159,14 @@ body.light .btn-secondary{background:var(--surface3);color:var(--text);border-co
 body.light .btn-secondary:hover{background:var(--surface2)}
 
 /* EASTER EGG */
-.egg-btn{position:fixed;top:4.4rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;user-select:none;overflow:hidden}
+.egg-btn{position:fixed;top:1.2rem;left:1.2rem;z-index:100;width:110px;height:40px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;gap:.4rem;transition:border-color .2s;-webkit-tap-highlight-color:transparent;user-select:none;overflow:hidden;font-family:'Inter',sans-serif;color:var(--text2);font-weight:400;letter-spacing:.01em}
 .egg-btn:hover{border-color:rgba(56,189,248,.5)}
 .egg-btn.shake{animation:eggshake .35s ease}
-@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.15)}75%{transform:rotate(14deg) scale(1.15)}}
-.egg-fill{position:absolute;bottom:0;left:-20%;width:140%;height:0%;pointer-events:none;background:#38BDF8;transition:none}
-.egg-fill::before{content:'';position:absolute;top:-6px;left:0;width:100%;height:12px;background:inherit;border-radius:40%;animation:wave 1s linear infinite}
-.egg-fill::after{content:'';position:absolute;top:-4px;left:0;width:100%;height:10px;background:rgba(56,189,248,.6);border-radius:40%;animation:wave 1.4s linear infinite reverse}
-@keyframes wave{0%{transform:translateX(0) scaleY(1)}50%{transform:translateX(-8px) scaleY(1.2)}100%{transform:translateX(0) scaleY(1)}}
+@keyframes eggshake{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.04)}75%{transform:rotate(3deg) scale(1.04)}}
+.egg-fill{position:absolute;top:0;left:-5%;width:0%;height:100%;pointer-events:none;background:#38BDF8;opacity:.7}
+.egg-fill::before{content:'';position:absolute;top:0;right:-10px;width:20px;height:100%;background:inherit;filter:blur(2px)}
+.egg-fill::after{content:'';position:absolute;top:-3px;right:-6px;width:12px;height:calc(100% + 6px);background:rgba(186,230,253,.6);border-radius:40%;animation:waveH 0.9s linear infinite}
+@keyframes waveH{0%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-3px) scaleX(1.3)}100%{transform:translateY(0) scaleX(1)}}
 
 .egg-overlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s}
 .egg-overlay.show{opacity:1;pointer-events:all}
@@ -190,7 +190,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
 <button class="egg-btn" id="egg-btn" title="">
   <div class="egg-fill" id="egg-fill"></div>
-  <span style="position:relative;z-index:1">👶</span>
+  <span id="egg-baby" style="position:absolute;z-index:1;font-size:1.1rem;left:8px;transition:left .05s linear">👶</span>
 </button>
 
 <!-- EASTER EGG OVERLAY -->
@@ -318,21 +318,33 @@ function eggUp(){
   cancelAnimationFrame(eggRaf);
   if(eggProgress < 100){
     eggProgress = 0;
-    document.getElementById('egg-fill').style.height = '0%';
+    document.getElementById('egg-fill').style.width = '0%';
+    const baby = document.getElementById('egg-baby');
+    baby.style.left = '8px';
+    baby.style.transform = '';
     document.getElementById('egg-btn').classList.remove('loading','done');
   }
 }
 function eggFrame(now){
   if(!eggPressing) return;
   eggProgress = Math.min(((now - eggStart) / EGG_DURATION) * 100, 100);
-  document.getElementById('egg-fill').style.height = eggProgress + '%';
+  const fill = document.getElementById('egg-fill');
+  const baby = document.getElementById('egg-baby');
+  const btn = document.getElementById('egg-btn');
+  const btnW = btn.offsetWidth;
+  fill.style.width = eggProgress + '%';
+  const fillPx = (eggProgress / 100) * btnW;
+  const bobY = Math.sin(now * 0.008) * 2;
+  baby.style.left = Math.max(4, fillPx - 20) + 'px';
+  baby.style.transform = `translateY(${bobY}px)`;
   if(eggProgress >= 100){
     eggPressing = false;
-    document.getElementById('egg-btn').classList.add('done');
-    document.getElementById('egg-btn').classList.add('shake');
+    document.getElementById('egg-btn').classList.add('done','shake');
     setTimeout(()=>{
       document.getElementById('egg-btn').classList.remove('loading','done','shake');
-      document.getElementById('egg-fill').style.height = '0%';
+      fill.style.width = '0%';
+      baby.style.left = '8px';
+      baby.style.transform = '';
       eggProgress = 0;
       openEgg();
     }, 350);
@@ -587,7 +599,6 @@ async function createRoom() {
   const code = genCode();
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
-  // insertar presencia propia
   await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
   connectRealtime(code);
   startPartnerPoll();
@@ -603,25 +614,38 @@ async function joinRoom() {
   state.roomCode = code;
   document.getElementById('room-display').textContent = code;
 
-  // insertar presencia propia para que el creador nos detecte
+  // primero comprobar si la sala existe
+  const existing = await dbFetchVotes(code);
+  const otherUsers = existing.filter(v => v.user_id !== state.myId);
+
+  if(existing.length === 0) {
+    document.getElementById('join-error').textContent = 'Sala no encontrada. ¿El código es correcto?';
+    setHomeLoading(false);
+    state.roomCode = null;
+    return;
+  }
+
+  // insertar presencia propia
   await dbInsert({room_code: code, user_id: state.myId, name: '__presence__', liked: false});
 
-  // cargar registros existentes para detectar si ya hay pareja
-  const existing = await dbFetchVotes(code);
-  const partnerRecords = existing.filter(v => v.user_id !== state.myId && v.name !== '__presence__');
-  for(const v of partnerRecords) {
+  // cargar votos reales del compañero
+  for(const v of otherUsers.filter(v => v.name !== '__presence__')) {
     state.partnerLikes[v.name] = v.liked;
   }
-  const partnerPresent = existing.some(v => v.user_id !== state.myId);
-  if(partnerPresent) state.partnerConnected = true;
 
   connectRealtime(code);
-  startPartnerPoll();
   setHomeLoading(false);
   showScreen('waiting');
-  if(state.partnerConnected) {
+
+  if(otherUsers.length > 0) {
+    // ya había alguien en la sala
+    state.partnerConnected = true;
+    updatePartnerDot(true);
     document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
     setTimeout(()=>showSetup(), 1200);
+  } else {
+    // nadie aún, arrancar polling
+    startPartnerPoll();
   }
 }
 
@@ -629,21 +653,24 @@ let partnerPollTimer = null;
 function startPartnerPoll() {
   clearInterval(partnerPollTimer);
   partnerPollTimer = setInterval(async () => {
-    if(!state.roomCode) return;
-    const votes = await dbFetchVotes(state.roomCode);
-    const partnerRecords = votes.filter(v => v.user_id !== state.myId);
-    if(partnerRecords.length > 0 && !state.partnerConnected) {
-      state.partnerConnected = true;
-      updatePartnerDot(true);
-      document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
-      if(document.getElementById('screen-waiting').classList.contains('active')) {
-        setTimeout(()=>showSetup(), 1200);
+    if(!state.roomCode || state.partnerConnected) { clearInterval(partnerPollTimer); return; }
+    try {
+      const votes = await dbFetchVotes(state.roomCode);
+      const partnerRecords = votes.filter(v => v.user_id !== state.myId);
+      if(partnerRecords.length > 0) {
+        clearInterval(partnerPollTimer);
+        state.partnerConnected = true;
+        updatePartnerDot(true);
+        // cargar votos reales del compañero
+        for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
+          state.partnerLikes[v.name] = v.liked;
+        }
+        if(document.getElementById('screen-waiting').classList.contains('active')) {
+          document.getElementById('waiting-status').textContent = '¡Pareja conectada! ✓';
+          setTimeout(()=>showSetup(), 1200);
+        }
       }
-    }
-    // sync partner likes (ignorar presencia)
-    for(const v of partnerRecords.filter(v => v.name !== '__presence__')) {
-      state.partnerLikes[v.name] = v.liked;
-    }
+    } catch(e) { console.warn('Poll error', e); }
   }, 2000);
 }
 
