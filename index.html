@@ -496,7 +496,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v7.0</div>
+<div class="version-tag">v7.1</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1468,6 +1468,8 @@ function startFilterPoll() {
 async function hostStartSwiping() {
   if(!state.isSolo) {
     try {
+      const seed = Math.floor(Math.random() * 1000000);
+      state.filters._seed = seed;
       await dbDelete(state.roomCode, '__filters__');
       await dbDelete(state.roomCode, '__done__');
       await dbInsert({room_code: state.roomCode, user_id: JSON.stringify(state.filters), name: '__filters__', liked: false});
@@ -1544,7 +1546,15 @@ function buildQueue() {
   // si sigue siendo vacío, usar todo
   if(pool.length === 0) pool = [...NAMES_DB];
 
-  pool.sort(() => Math.random() - .5);
+  // ordenar con seed determinista para que ambos jugadores vean los mismos nombres
+  const seed = state.filters._seed;
+  if(seed !== undefined) {
+    const seededRand = (i) => { let x = Math.sin(seed + i) * 10000; return x - Math.floor(x); };
+    pool = pool.map((n, i) => ({n, r: seededRand(i)})).sort((a,b)=>a.r-b.r).map(x=>x.n);
+  } else {
+    pool.sort(() => Math.random() - .5);
+  }
+
   const count = state.filters.count || 20;
   state.queue = pool.slice(0, Math.min(count, pool.length));
   state.currentIdx = 0;
