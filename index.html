@@ -389,6 +389,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="swipe-header">
     <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
     <div style="display:flex;align-items:center;gap:.5rem">
+      <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
       <button onclick="confirmGoHome()" style="background:none;border:none;font-size:.72rem;color:var(--text3);cursor:pointer;padding:.2rem .4rem;font-family:'Inter',sans-serif">← inicio</button>
       <div class="score-badge" id="match-count">💞 0 matches</div>
     </div>
@@ -471,7 +472,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v5.2</div>
+<div class="version-tag">v5.3</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -946,6 +947,8 @@ const state = {
   partnerLikes: {},
   matches: [],
   filters: {gender:'all', origin:'all', length:'all', count:20},
+  streak: 0,
+  streakType: null, // 'match' | 'nomatch'
 };
 
 let realtimeWs = null;
@@ -1409,6 +1412,18 @@ async function swipeCard(liked) {
       isMatch = true;
       state.matches.push(nm.n);
     }
+    // racha
+    if(liked !== null) {
+      const wasMatch = isMatch;
+      if(wasMatch) {
+        if(state.streakType === 'match') state.streak++;
+        else { state.streak = 1; state.streakType = 'match'; }
+      } else {
+        if(state.streakType === 'nomatch') state.streak++;
+        else { state.streak = 1; state.streakType = 'nomatch'; }
+      }
+      updateStreakBadge();
+    }
   }
 
   const top = document.querySelector('.name-card.active');
@@ -1518,10 +1533,20 @@ function renderSummary() {
   const title = document.getElementById('summary-title');
   const sub = document.getElementById('summary-sub');
 
+  // nombres que solo me gustaron a mí
+  const onlyMe = Object.entries(state.myLikes)
+    .filter(([name, liked]) => liked && !state.partnerLikes[name])
+    .map(([name]) => name);
+
+  // nombres que solo le gustaron a mi pareja
+  const onlyPartner = Object.entries(state.partnerLikes)
+    .filter(([name, liked]) => liked && !state.myLikes[name])
+    .map(([name]) => name);
+
   if(state.matches.length === 0) {
     title.textContent = 'Habéis terminado 🙈';
     sub.textContent = 'Ningún match esta vez... ¡seguid explorando!';
-    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1.5rem 1rem;text-align:center">No hay matches aún. Prueba con otros filtros.</p>';
+    list.innerHTML = '<p style="color:var(--text2);font-size:.9rem;padding:1rem 0;text-align:center">No hay matches aún. Prueba con otros filtros.</p>';
   } else {
     title.textContent = `${state.matches.length} match${state.matches.length>1?'es':''} encontrado${state.matches.length>1?'s':''}! 💞`;
     sub.textContent = 'Los nombres que os gustan a los dos';
@@ -1540,10 +1565,37 @@ function renderSummary() {
       list.appendChild(d);
     });
   }
-  showScreen('summary');
-  if(state.matches.length >= 3) {
-    setTimeout(()=>launchSummaryConfetti(), 400);
+
+  // solo a mí
+  if(onlyMe.length > 0) {
+    const section = document.createElement('div');
+    section.style.cssText = 'width:100%;margin-top:.8rem';
+    section.innerHTML = `<p style="font-size:.7rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif">Solo a ti te gustaron</p>`;
+    onlyMe.forEach(name => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `<div class="liked-item-name">${name}</div><span style="font-size:.75rem;color:var(--text3)">solo tú ♥</span>`;
+      section.appendChild(d);
+    });
+    list.appendChild(section);
   }
+
+  // solo a la pareja
+  if(onlyPartner.length > 0) {
+    const section = document.createElement('div');
+    section.style.cssText = 'width:100%;margin-top:.8rem';
+    section.innerHTML = `<p style="font-size:.7rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif">Solo a tu pareja le gustaron</p>`;
+    onlyPartner.forEach(name => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `<div class="liked-item-name">${name}</div><span style="font-size:.75rem;color:var(--text3)">solo pareja ♥</span>`;
+      section.appendChild(d);
+    });
+    list.appendChild(section);
+  }
+
+  showScreen('summary');
+  if(state.matches.length >= 3) setTimeout(()=>launchSummaryConfetti(), 400);
 }
 
 function launchSummaryConfetti() {
@@ -1666,6 +1718,22 @@ function shareMatches() {
 }
 
 function backToSwipe() { showScreen('swipe'); }
+
+function updateStreakBadge() {
+  const el = document.getElementById('streak-badge');
+  if(!el) return;
+  if(state.streak >= 3 && state.streakType === 'match') {
+    el.style.display = '';
+    el.textContent = `🔥 ${state.streak} matches seguidos!`;
+    el.style.color = 'var(--salmon)';
+  } else if(state.streak >= 3 && state.streakType === 'nomatch') {
+    el.style.display = '';
+    el.textContent = `${state.streak} sin match...`;
+    el.style.color = 'var(--text3)';
+  } else {
+    el.style.display = 'none';
+  }
+}
 
 function continueAfterMatch() { showScreen('swipe'); }
 
