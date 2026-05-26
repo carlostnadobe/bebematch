@@ -149,6 +149,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 @keyframes popYes{0%{transform:scale(1)}40%{transform:scale(1.35);box-shadow:0 6px 32px rgba(232,115,90,.6)}100%{transform:scale(1)}}
 @keyframes popNo{0%{transform:scale(1)}40%{transform:scale(1.3);border-color:rgba(255,107,107,.8);color:#FF6B6B}100%{transform:scale(1)}}
 
+/* RUSH MODE */
+.rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.rush-toggle input{display:none}
+.rush-track{width:30px;height:17px;border-radius:9px;background:var(--border2);transition:background .2s;position:relative;flex-shrink:0}
+.rush-track::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
+.rush-toggle input:checked + .rush-track{background:var(--salmon)}
+.rush-toggle input:checked + .rush-track::after{transform:translateX(13px)}
+.rush-label{font-size:.65rem;color:var(--text3);font-family:'Inter',sans-serif;letter-spacing:.04em;font-weight:500}
+.rush-label.on{color:var(--salmon)}
+.rush-match-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:300;background:var(--salmon);color:#fff;border-radius:14px;padding:.6rem 1.4rem;font-family:'Instrument Serif',serif;font-size:1.4rem;font-style:italic;pointer-events:none;opacity:0;white-space:nowrap;box-shadow:0 4px 24px rgba(232,115,90,.4)}
+.rush-match-toast.show{animation:rushPop .8s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes rushPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}55%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
+
 /* MATCH */
 .match-explosion{font-size:3.5rem;animation:pop .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
@@ -398,7 +411,14 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- SWIPE -->
 <div class="screen" id="screen-swipe" style="padding-top:1rem;overflow:hidden;touch-action:pan-y">
   <div class="swipe-header">
-    <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
+      <label class="rush-toggle" title="Modo Rush">
+        <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
+        <div class="rush-track"></div>
+        <span class="rush-label" id="rush-label">RUSH</span>
+      </label>
+    </div>
     <div style="display:flex;align-items:center;gap:.5rem">
       <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
       <button onclick="confirmGoHome()" style="background:var(--surface2);border:1px solid var(--border2);font-size:.72rem;color:var(--text2);cursor:pointer;padding:.3rem .7rem;font-family:'Inter',sans-serif;border-radius:7px;font-weight:500;transition:all .15s" onmouseover="this.style.borderColor='var(--salmon)';this.style.color='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← inicio</button>
@@ -496,8 +516,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v7.1</div>
+<div class="version-tag">v7.2</div>
 <div class="toast" id="toast"></div>
+<div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
 <script>
 const SUPABASE_URL = 'https://myakshqgodbvwnbnvjjn.supabase.co';
@@ -1804,11 +1825,28 @@ function checkMatch(name) {
   }
 }
 
+let rushMode = false;
+function toggleRush(on) {
+  rushMode = on;
+  const lbl = document.getElementById('rush-label');
+  if(lbl) { lbl.textContent = on ? '⚡ RUSH' : 'RUSH'; lbl.classList.toggle('on', on); }
+}
+
 function triggerMatch(name) {
-  document.getElementById('match-name-display').textContent = name;
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
-  spawnHearts();
-  showScreen('match');
+  if(rushMode) {
+    // modo rush: toast rápido sin salir del swipe
+    const toast = document.getElementById('rush-match-toast');
+    toast.textContent = `💞 ${name}`;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 800);
+  } else {
+    document.getElementById('match-name-display').textContent = name;
+    spawnHearts();
+    showScreen('match');
+  }
 }
 
 function spawnHearts() {
