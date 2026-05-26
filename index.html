@@ -373,6 +373,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
     <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
     <div class="pill" data-v="calorro" onclick="togglePill(this,'origin')">🔥 Calorro</div>
+    <div class="pill" data-v="sudamerica" onclick="togglePill(this,'origin')">🌎 Sudamérica Fusión</div>
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Longitud del nombre</p>
   <div class="pill-row" id="length-pills">
@@ -515,7 +516,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v7.9</div>
+<div class="version-tag">v8.1</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -1276,6 +1277,63 @@ const NAMES_DB = [
   {n:"Esperanza",g:"girl",o:"español",m:"esperanza y fe"},
   {n:"Celestino",g:"boy",o:"latino",m:"del cielo"},
   {n:"Evangelina",g:"girl",o:"clásico",m:"portadora del evangelio"},
+  // ── SUDAMÉRICA FUSIÓN 🌎 ──
+  {n:"Usnavi",g:"boy",o:"sudamerica",m:"US Navy — visto en un barco al llegar a América"},
+  {n:"Yotuel",g:"boy",o:"sudamerica",m:"yo + tuel, mezcla de nombres familiares"},
+  {n:"Yonatan",g:"boy",o:"sudamerica",m:"Jonathan pronunciado como suena en español"},
+  {n:"Yunior",g:"boy",o:"sudamerica",m:"Junior pronunciado con acento caribeño"},
+  {n:"Guashinton",g:"boy",o:"sudamerica",m:"Washington adaptado al español del barrio"},
+  {n:"Yeison",g:"boy",o:"sudamerica",m:"Jason como suena cuando lo dicen en español"},
+  {n:"Nixón",g:"boy",o:"sudamerica",m:"el presidente Nixon, admirado en la época"},
+  {n:"Klinton",g:"boy",o:"sudamerica",m:"Clinton reescrito en español fonético"},
+  {n:"Eidyn",g:"boy",o:"sudamerica",m:"Aiden escrito como se oye en el barrio"},
+  {n:"Leider",g:"boy",o:"sudamerica",m:"Leader — para que sea un líder en la vida"},
+  {n:"Yilber",g:"boy",o:"sudamerica",m:"Wilber adaptado al español caribeño"},
+  {n:"Wilmar",g:"boy",o:"sudamerica",m:"William + Omar, fusión de dos nombres admirados"},
+  {n:"Deibys",g:"boy",o:"sudamerica",m:"Davis escrito fonéticamente en español"},
+  {n:"Jersón",g:"boy",o:"sudamerica",m:"Jefferson recortado y hispanizado"},
+  {n:"Yendry",g:"boy",o:"sudamerica",m:"Henry pronunciado desde fuera"},
+  {n:"Maikel",g:"boy",o:"sudamerica",m:"Michael Jackson, el rey del pop en el barrio"},
+  {n:"Kervin",g:"boy",o:"sudamerica",m:"Kevin escrito como lo dicen en Venezuela"},
+  {n:"Eudomar",g:"boy",o:"sudamerica",m:"griego eudo + mar, inventado en los llanos"},
+  {n:"Rhandall",g:"boy",o:"sudamerica",m:"Randall con h para que se vea más especial"},
+  {n:"Deivis",g:"boy",o:"sudamerica",m:"Davis escrito con ei para sonar más moderno"},
+  {n:"Yhonier",g:"boy",o:"sudamerica",m:"Junior con yh para diferenciarse del montón"},
+  {n:"Wendolin",g:"girl",o:"sudamerica",m:"Wendy + línea melódica caribeña inventada"},
+  {n:"Yuleidy",g:"girl",o:"sudamerica",m:"Judy + sonido latino, suena más bonito así"},
+  {n:"Yomaira",g:"girl",o:"sudamerica",m:"Jomaira, inventado sonoro con j tropical"},
+  {n:"Naileth",g:"girl",o:"sudamerica",m:"Nailet, nombre de fantasía sin etimología clara"},
+  {n:"Leydis",g:"girl",o:"sudamerica",m:"Ladies — las damas, escrito como suena en el barrio"},
+  {n:"Yuraima",g:"girl",o:"sudamerica",m:"mezcla de Yuri y Aima, inventado en Venezuela"},
+  {n:"Keilis",g:"girl",o:"sudamerica",m:"Kelly hispanizada con terminación suave"},
+  {n:"Maikelin",g:"girl",o:"sudamerica",m:"Michael Jackson femenino con diminutivo caribeño"},
+  {n:"Yolimar",g:"girl",o:"sudamerica",m:"Yoli + Mar, mezcla de dos nombres queridos"},
+  {n:"Jhoana",g:"girl",o:"sudamerica",m:"Joana con jh para que sea única en la clase"},
+  {n:"Yureidys",g:"girl",o:"sudamerica",m:"Euridice caribeña, inventada con música"},
+  {n:"Lizbeth",g:"girl",o:"sudamerica",m:"Elizabeth recortada y mejorada a criterio propio"},
+  {n:"Yohandris",g:"girl",o:"sudamerica",m:"Yolanda + Andris, fusión inventada en Cuba"},
+  {n:"Yoselín",g:"girl",o:"sudamerica",m:"Joselyn pronunciado con sabor caribeño"},
+  // cine y cultura pop
+  {n:"Rambo",g:"boy",o:"sudamerica",m:"del personaje de Sylvester Stallone — para que sea fuerte como él"},
+  {n:"Terminator",g:"boy",o:"sudamerica",m:"de la película de Schwarzenegger — nombre de respeto en el barrio"},
+  {n:"Roki Balboa",g:"boy",o:"sudamerica",m:"Rocky Balboa hispanizado — el campeón que nunca se rinde"},
+  {n:"Yontravolta",g:"boy",o:"sudamerica",m:"John Travolta escrito como suena — bailarín del barrio"},
+  {n:"Maicol Yackson",g:"boy",o:"sudamerica",m:"Michael Jackson fonético — el rey del pop del bloque"},
+  {n:"Marlon Brando",g:"boy",o:"sudamerica",m:"el padrino del edificio — nombre con mucho carácter"},
+  {n:"Usher José",g:"boy",o:"sudamerica",m:"Usher el cantante + José por si acaso — doble protección"},
+  {n:"Yackelin",g:"girl",o:"sudamerica",m:"Jacqueline Kennedy pronunciada con cariño tropical"},
+  {n:"Dayana Princesa",g:"girl",o:"sudamerica",m:"Diana de Gales + Princesa — dos nombres por el precio de uno"},
+  // marcas de lujo y consumo
+  {n:"Kelvin Klein",g:"boy",o:"sudamerica",m:"Calvin Klein escrito como suena — para que vista bien de mayor"},
+  {n:"Versache",g:"boy",o:"sudamerica",m:"Versace sin la e muda — el lujo adaptado al barrio"},
+  {n:"Cartier Manuel",g:"boy",o:"sudamerica",m:"la joyería Cartier + Manuel de la familia — elegancia con raíces"},
+  {n:"Armani José",g:"boy",o:"sudamerica",m:"Giorgio Armani + José — diseñador con valores"},
+  {n:"Nescafé Antonio",g:"boy",o:"sudamerica",m:"la marca de café + Antonio — despierto y trabajador"},
+  {n:"Nesquik Antonio",g:"boy",o:"sudamerica",m:"el colacao de la infancia + Antonio — dulce como él"},
+  {n:"Bacardí Manuel",g:"boy",o:"sudamerica",m:"el ron de las fiestas + Manuel — alegre por naturaleza"},
+  {n:"Versache",g:"girl",o:"sudamerica",m:"Versace con h extra — más exclusivo aún que el original"},
+  {n:"Chanel María",g:"girl",o:"sudamerica",m:"la perfumería francesa + María — glamour con fe"},
+  {n:"Dolche",g:"girl",o:"sudamerica",m:"Dolce de Dolce & Gabbana, sin el ampersand — más fácil de escribir"},
 ];
 
 
