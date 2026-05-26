@@ -388,7 +388,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <div class="screen" id="screen-swipe" style="padding-top:1rem">
   <div class="swipe-header">
     <div class="partner-status"><div class="partner-dot" id="partner-dot"></div><span id="partner-label">Pareja conectada</span></div>
-    <div class="score-badge" id="match-count">💞 0 matches</div>
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <button onclick="confirmGoHome()" style="background:none;border:none;font-size:.72rem;color:var(--text3);cursor:pointer;padding:.2rem .4rem;font-family:'Inter',sans-serif">← inicio</button>
+      <div class="score-badge" id="match-count">💞 0 matches</div>
+    </div>
   </div>
   <div class="progress" style="max-width:400px;width:100%"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
   <div class="card-stack" id="card-stack"></div>
@@ -398,7 +401,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
   </div>
   <button class="btn" style="font-size:.8rem;color:var(--text2);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
-  <button class="btn" style="font-size:.72rem;color:var(--text3);margin-top:.2rem;padding:.4rem 1rem" onclick="confirmGoHome()">← inicio</button>
 </div>
 
 <!-- MATCH -->
@@ -460,7 +462,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v4.8</div>
+<div class="version-tag">v4.9</div>
 <div class="toast" id="toast"></div>
 
 <script>
