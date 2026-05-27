@@ -1325,156 +1325,6 @@ const NAMEDAY_DATA = [
 
 let lastNamedayIdx = 0;
 
-function showNamedayAt(idx, dir = 1) {
-  lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
-  const content = document.getElementById('nameday-content');
-  // fade out
-  content.style.opacity = '0';
-  content.style.transform = `translateX(${dir > 0 ? '-12px' : '12px'})`;
-  content.style.transition = 'opacity .15s ease, transform .15s ease';
-  setTimeout(() => {
-    const d = NAMEDAY_DATA[lastNamedayIdx];
-    document.getElementById('nameday-name').textContent = d.n;
-    document.getElementById('nameday-origin').textContent = d.o;
-    document.getElementById('nameday-meaning').textContent = '"' + d.m + '"';
-    const storyEl = document.getElementById('nameday-story');
-    storyEl.innerHTML = '';
-    d.s.split('\n\n').forEach((para, i) => {
-      const p = document.createElement('p');
-      p.textContent = para;
-      p.style.cssText = i > 0 ? 'margin-top:.7rem' : '';
-      storyEl.appendChild(p);
-    });
-    const curiousSec = document.getElementById('nameday-curious');
-    if(d.curioso) {
-      curiousSec.style.display = '';
-      document.getElementById('nameday-curious-text').textContent = d.curioso;
-    } else curiousSec.style.display = 'none';
-    // famosos
-    const famososSec = document.getElementById('nameday-famosos');
-    famososSec.innerHTML = '';
-    if(d.famosos && d.famosos.length) {
-      famososSec.style.display = '';
-      const lbl = document.createElement('span');
-      lbl.className = 'nameday-famosos-label';
-      lbl.textContent = 'Lo llevan:';
-      famososSec.appendChild(lbl);
-      const CHIP_COLORS = [
-        {bg:'rgba(232,115,90,.1)',dot:'#E8735A'},
-        {bg:'rgba(124,109,222,.1)',dot:'#7C6DDE'},
-        {bg:'rgba(45,184,138,.1)',dot:'#2DB88A'},
-        {bg:'rgba(224,155,61,.1)',dot:'#E09B3D'},
-      ];
-      // emojis por categoría según palabras clave en el nombre
-      function chipEmoji(name) {
-        const n = name.toLowerCase();
-        // Religión / Santos
-        if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
-        // Reyes / nobles
-        if(/rey |reina |emperor|kaiser|zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|del s\.i\.r\.|de bisanzio|de dinamarca|cristián x|adriano \(emp|zarina|bolena/.test(n)) return '👑';
-        // Música
-        if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
-        // Cine / TV
-        if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage/.test(n)) return '🎬';
-        // Arte / Pintura / Moda
-        if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
-        // Literatura / Escritura
-        if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
-        // Ciencia / Tecnología
-        if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
-        // Deporte (fútbol, tenis, etc.)
-        if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
-        // Hockey
-        if(/huet/.test(n)) return '🏒';
-        // Motor
-        if(/vettel|sutil/.test(n)) return '🏎️';
-        // Historia / Guerra
-        if(/alejandro magno|leonidas i|julio césar|cleopatra vii|adriano \(emp/.test(n)) return '⚔️';
-        if(/jesús gil/.test(n)) return '👯';
-        // Exploración / Aventura / Líderes
-        if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|jesús gil|beckham/.test(n)) return '🌍';
-        // Espacio
-        if(/tereshkova/.test(n)) return '🚀';
-        // Música (matteo romano)
-        if(/matteo romano/.test(n)) return '🎵';
-        return '';
-      }
-      function abbrevName(full) {
-        const parts = full.trim().split(' ');
-        if(parts.length === 1) return full;
-        return parts[0] + ' ' + parts.slice(1).map(p => p[0] + '.').join(' ');
-      }
-      const four = d.famosos.slice(0,4);
-      [[0,1],[2,3]].forEach(pair => {
-        const row = document.createElement('div');
-        row.className = 'nameday-famosos-row';
-        pair.forEach(i => {
-          if(four[i] !== undefined) {
-            const col = CHIP_COLORS[i % CHIP_COLORS.length];
-            const chip = document.createElement('span');
-            chip.className = 'nameday-chip';
-            chip.style.background = col.bg;
-            // punto de color
-            const dot = document.createElement('span');
-            dot.style.cssText = `width:6px;height:6px;min-width:6px;min-height:6px;border-radius:50%;background:${col.dot};flex-shrink:0;align-self:center`;
-            // emoji solo si hay categoría
-            const emojiStr = chipEmoji(four[i]);
-            const txt = document.createElement('span');
-            txt.textContent = four[i];
-            txt.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-            chip.appendChild(dot);
-            if(emojiStr) {
-              const em = document.createElement('span');
-              em.textContent = emojiStr;
-              em.style.cssText = 'font-size:.7rem;flex-shrink:0;line-height:1;display:flex;align-items:center';
-              chip.appendChild(em);
-            }
-            chip.appendChild(txt);
-            row.appendChild(chip);
-          }
-        });
-        famososSec.appendChild(row);
-      });
-    } else famososSec.style.display = 'none';
-    // fade in
-    content.style.transition = 'none';
-    content.style.transform = `translateX(${dir > 0 ? '12px' : '-12px'})`;
-    content.style.opacity = '0';
-    requestAnimationFrame(() => {
-      content.style.transition = 'opacity .2s ease, transform .2s ease';
-      content.style.transform = 'translateX(0)';
-      content.style.opacity = '1';
-    });
-  }, 150);
-}
-
-function openNameOfDay() {
-  document.getElementById('nameday-overlay').style.display = 'flex';
-  const idx = Math.floor(Math.random() * NAMEDAY_DATA.length);
-  document.getElementById('nameday-content').style.opacity = '1';
-  document.getElementById('nameday-content').style.transform = 'translateX(0)';
-  showNamedayAt(idx, 0);
-  setupNamedaySwipe();
-}
-
-let namedaySwipeX = 0;
-function setupNamedaySwipe() {
-  const card = document.getElementById('nameday-card-inner');
-  if(!card || card._swipeSetup) return;
-  card._swipeSetup = true;
-  card.addEventListener('touchstart', e => { namedaySwipeX = e.touches[0].clientX; }, {passive:true});
-  card.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - namedaySwipeX;
-    if(Math.abs(dx) > 50) dx < 0 ? nextNameOfDay() : prevNameOfDay();
-  }, {passive:true});
-}
-
-function nextNameOfDay() { showNamedayAt(lastNamedayIdx + 1, 1); }
-function prevNameOfDay() { showNamedayAt(lastNamedayIdx - 1, -1); }
-
-function closeNameOfDay() {
-  document.getElementById('nameday-overlay').style.display = 'none';
-}
 
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light');
@@ -3107,6 +2957,45 @@ if(urlJoin) {
 /* ── NOMBRE DEL DÍA ── */
 lastNamedayIdx = 0;
 
+function chipEmoji(name) {
+    const n = name.toLowerCase();
+    if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
+    if(/rey |reina |zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|de bisanzio|de dinamarca|cristián x|zarina|bolena/.test(n)) return '👑';
+    if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
+    if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage|diana rigg/.test(n)) return '🎬';
+    if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
+    if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
+    if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
+    if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
+    if(/huet/.test(n)) return '🏒';
+    if(/vettel|sutil/.test(n)) return '🏎️';
+    if(/alejandro magno|leonidas i|julio césar|cleopatra vii/.test(n)) return '⚔️';
+    if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|beckham/.test(n)) return '🌍';
+    if(/tereshkova/.test(n)) return '🚀';
+    if(/matteo romano/.test(n)) return '🎵';
+    if(/bella hadid/.test(n)) return '💃';
+    if(/elena de troya/.test(n)) return '⚔️';
+    if(/valentina greco|valentina vignali/.test(n)) return '💃';
+    if(/victor hugo/.test(n)) return '📖';
+    if(/hugo boss/.test(n)) return '🧥';
+    if(/leonidas gómez/.test(n)) return '⚽';
+    if(/noa \(cantante|noa kirel/.test(n)) return '🎵';
+    if(/noa pothoven/.test(n)) return '📖';
+    if(/cléopâtre séméria/.test(n)) return '👑';
+    if(/aurora disney/.test(n)) return '🎬';
+    if(/maximiliano i del s/.test(n)) return '👑';
+    if(/zenobia camprubí/.test(n)) return '📖';
+    if(/zenobia shroff/.test(n)) return '🎬';
+    if(/zenobia barlow/.test(n)) return '🌍';
+    if(/natalia vodianova/.test(n)) return '💃';
+    if(/george lucas/.test(n)) return '🎬';
+    if(/adriano \(emp/.test(n)) return '👑';
+    if(/marco aurelio/.test(n)) return '📖';
+    if(/celia de cáceres/.test(n)) return '🌍';
+    if(/jesús gil/.test(n)) return '👯';
+    return '';
+}
+
 function showNamedayAt(idx, dir=1) {
   lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
   const content = document.getElementById('nameday-content');
@@ -3134,25 +3023,6 @@ function showNamedayAt(idx, dir=1) {
     if(d.famosos && d.famosos.length) {
       famososSec.style.display = '';
       const CHIP_COLORS = [{bg:'rgba(232,115,90,.1)',dot:'#E8735A'},{bg:'rgba(124,109,222,.1)',dot:'#7C6DDE'},{bg:'rgba(45,184,138,.1)',dot:'#2DB88A'},{bg:'rgba(224,155,61,.1)',dot:'#E09B3D'}];
-      function chipEmoji(name) {
-        const n = name.toLowerCase();
-        if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
-        if(/rey |reina |zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|de bisanzio|de dinamarca|cristián x|zarina|bolena/.test(n)) return '👑';
-        if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
-        if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage|diana rigg/.test(n)) return '🎬';
-        if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
-        if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
-        if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
-        if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
-        if(/huet/.test(n)) return '🏒';
-        if(/vettel|sutil/.test(n)) return '🏎️';
-        if(/alejandro magno|leonidas i|julio césar|cleopatra vii/.test(n)) return '⚔️';
-        if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|beckham/.test(n)) return '🌍';
-        if(/tereshkova/.test(n)) return '🚀';
-        if(/matteo romano/.test(n)) return '🎵';
-        if(/jesús gil/.test(n)) return '👯';
-        return '';
-      }
       const lbl = document.createElement('span');
       lbl.className = 'nameday-famosos-label'; lbl.textContent = 'Lo llevan:';
       famososSec.appendChild(lbl);
