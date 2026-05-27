@@ -154,7 +154,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
 
 /* RUSH MODE */
-.rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 .6rem;height:44px;box-sizing:border-box}
+.rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 .6rem;height:44px;box-sizing:border-box;white-space:nowrap;flex-shrink:0}
 .rush-toggle input{display:none}
 .rush-track{width:30px;height:17px;border-radius:9px;background:var(--border2);transition:background .2s;position:relative;flex-shrink:0}
 .rush-track::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -484,14 +484,14 @@ body.light .btn-secondary:hover{background:var(--surface2)}
         <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
         <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
       </div>
-      <div style="display:flex;align-items:center;gap:.4rem;position:absolute;left:50%;transform:translateX(-50%)">
+      <div style="display:flex;align-items:center;gap:.7rem;position:absolute;left:50%;transform:translateX(-50%)">
         <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
           <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
           <div class="rush-track"></div>
-          <span class="rush-label" id="rush-label">RUSH</span>
+          <span class="rush-label" id="rush-label" style="white-space:nowrap"><span id="rush-lightning" style="display:none">⚡ </span>RUSH</span>
         </label>
         <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
-        <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
+        <span id="streak-badge" style="font-size:.72rem;color:var(--text3);font-family:'Inter',sans-serif;display:none;line-height:1.2;text-align:center;max-width:90px;white-space:normal;align-self:center"></span>
       </div>
     </div>
   </div>
@@ -602,7 +602,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v14.2</div>
+<div class="version-tag">v14.8</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2108,7 +2108,8 @@ async function startSwiping() {
   state.streakType = null;
   rushMode = false;
   const rt = document.getElementById('rush-toggle'); if(rt) rt.checked = false;
-  const lbl = document.getElementById('rush-label'); if(lbl) { lbl.textContent = 'RUSH'; lbl.classList.remove('on'); }
+  const lbl = document.getElementById('rush-label'); if(lbl) lbl.classList.remove('on');
+  const lightning = document.getElementById('rush-lightning'); if(lightning) lightning.style.display = 'none';
   buildQueue();
   showScreen('swipe');
   // botón filtros y contador según modo
@@ -2471,7 +2472,9 @@ let rushMode = false;
 function toggleRush(on) {
   rushMode = on;
   const lbl = document.getElementById('rush-label');
-  if(lbl) { lbl.textContent = on ? '⚡ RUSH' : 'RUSH'; lbl.classList.toggle('on', on); }
+  const lightning = document.getElementById('rush-lightning');
+  if(lbl) lbl.classList.toggle('on', on);
+  if(lightning) lightning.style.display = on ? '' : 'none';
 }
 
 function triggerMatch(name) {
@@ -2778,7 +2781,7 @@ function updateStreakBadge() {
   if(!el) return;
   if(state.streak >= 3 && state.streakType === 'match') {
     el.style.display = '';
-    el.textContent = state.isSolo ? `🔥 ${state.streak} seguidos!` : `🔥 ${state.streak} matches seguidos!`;
+    el.textContent = `🔥 ${state.streak} seguidos`;
     el.style.color = 'var(--salmon)';
   } else if(state.streak >= 3 && state.streakType === 'nomatch' && !state.isSolo) {
     el.style.display = '';
