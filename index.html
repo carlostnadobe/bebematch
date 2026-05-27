@@ -215,7 +215,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .nameday-famosos-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:'Inter',sans-serif;font-weight:500;margin-bottom:.1rem}
 .nameday-chip{font-size:.72rem;color:var(--text2);border-radius:20px;padding:0 .7rem;font-family:'Inter',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%;flex:1;font-weight:500;display:flex;align-items:center;gap:.35rem;border:none;height:26px;box-sizing:border-box}
 .nameday-chip-avatar{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:600;font-family:'Inter',sans-serif;flex-shrink:0;color:#fff}
-.nameday-badge{display:inline-block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--salmon);border:1px solid rgba(232,115,90,.35);border-radius:5px;padding:.22rem .65rem;font-family:'Inter',sans-serif;font-weight:500;margin-bottom:1.2rem}
+.nameday-badge{display:inline-block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--salmon);border:1px solid rgba(232,115,90,.35);border-radius:5px;padding:.22rem .65rem;font-family:'Inter',sans-serif;font-weight:500}
 .nameday-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:var(--text);font-weight:400;font-style:italic;letter-spacing:-.02em;line-height:1}
 .nameday-origin{font-size:.68rem;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-family:'Inter',sans-serif}
 .nameday-meaning{color:var(--salmon);font-style:italic;font-family:'Instrument Serif',serif;font-size:1.1rem;margin-top:.5rem}
@@ -303,8 +303,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- NOMBRE DEL DÍA -->
 <div class="nameday-overlay" id="nameday-overlay" onclick="closeNameOfDay()">
   <div class="nameday-card" onclick="event.stopPropagation()" id="nameday-card-inner">
-    <button onclick="closeNameOfDay()" style="position:absolute;top:.8rem;right:.8rem;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-size:.9rem;z-index:1;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center">✕</button>
-    <div class="nameday-badge" style="margin-right:2rem">✨ Inspírate hoy</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-shrink:0">
+      <div class="nameday-badge" style="margin-bottom:0">✨ Inspírate hoy</div>
+      <button onclick="closeNameOfDay()" style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--salmon);border:1px solid rgba(232,115,90,.35);border-radius:5px;padding:0 .65rem;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;background:transparent;flex-shrink:0;height:36px;min-width:36px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
     <div class="nameday-content" id="nameday-content">
       <div class="nameday-name" id="nameday-name">—</div>
       <div class="nameday-origin" id="nameday-origin" style="margin-top:.3rem;margin-bottom:0">—</div>
@@ -603,7 +605,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v15.3</div>
+<div class="version-tag">v15.8</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
