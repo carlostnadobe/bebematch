@@ -602,7 +602,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v14.8</div>
+<div class="version-tag">v14.9</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2676,14 +2676,13 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:20, calorro: false, sudamerica: false, reyes: false};
+  state.filters = {gender:'all', origin:'all', count:20, calorro: false, sudamerica: false, reyes: false};
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
-  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill, #length-pills .pill').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
   document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
-  document.querySelector('#length-pills .pill[data-v="all"]').classList.add('selected');
   document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
   document.querySelector('#count-pills .pill[data-v="20"]').classList.add('selected');
   document.querySelectorAll('#super-pills .pill').forEach(p => p.classList.remove('selected'));
