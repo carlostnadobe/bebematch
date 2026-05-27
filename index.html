@@ -279,6 +279,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .mine-cell.flagged{background:rgba(251,146,60,.15);border-color:rgba(251,146,60,.4)}
 .mine-cell.boom{background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.5);animation:boomanim .3s ease}
 @keyframes boomanim{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes matchPulse{0%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(.95)}100%{transform:scale(1)}}
 .mine-msg{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;font-style:italic;text-align:center;min-height:1.8rem}
 .mine-hint{font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;letter-spacing:.04em;text-align:center}
 .n1{color:#60A5FA}.n2{color:#4ADE80}.n3{color:#F87171}.n4{color:#A78BFA}.n5{color:#FB923C}.n6{color:#34D399}.n7{color:#F5F5F5}.n8{color:#9CA3AF}
@@ -484,7 +485,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
         <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
         <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
       </div>
-      <div style="display:flex;align-items:center;gap:.7rem;position:absolute;left:50%;transform:translateX(-50%)">
+      <div style="display:flex;align-items:center;gap:.7rem;margin-left:auto">
         <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
           <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
           <div class="rush-track"></div>
@@ -602,7 +603,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v14.9</div>
+<div class="version-tag">v15.1</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2458,9 +2459,6 @@ function checkMatch(name) {
   if(state.myLikes[name] && state.partnerLikes[name]) {
     if(!state.matches.includes(name)) {
       state.matches.push(name);
-      if(state.streakType === 'match') state.streak++;
-      else { state.streak = 1; state.streakType = 'match'; }
-      updateStreakBadge();
       const top = document.querySelector('.name-card.active');
       if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
       else triggerMatch(name);
@@ -2479,7 +2477,16 @@ function toggleRush(on) {
 
 function triggerMatch(name) {
   const mc = document.getElementById('match-count');
-  if(mc && mc.style.display !== 'none') mc.innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
+  if(mc && mc.style.display !== 'none') {
+    mc.innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
+    mc.style.animation = 'none';
+    void mc.offsetWidth;
+    mc.style.animation = 'matchPulse .4s cubic-bezier(.34,1.56,.64,1)';
+    if(state.matches.length >= 3) {
+      mc.style.borderColor = 'var(--salmon)';
+      mc.style.color = 'var(--salmon)';
+    }
+  }
   if(rushMode) {
     const toast = document.getElementById('rush-match-toast');
     toast.textContent = `💞 ${name}`;
@@ -2728,7 +2735,7 @@ function goHome() {
   if(realtimeWs) { try { realtimeWs.close(); } catch(e) {} realtimeWs = null; }
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  const _mc=document.getElementById('match-count'); if(_mc){ _mc.innerHTML='💞 0 matches'; _mc.style.borderColor=''; _mc.style.color=''; _mc.style.animation=''; }
   document.getElementById('join-code').value = '';
   document.getElementById('join-error').textContent = '';
   localStorage.removeItem('bm_room');
@@ -2820,7 +2827,7 @@ function startRefineMode() {
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('partner-progress-bar').style.width = '0%';
-  document.getElementById('match-count').innerHTML = '💞 0 matches';
+  const _mc=document.getElementById('match-count'); if(_mc){ _mc.innerHTML='💞 0 matches'; _mc.style.borderColor=''; _mc.style.color=''; _mc.style.animation=''; }
   if(state.roomCode) dbDelete(state.roomCode, '__done__').catch(()=>{});
   showScreen('swipe');
   renderCards();
