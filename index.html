@@ -605,7 +605,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v15.9</div>
+<div class="version-tag">v16.0</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -1027,12 +1027,7 @@ function startSolo() {
   state.isSolo = true;
   state.isHost = true;
   state.roomCode = null;
-  state.myLikes = {};
-  state.partnerLikes = {};
-  state.matches = [];
-  state.streak = 0;
-  state.streakType = null;
-  // adaptar UI para solo
+  resetGameState();
   document.getElementById('setup-subtitle').textContent = 'Elige qué nombres quieres ver';
   document.getElementById('partner-label').textContent = 'Modo un jugador';
   showScreen('setup');
@@ -1053,15 +1048,7 @@ function finishSolo() {
     title.textContent = `${liked.length} favorito${liked.length>1?'s':''} ♥`;
     sub.textContent = 'Los nombres que más te han gustado';
     liked.forEach((name, i) => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
-          <div class="liked-item-name">${name}</div>
-        </div>
-        <span style="font-size:1.1rem">♥</span>`;
-      list.appendChild(d);
+      list.appendChild(createLikedItem(name, {rank:i+1, badge:'♥'}));
     });
   }
   showScreen('summary-solo');
@@ -1838,10 +1825,33 @@ const state = {
   myLikes: {},
   partnerLikes: {},
   matches: [],
-  filters: {gender:'all', origin:'all', length:'all', count:20, calorro: false, sudamerica: false, reyes: false},
+  filters: {gender:'all', origin:'all', count:20, calorro: false, sudamerica: false, reyes: false},
   streak: 0,
   streakType: null,
 };
+
+function resetGameState() {
+  state.queue = [];
+  state.currentIdx = 0;
+  state.myLikes = {};
+  state.partnerLikes = {};
+  state.matches = [];
+  state.streak = 0;
+  state.streakType = null;
+  state._midGameLikes = null;
+  state._midGameMatches = null;
+}
+
+function createLikedItem(name, {rank=null, badge='', sub='', dim=false}={}) {
+  const d = document.createElement('div');
+  d.className = 'liked-item';
+  if(dim) d.style.opacity = '.6';
+  const left = rank != null
+    ? `<div style="display:flex;align-items:center;gap:.7rem"><span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${rank}</span><div>${name}${sub?`<div class="liked-item-sub">${sub}</div>`:''}</div></div>`
+    : `<div class="liked-item-name">${name}${sub?`<div class="liked-item-sub">${sub}</div>`:''}</div>`;
+  d.innerHTML = left + (badge ? `<span class="match-badge">${badge}</span>` : '');
+  return d;
+}
 
 let realtimeWs = null;
 let isDragging = false, startX = 0, currentX = 0;
@@ -2107,8 +2117,7 @@ async function hostStartSwiping() {
 }
 
 async function startSwiping() {
-  state.streak = 0;
-  state.streakType = null;
+  resetGameState();
   rushMode = false;
   const rt = document.getElementById('rush-toggle'); if(rt) rt.checked = false;
   const lbl = document.getElementById('rush-label'); if(lbl) lbl.classList.remove('on');
@@ -2626,18 +2635,7 @@ function renderSummary() {
     title.textContent = `${state.matches.length} match${state.matches.length>1?'es':''} encontrado${state.matches.length>1?'s':''}! 💞`;
     sub.textContent = 'Los nombres que os gustan a los dos';
     normalMatches.forEach((name, i) => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
-          <div>
-            <div class="liked-item-name">${name}</div>
-            <div class="liked-item-sub">Match de los dos 💞</div>
-          </div>
-        </div>
-        <span class="match-badge">💞 Match</span>`;
-      list.appendChild(d);
+      list.appendChild(createLikedItem(name, {rank:i+1, badge:'💞 Match', sub:'Match de los dos 💞'}));
     });
   }
 
@@ -2646,12 +2644,7 @@ function renderSummary() {
     const section = document.createElement('div');
     section.style.cssText = 'width:100%;margin-top:.8rem';
     section.innerHTML = `<p style="font-size:.7rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif">Solo a ti te gustaron</p>`;
-    onlyMe.forEach(name => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `<div class="liked-item-name">${name}</div><span style="font-size:.75rem;color:var(--text3)">solo tú ♥</span>`;
-      section.appendChild(d);
-    });
+    onlyMe.forEach(name => { section.appendChild(createLikedItem(name, {dim:true})); });
     list.appendChild(section);
   }
 
@@ -2660,12 +2653,7 @@ function renderSummary() {
     const section = document.createElement('div');
     section.style.cssText = 'width:100%;margin-top:.8rem';
     section.innerHTML = `<p style="font-size:.7rem;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif">Solo a tu pareja le gustaron</p>`;
-    onlyPartner.forEach(name => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `<div class="liked-item-name">${name}</div><span style="font-size:.75rem;color:var(--text3)">solo pareja ♥</span>`;
-      section.appendChild(d);
-    });
+    onlyPartner.forEach(name => { section.appendChild(createLikedItem(name, {dim:true})); });
     list.appendChild(section);
   }
 
@@ -2706,9 +2694,7 @@ function launchSummaryConfetti() {
 }
 
 function restartFromSetup() {
-  state.queue = [];
-  state.currentIdx = 0;
-  state.myLikes = {};
+  resetGameState();
   state.filters = {gender:'all', origin:'all', count:20, calorro: false, sudamerica: false, reyes: false};
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
@@ -2750,13 +2736,7 @@ function goHome() {
   state.refinePrefix = '';
   state.roomCode = null;
   state.partnerConnected = false;
-  state.queue = [];
-  state.currentIdx = 0;
-  state.myLikes = {};
-  state.partnerLikes = {};
-  state.matches = [];
-  state.streak = 0;
-  state.streakType = null;
+  resetGameState();
   clearInterval(partnerPollTimer);
   if(realtimeWs) { try { realtimeWs.close(); } catch(e) {} realtimeWs = null; }
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
@@ -2779,10 +2759,10 @@ function showLiked() {
   } else {
     liked.forEach(name=>{
       const isMatch = state.matches.includes(name);
-      const d = document.createElement('div');
-      d.className='liked-item';
-      d.innerHTML=`<div><div class="liked-item-name">${name}</div><div class="liked-item-sub">${isMatch?'¡Match con tu pareja! 🎉':'Solo tú lo has elegido'}</div></div>${isMatch?'<span class="match-badge">💞 Match</span>':'<span style="font-size:1.2rem">♥</span>'}`;
-      list.appendChild(d);
+      list.appendChild(createLikedItem(name, {
+        sub: isMatch?'¡Match con tu pareja! 🎉':'Solo tú lo has elegido',
+        badge: isMatch?'💞 Match':''
+      }));
     });
   }
   showScreen('liked');
@@ -2940,17 +2920,7 @@ async function renderRefineResult() {
     // 2-3 nombres: fase final — mostrar y ofrecer elección opcional
     title.textContent = `🎯 ${refined.length} finalistas`;
     sub.textContent = '¡Estos son los que más os gustan a los dos!';
-    refined.forEach((name, i) => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
-          <div class="liked-item-name">${name}</div>
-        </div>
-        <span style="font-size:1rem">🎯</span>`;
-      list.appendChild(d);
-    });
+    refined.forEach((name, i) => { list.appendChild(createLikedItem(name, {rank:i+1, badge:'🎯'})); });
     if(refineAgainBtn) refineAgainBtn.style.display = 'none';
     // ofrecer elección final opcional
     pickSection.style.display = '';
@@ -2958,17 +2928,7 @@ async function renderRefineResult() {
   } else {
     title.textContent = `${refined.length} afinados 🎯`;
     sub.textContent = 'Los que os gustan a los dos en esta ronda';
-    refined.forEach((name, i) => {
-      const d = document.createElement('div');
-      d.className = 'liked-item';
-      d.innerHTML = `
-        <div style="display:flex;align-items:center;gap:.7rem">
-          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
-          <div class="liked-item-name">${name}</div>
-        </div>
-        <span style="font-size:1rem">🎯</span>`;
-      list.appendChild(d);
-    });
+    refined.forEach((name, i) => { list.appendChild(createLikedItem(name, {rank:i+1, badge:'🎯'})); });
     if(refineAgainBtn) refineAgainBtn.style.display = '';
   }
   state.isRefining = false;
