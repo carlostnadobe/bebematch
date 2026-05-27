@@ -598,7 +598,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v13.4</div>
+<div class="version-tag">v13.6</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2102,6 +2102,9 @@ async function hostStartSwiping() {
 async function startSwiping() {
   state.streak = 0;
   state.streakType = null;
+  rushMode = false;
+  const rt = document.getElementById('rush-toggle'); if(rt) rt.checked = false;
+  const lbl = document.getElementById('rush-label'); if(lbl) { lbl.textContent = 'RUSH'; lbl.classList.remove('on'); }
   buildQueue();
   showScreen('swipe');
   // botón filtros y contador según modo
@@ -2407,16 +2410,18 @@ async function swipeCard(liked) {
       isMatch = true;
       state.matches.push(nm.n);
     }
-    // racha: en modo solo se basa en si se da like; en pareja en si hay match
-    const wasStreak = state.isSolo ? liked === true : isMatch;
-    if(wasStreak) {
-      if(state.streakType === 'match') state.streak++;
-      else { state.streak = 1; state.streakType = 'match'; }
-    } else {
-      if(state.streakType === 'nomatch') state.streak++;
-      else { state.streak = 1; state.streakType = 'nomatch'; }
+    // racha: en modo solo se basa en si se da like; en pareja lo gestiona checkMatch
+    if(state.isSolo) {
+      const wasStreak = liked === true;
+      if(wasStreak) {
+        if(state.streakType === 'match') state.streak++;
+        else { state.streak = 1; state.streakType = 'match'; }
+      } else {
+        if(state.streakType === 'nomatch') state.streak++;
+        else { state.streak = 1; state.streakType = 'nomatch'; }
+      }
+      updateStreakBadge();
     }
-    updateStreakBadge();
   }
 
   const top = document.querySelector('.name-card.active');
@@ -2443,6 +2448,9 @@ function checkMatch(name) {
   if(state.myLikes[name] && state.partnerLikes[name]) {
     if(!state.matches.includes(name)) {
       state.matches.push(name);
+      if(state.streakType === 'match') state.streak++;
+      else { state.streak = 1; state.streakType = 'match'; }
+      updateStreakBadge();
       const top = document.querySelector('.name-card.active');
       if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
       else triggerMatch(name);
@@ -2458,10 +2466,11 @@ function toggleRush(on) {
 }
 
 function triggerMatch(name) {
-  document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
+  const mc = document.getElementById('match-count');
+  if(mc && mc.style.display !== 'none') mc.innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
   if(rushMode) {
     const toast = document.getElementById('rush-match-toast');
-    toast.textContent = `${isSuperMatch?'⭐':'💞'} ${name}`;
+    toast.textContent = `💞 ${name}`;
     toast.classList.remove('show');
     void toast.offsetWidth;
     toast.classList.add('show');
