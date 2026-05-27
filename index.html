@@ -146,21 +146,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .btn-yes.pop{animation:popYes .35s cubic-bezier(.34,1.56,.64,1)}
 .btn-skip{width:44px;height:44px;font-size:1rem;color:var(--text3)}
 .btn-skip:hover{background:var(--surface3);color:var(--text2)}
-.btn-super{width:50px;height:50px;font-size:1.3rem;background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#22C55E;position:relative}
-.btn-super:hover{background:rgba(34,197,94,.25);border-color:rgba(34,197,94,.7)}
-.btn-super.pop{animation:popYes .35s cubic-bezier(.34,1.56,.64,1)}
-.btn-super.used{opacity:.35;cursor:not-allowed}
-.btn-super .super-count{position:absolute;top:-4px;right:-4px;background:#22C55E;color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;line-height:1}
-.superlike-badge{background:linear-gradient(135deg,#22C55E,#16A34A);color:#fff;border-radius:6px;padding:.2rem .55rem;font-size:.7rem;font-weight:600;font-family:'Inter',sans-serif;letter-spacing:.02em}
-@keyframes superPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
-/* SUPERMATCH */
-.supermatch-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#052e16 0%,#000 70%)}
-.supermatch-star{position:absolute;font-size:1.3rem;animation:starFall linear forwards;opacity:0}
-@keyframes starFall{0%{opacity:0;transform:translateY(-40px) scale(.3) rotate(0deg)}15%{opacity:1}85%{opacity:.8}100%{opacity:0;transform:translateY(110vh) scale(.9) rotate(540deg)}}
-.supermatch-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:#22C55E;margin:.6rem 0;font-weight:400;font-style:italic;letter-spacing:-.02em;animation:glowPulse 1.5s ease-in-out infinite}
-@keyframes glowPulse{0%,100%{text-shadow:0 0 30px rgba(34,197,94,.9),0 0 70px rgba(34,197,94,.5)}50%{text-shadow:0 0 60px #22C55E,0 0 120px rgba(74,222,128,.8),0 0 200px rgba(34,197,94,.3)}}
-@keyframes popYes{0%{transform:scale(1)}40%{transform:scale(1.35);box-shadow:0 6px 32px rgba(232,115,90,.6)}100%{transform:scale(1)}}
-@keyframes popNo{0%{transform:scale(1)}40%{transform:scale(1.3);border-color:rgba(255,107,107,.8);color:#FF6B6B}100%{transform:scale(1)}}
+
+
+
+
+
+40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
 
 /* RUSH MODE */
 .rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -204,6 +195,29 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 
 /* THEME TOGGLE */
 .theme-toggle{position:fixed;top:1.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;color:var(--text2)}
+.name-of-day-btn{position:fixed;top:5.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
+.name-of-day-btn:hover{border-color:rgba(232,115,90,.5);animation:none;transform:scale(1.1)}
+@keyframes giftWiggle{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-12deg) scale(1.1)}30%{transform:rotate(10deg) scale(1.05)}45%{transform:rotate(-6deg) scale(1.08)}60%{transform:rotate(0) scale(1)}}
+.nameday-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto}
+.nameday-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;padding:2rem 2rem;position:relative;animation:screenIn .4s cubic-bezier(.34,1.56,.64,1);height:720px;display:flex;flex-direction:column;overflow:hidden}
+.nameday-content{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0}
+.nameday-content.fade-out{opacity:0;transform:translateX(-12px);transition:opacity .15s ease,transform .15s ease}
+.nameday-content.fade-in{opacity:0;transform:translateX(12px)}
+.nameday-content.fade-in.show{opacity:1;transform:translateX(0);transition:opacity .2s ease,transform .2s ease}
+.nameday-curious{background:rgba(232,115,90,.07);border:1px solid rgba(232,115,90,.18);border-radius:10px;padding:.7rem .9rem;margin:.8rem 0 0}
+.nameday-curious-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--salmon);font-family:'Inter',sans-serif;font-weight:600;margin-bottom:.3rem}
+.nameday-curious-text{font-size:.82rem;color:var(--text2);line-height:1.65;font-family:'Inter',sans-serif}
+.nameday-famosos{margin:.8rem 0 0;display:flex;flex-direction:column;gap:.35rem}
+.nameday-famosos-row{display:flex;align-items:center;gap:.3rem}
+.nameday-famosos-label{font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:'Inter',sans-serif;font-weight:500}
+.nameday-chip{font-size:.72rem;color:var(--text2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:.18rem .6rem;font-family:'Inter',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%;flex:1}
+.nameday-santo{font-size:.72rem;color:var(--text3);font-family:'Inter',sans-serif;margin:.6rem 0 0;display:flex;align-items:center;gap:.3rem}
+.nameday-badge{display:inline-block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--salmon);border:1px solid rgba(232,115,90,.35);border-radius:5px;padding:.2rem .6rem;font-family:'Inter',sans-serif;font-weight:500;margin-bottom:1rem}
+.nameday-name{font-family:'Instrument Serif',serif;font-size:3.2rem;color:var(--text);font-weight:400;font-style:italic;letter-spacing:-.02em;line-height:1;margin-bottom:.3rem}
+.nameday-origin{font-size:.7rem;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif;margin-bottom:.8rem}
+.nameday-meaning{font-size:.95rem;color:var(--salmon);font-style:italic;margin-bottom:1.2rem;font-family:'Instrument Serif',serif;font-size:1.1rem}
+.nameday-divider{width:32px;height:1.5px;background:rgba(232,115,90,.3);margin:1rem 0}
+.nameday-story{font-size:.8rem;color:var(--text2);line-height:1.55;font-family:'Inter',sans-serif;font-weight:300;flex:1;overflow-y:auto}
 .theme-toggle:hover{background:var(--surface3);color:var(--text)}
 body.light .toast{background:rgba(255,255,255,.92);color:var(--text)}
 body.light .btn-secondary{background:var(--surface3);color:var(--text);border-color:var(--border2)}
@@ -265,9 +279,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .mine-msg{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;font-style:italic;text-align:center;min-height:1.8rem}
 .mine-hint{font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;letter-spacing:.04em;text-align:center}
 .n1{color:#60A5FA}.n2{color:#4ADE80}.n3{color:#F87171}.n4{color:#A78BFA}.n5{color:#FB923C}.n6{color:#34D399}.n7{color:#F5F5F5}.n8{color:#9CA3AF}
-.game-wrap{display:none;flex-direction:column;align-items:center;gap:.8rem;width:100%;max-width:380px}
+.game-wrap{display:none;flex-direction:column;align-items:center;gap:.8rem;width:100%;max-width:480px}
 .game-wrap.show{display:flex}
-.game-arena{position:relative;width:100%;height:280px;border-radius:12px;overflow:hidden;background:#FDF8F4;border:1px solid rgba(44,31,26,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none}
+.game-arena{position:relative;width:100%;height:280px;border-radius:12px;overflow:hidden;background:#FDF8F4;border:1px solid rgba(44,31,26,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;max-width:100%}
 .game-ground{position:absolute;bottom:54px;left:0;right:0;height:1.5px;background:rgba(44,31,26,.2)}
 .game-baby{position:absolute;font-size:36px;line-height:1;bottom:54px;left:40px;transition:none;user-select:none}
 .game-obstacle{position:absolute;font-size:30px;line-height:1;bottom:54px;user-select:none}
@@ -280,6 +294,31 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 </head>
 <body>
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
+<button class="name-of-day-btn" id="nameday-btn" onclick="openNameOfDay()" title="Nombre del día">🎁</button>
+
+<!-- NOMBRE DEL DÍA OVERLAY -->
+<div class="nameday-overlay" id="nameday-overlay" onclick="closeNameOfDay()">
+  <div class="nameday-card" onclick="event.stopPropagation()" id="nameday-card-inner">
+    <button onclick="closeNameOfDay()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;z-index:1">✕</button>
+    <div class="nameday-badge" style="margin-right:2rem">✨ Inspírate hoy</div>
+    <div class="nameday-content" id="nameday-content">
+      <div class="nameday-name" id="nameday-name">—</div>
+      <div class="nameday-origin" id="nameday-origin">—</div>
+      <div class="nameday-meaning" id="nameday-meaning">—</div>
+      <div class="nameday-divider"></div>
+      <div class="nameday-story" id="nameday-story" style="font-size:.8rem;color:var(--text2);line-height:1.55;font-family:'Inter',sans-serif;font-weight:300"></div>
+      <div class="nameday-curious" id="nameday-curious" style="display:none">
+        <div class="nameday-curious-label">¿Sabías que...?</div>
+        <div class="nameday-curious-text" id="nameday-curious-text"></div>
+      </div>
+      <div class="nameday-famosos" id="nameday-famosos" style="display:none"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;flex-shrink:0;gap:.6rem">
+      <button onclick="prevNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.5rem 1.2rem;font-size:.82rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">← Anterior</button>
+      <button onclick="nextNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.5rem 1.2rem;font-size:.82rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">Otro nombre →</button>
+    </div>
+  </div>
+</div>
 <button class="egg-btn" id="egg-btn" title="">
   <div class="egg-fill" id="egg-fill"></div>
   <span id="egg-baby" style="position:relative;z-index:1">👶</span>
@@ -296,11 +335,11 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="mine-info">
       <span>👶🏾 <span id="mine-count-left">0</span> bebés</span>
       <span>⏱ <span id="mine-timer">0</span>s</span>
-      <span>🚩 click largo = bandera</span>
+      <button id="mine-flag-btn" onclick="toggleFlagMode()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);padding:.2rem .6rem;border-radius:7px;font-size:.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">🚩 Bandera</button>
     </div>
     <div class="mine-grid" id="mine-grid"></div>
     <div class="mine-msg" id="mine-msg"></div>
-    <div class="mine-hint">Encuentra todas las celdas seguras</div>
+    <div class="mine-hint" id="mine-hint-txt">Tap para revelar · activa 🚩 para poner banderas</div>
     <div style="display:flex;gap:.5rem;margin-top:.3rem">
       <button class="egg-close" onclick="startMines()" style="margin-top:0;opacity:1">Nueva partida</button>
       <button class="egg-close" onclick="closeMines()" style="margin-top:0;opacity:1">cerrar</button>
@@ -388,7 +427,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
   <div class="pill-row" id="count-pills">
-    <div class="pill" data-v="5" onclick="togglePill(this,'count')">Flash (5)</div>
+    <div class="pill" data-v="5" onclick="togglePill(this,'count')">Flash (~5)</div>
     <div class="pill selected" data-v="20" onclick="togglePill(this,'count')">Normal (~20)</div>
     <div class="pill" data-v="40" onclick="togglePill(this,'count')">Largo (~40)</div>
   </div>
@@ -397,7 +436,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div class="pill" data-v="calorro" onclick="togglePillExtra(this,'calorro')">🔥 Calorro</div>
     <div class="pill" data-v="sudamerica" onclick="togglePillExtra(this,'sudamerica')">🌎 Sudamérica Fusión</div>
     <div class="pill" data-v="reyes" onclick="togglePillExtra(this,'reyes')">👑 Reyes y Emperadores</div>
-    <div class="pill" data-v="superlike" onclick="togglePillExtra(this,'superlike')">⭐ SuperLikes</div>
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;font-size:.82rem">← Volver al inicio</button>
@@ -450,7 +488,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="action-btns">
     <button class="action-btn btn-no" id="btn-no" onclick="swipeCard(false)" title="No me gusta">✕</button>
     <button class="action-btn btn-yes" id="btn-yes" onclick="swipeCard(true)" title="Me encanta">♥</button>
-    <button class="action-btn btn-super" id="btn-super" onclick="swipeCard('super')" title="SuperLike ⭐">⭐<span class="super-count" id="super-count">2</span></button>
     <button class="action-btn btn-skip" onclick="swipeCard(null)" title="Saltar">→</button>
   </div>
   <button class="btn" style="font-size:.8rem;color:var(--text2);margin-top:.5rem" onclick="showLiked()">Ver mis favoritos (♥ <span id="liked-count">0</span>)</button>
@@ -468,23 +505,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <button class="btn btn-primary" onclick="continueAfterMatch()" style="width:280px;justify-content:center;margin-bottom:.75rem">Seguir explorando ✨</button>
     <button class="btn btn-outline" onclick="showLiked()" style="width:280px;justify-content:center">Ver todos los matches</button>
   </div>
-</div>
-
-<!-- SUPERMATCH -->
-<div class="screen" id="screen-supermatch" style="position:relative;overflow:hidden;background:#000">
-  <div class="supermatch-bg" id="supermatch-bg"></div>
-  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center">
-    <div style="font-size:3.5rem;animation:pop .5s cubic-bezier(.34,1.56,.64,1)">⭐</div>
-    <p style="font-size:.9rem;color:#86EFAC;letter-spacing:.2em;text-transform:uppercase;margin:.5rem 0 0;font-family:'Inter',sans-serif;font-weight:600">¡Super Match!</p>
-    <div class="supermatch-name" id="supermatch-name-display">—</div>
-    <div style="display:flex;gap:.4rem;font-size:1.2rem;margin:.3rem 0 1.5rem;animation:float 2s ease-in-out infinite">⭐ 💚 ⭐ 💚 ⭐</div>
-    <p style="font-size:.9rem;color:#86EFAC;max-width:260px;margin-bottom:2rem;text-align:center">¡Los dos lo tenéis clarísimo! Este nombre es especial 🌟</p>
-    <button class="btn" onclick="continueAfterMatch()" style="width:280px;justify-content:center;margin-bottom:.75rem;background:#22C55E;color:#fff;border:none;box-shadow:0 4px 24px rgba(34,197,94,.4)">Seguir explorando ✨</button>
-    <button class="btn btn-outline" onclick="showLiked()" style="width:280px;justify-content:center;border-color:rgba(34,197,94,.4);color:#86EFAC">Ver todos los matches</button>
-  </div>
-</div>
-
-<!-- LIKED -->
+</div><!-- LIKED -->
 <div class="screen" id="screen-liked">
   <p class="title-serif">Vuestros matches 💞</p>
   <p class="subtitle" id="liked-subtitle">Nombres que os gustan a los dos</p>
@@ -573,10 +594,9 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v9.9</div>
+<div class="version-tag">v10.5</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
-<div class="rush-match-toast" id="super-toast" style="background:linear-gradient(135deg,#22C55E,#16A34A)">⭐ SuperLike!</div>
 
 <script>
 const SUPABASE_URL = 'https://myakshqgodbvwnbnvjjn.supabase.co';
@@ -598,9 +618,19 @@ eggBtn.addEventListener('click', () => {
     btn.classList.remove('shake');
     fill.style.transition = 'none';
     fill.style.height = '0%';
-    openEgg();
+    openEggGame();
   }, 650);
 });
+function openEggGame() {
+  const overlay = document.getElementById('egg-overlay');
+  overlay.classList.add('show');
+  // saltar directamente al juego sin mostrar el regalo
+  document.getElementById('egg-box-wrap').style.display = 'none';
+  const gw = document.getElementById('game-wrap');
+  gw.classList.add('show');
+  initGame();
+}
+
 function openEgg(){
   const overlay = document.getElementById('egg-overlay');
   overlay.classList.add('show');
@@ -835,6 +865,18 @@ eggBtn2.addEventListener('click', () => {
 const MINE_ROWS = 9, MINE_COLS = 9, MINE_COUNT = 10;
 let mineBoard = [], mineRevealed = [], mineFlagged = [], mineGameOver = false;
 let mineFirstClick = true, mineTimerInt = null, mineSeconds = 0, mineLeft = MINE_COUNT;
+let mineFlagMode = false;
+
+function toggleFlagMode() {
+  mineFlagMode = !mineFlagMode;
+  const btn = document.getElementById('mine-flag-btn');
+  if(btn) {
+    btn.style.background = mineFlagMode ? 'rgba(251,146,60,.35)' : 'rgba(255,255,255,.1)';
+    btn.style.borderColor = mineFlagMode ? 'rgba(251,146,60,.7)' : 'rgba(255,255,255,.2)';
+    btn.style.color = mineFlagMode ? '#FB923C' : 'rgba(255,255,255,.7)';
+    btn.textContent = mineFlagMode ? '🚩 Poniendo banderas' : '🚩 Bandera';
+  }
+}
 
 function openMines() {
   document.getElementById('mine-overlay').classList.add('show');
@@ -852,6 +894,9 @@ function startMines() {
   mineFirstClick = true;
   mineSeconds = 0;
   mineLeft = MINE_COUNT;
+  mineFlagMode = false;
+  const btn = document.getElementById('mine-flag-btn');
+  if(btn) { btn.style.background='rgba(255,255,255,.1)'; btn.style.borderColor='rgba(255,255,255,.2)'; btn.style.color='rgba(255,255,255,.7)'; btn.textContent='🚩 Bandera'; }
   mineBoard = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(0));
   mineRevealed = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(false));
   mineFlagged = Array.from({length:MINE_ROWS},()=>Array(MINE_COLS).fill(false));
@@ -899,9 +944,6 @@ function renderMineGrid() {
     }
     cell.addEventListener('click', onMineClick);
     cell.addEventListener('contextmenu', onMineFlag);
-    let pressTimer = null;
-    cell.addEventListener('touchstart', e=>{ pressTimer=setTimeout(()=>{ onMineFlag(e,r,c); pressTimer=null; },400); },{passive:true});
-    cell.addEventListener('touchend', ()=>{ if(pressTimer){ clearTimeout(pressTimer); } });
     grid.appendChild(cell);
   }
 }
@@ -909,7 +951,13 @@ function renderMineGrid() {
 function onMineClick(e) {
   if(mineGameOver) return;
   const r=+e.currentTarget.dataset.r, c=+e.currentTarget.dataset.c;
-  if(mineFlagged[r][c]||mineRevealed[r][c]) return;
+  if(mineRevealed[r][c]) return;
+  // modo bandera activo → poner/quitar bandera
+  if(mineFlagMode) {
+    onMineFlag(e, r, c);
+    return;
+  }
+  if(mineFlagged[r][c]) return;
   if(mineFirstClick) {
     mineFirstClick=false;
     placeMines(r,c);
@@ -965,13 +1013,12 @@ function checkMineWin() {
 
 /* ── TARJETA DE MATCHES ── */
 async function generateMatchCard() {
-  const matches = state.matches.filter(n => !state.superlikes.includes(n));
-  const superlikes = state.superlikes || [];
-  const allNames = [...superlikes, ...matches];
+  const matches = [...state.matches];
+  const allNames = [...matches];
   if(allNames.length === 0) { showToast('No hay matches que mostrar'); return; }
 
   const canvas = document.getElementById('match-card-canvas');
-  const W = 420, H = Math.max(540, 200 + allNames.length * 44 + (superlikes.length > 0 ? 40 : 0));
+  const W = 420, H = Math.max(540, 200 + allNames.length * 44);
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   const isDark = !document.body.classList.contains('light');
@@ -1016,37 +1063,9 @@ async function generateMatchCard() {
 
   let y = 120;
 
-  // superlikes
-  if(superlikes.length > 0) {
-    ctx.font = '600 11px Inter, sans-serif';
-    ctx.fillStyle = '#22C55E';
-    ctx.fillText('⭐  SUPERLIKES', 30, y);
-    y += 8;
-    for(const name of superlikes) {
-      y += 36;
-      ctx.fillStyle = isDark ? 'rgba(34,197,94,.12)' : 'rgba(34,197,94,.1)';
-      ctx.beginPath(); ctx.roundRect(30, y - 24, W - 60, 34, 8); ctx.fill();
-      ctx.font = 'italic 600 20px serif';
-      ctx.fillStyle = '#22C55E';
-      ctx.fillText(name, 50, y - 2);
-      ctx.font = '11px serif'; ctx.fillText('⭐', W - 56, y - 2);
-    }
-    y += 20;
-    ctx.strokeStyle = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(W-30, y); ctx.stroke();
-    y += 16;
-  }
-
-  // matches normales
+  // matches
   if(matches.length > 0) {
-    if(superlikes.length > 0) {
-      ctx.font = '600 11px Inter, sans-serif';
-      ctx.fillStyle = mutedColor;
-      ctx.fillText('💞  MATCHES', 30, y);
-      y += 8;
-    }
-    for(let i = 0; i < matches.length; i++) {
+      for(let i = 0; i < matches.length; i++) {
       y += 36;
       ctx.fillStyle = isDark ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.04)';
       ctx.beginPath(); ctx.roundRect(30, y - 24, W - 60, 34, 8); ctx.fill();
@@ -1210,6 +1229,131 @@ function spawnHeartParticles(btn) {
   }
 }
 
+/* ── NOMBRE DEL DÍA ── */
+const NAMEDAY_DATA = [
+  {n:"Sofía",o:"Griego",m:"Sabiduría divina",s:"En filosofía griega, la 'sophia' era la virtud suprema del conocimiento. Santa Sofía de Roma fue mártir junto a sus hijas Fe, Esperanza y Caridad.\n\nTres papas eligieron este nombre. La catedral de Estambul lleva su nombre por la Sabiduría Divina, no por ninguna santa.",santo:"30 de septiembre",curioso:"La catedral de Estambul (Hagia Sophia) lleva su nombre, pero no está dedicada a ninguna santa, sino a la Sabiduría Divina de Dios.",famosos:["Sofía Loren","Sofía Vergara","Reina Sofía","Sofía Coppola"]},
+  {n:"Alejandro",o:"Griego",m:"Defensor del pueblo",s:"Alejandro Magno construyó el mayor imperio de la Antigüedad a los 32 años sin perder una sola batalla. Fue el nombre favorito de reyes y emperadores.\n\nFundó más de 20 ciudades llamadas Alejandría. La Biblioteca de Alejandría fue su legado cultural más duradero.",santo:"22 de abril",curioso:"Alejandro Magno nunca perdió una sola batalla en toda su vida militar. Fundó más de 20 ciudades llamadas Alejandría.",famosos:["Alejandro Sanz","Alejandro Magno","Alejandro Dumas","A. González Iñárritu"]},
+  {n:"Isabella",o:"Hebreo",m:"Consagrada a Dios",s:"Isabella I de Castilla financió el viaje de Colón en 1492 y unificó España. Fue el nombre más popular en Europa durante el siglo XVI.\n\nFue la primera monarca en aparecer en una moneda de circulación occidental. Su retrato en los reales castellanos viajó con Colón al Nuevo Mundo.",santo:"4 de julio",curioso:"Isabella I de Castilla fue la primera mujer en aparecer en una moneda de circulación en el mundo occidental.",famosos:["Isabella Rossellini","Isabel la Católica","Isabella d'Este","Bella Hadid"]},
+  {n:"Martín",o:"Latino",m:"Dedicado a Marte, el guerrero",s:"San Martín de Tours partió su capa con un mendigo y se convirtió en el patrón de Francia. Martín Luther King lo inmortalizó en la lucha por los derechos civiles.\n\nEl 11 de noviembre, día de San Martín, es la fecha para abrir el vino nuevo en Europa.",santo:"11 de noviembre",curioso:"El día de San Martín (11 de noviembre) es la fecha tradicional para abrir el vino nuevo en muchas regiones de Europa.",famosos:["Martín Luther King","Ricky Martin","San Martín de Tours","Martín Fierro"]},
+  {n:"Elena",o:"Griego",m:"Antorcha resplandeciente",s:"Helena de Troya fue 'el rostro que lanzó mil naves'. Santa Elena (250-330), madre de Constantino, encontró la Vera Cruz en Jerusalén con ochenta años.\n\nElena Cornaro Piscopia fue en 1678 la primera mujer en recibir un doctorado universitario en el mundo.",santo:"18 de agosto",curioso:"Elena Cornaro Piscopia fue en 1678 la primera mujer en recibir un doctorado universitario en la historia del mundo.",famosos:["Elena de Troya","Santa Elena","Elena Anaya","Elena Ferrante"]},
+  {n:"Valentina",o:"Latino",m:"Fuerte y valerosa",s:"Del latín 'valens', vigor y salud. San Valentín casó en secreto a parejas de soldados, dando al nombre su asociación eterna con el amor.\n\nValentina Tereshkova fue la primera mujer en el espacio en 1963. Propuso ir a Marte de ida sin retorno si fuera necesario.",santo:"14 de febrero",curioso:"Tereshkova voló sola al espacio en 1963 y orbita la Tierra 48 veces. Sigue siendo la única mujer que ha realizado una misión espacial en solitario.",famosos:["Valentina Tereshkova","Valentina Lisitsa","Valentina Greco","Valentina Vignali"]},
+  {n:"Hugo",o:"Germánico",m:"Mente brillante, espíritu luminoso",s:"Del germánico 'hug', pensamiento o inteligencia. Victor Hugo (1802-1885) lo convirtió en sinónimo de genio literario con 'Los Miserables'.\n\nVictor Hugo escribió su obra durante 19 años de exilio en Guernsey. Cuando volvió a París, más de un millón de personas salieron a recibirle.",santo:"1 de abril",curioso:"Victor Hugo escribió 'Los Miserables' en el exilio en la isla de Guernsey, donde vivió 19 años alejado de Francia por oponerse a Napoleón III.",famosos:["Victor Hugo","Hugo Chávez","Hugo Boss","Hugo Sánchez"]},
+  {n:"Camila",o:"Latino",m:"Mensajera de los dioses",s:"En la mitología romana, Camila era una guerrera que corría tan rápido que sus pies no rozaban el suelo. Virgilio la inmortalizó en la Eneida.\n\nEn 2005, Camila Parker Bowles se convirtió en Princesa de Gales. Su historia de amor de décadas se convirtió en una de las más seguidas del mundo.",santo:"14 de julio",curioso:"Virgiliana corría tan rápido que sus pies no rozaban el suelo según la Eneida. Virgilio la describió como la mujer más veloz del mundo antiguo.",famosos:["Camila Cabello","Princesa Camila","Camila Morrone","Camille Saint-Saëns"]},
+  {n:"Leonidas",o:"Griego",m:"Hijo del león",s:"Leonidas I dirigió a 300 espartanos en las Termópilas en el 480 a.C. Su respuesta —'molon labe', ven a tomarlas— fue el grito de la libertad.\n\nSu sacrificio dio tiempo a Grecia para organizarse y vencer en Salamina. Alejandro Magno lloró ante su tumba.",santo:"14 de abril",curioso:"Los 300 espartanos de Leonidas en las Termópilas inspiraron al escritor Frank Miller en 1998 para su novela gráfica '300', llevada al cine en 2006.",famosos:["Leonidas I de Esparta","Leonidas Da Silva","Leonidas Kavakos","Leonidas Gómez"]},
+  {n:"Noa",o:"Hebreo",m:"Movimiento, descanso interior",s:"Una de las cinco hijas de Zelofehad que exigió y obtuvo el derecho a heredar las tierras de su padre, cambiando la ley judía para siempre.\n\nNoa es distinta de Noé: son personas diferentes en la Biblia. Fue uno de los primeros casos legales de derechos femeninos de la historia escrita.",santo:"No establecido",curioso:"Noa y Noé son dos personas distintas en la Biblia. Noa ganó en el año 1400 a.C. el primer caso legal de herencia femenina registrado en la historia.",famosos:["Noa (cantante israelí)","Noa Kirel","Noa Pothoven","Noa Lang"]},
+  {n:"Cleopatra",o:"Reyes",m:"Gloria del padre",s:"Cleopatra VII fue la primera de su dinastía en aprender el egipcio. Gobernó 21 años y su muerte la convirtió en símbolo eterno de libertad.\n\nFue envuelta en una alfombra ante César, quien quedó fascinado. Dominaba nueve idiomas y fue la reina más poderosa de su tiempo.",santo:"No establecido",curioso:"Habló nueve idiomas y fue la primera de su dinastía en aprender el egipcio. Era la única de su familia que podía hablar directamente con sus súbditos.",famosos:["Cleopatra VII","Cleopatra Jones","Cleo de Mérode","Cléopâtre Séméria"]},
+  {n:"Aurora",o:"Latino",m:"La diosa del amanecer",s:"Aurora era la diosa romana que abría las puertas del cielo con sus dedos de rosa cada mañana. Sus lágrimas formaban el rocío matinal.\n\nGeorge Sand adoptó un nombre masculino para publicar sus novelas. Tuvo relaciones con Chopin y Liszt, y escandalizó al siglo XIX vistiendo de hombre.",santo:"15 de junio",curioso:"La aurora boreal fue bautizada 'Aurora Borealis' por Gassendi en 1621 combinando el nombre de la diosa con 'Boreas', el viento del norte.",famosos:["Aurora (cantante)","George Sand","Aurora Disney","Aurora de Noruega"]},
+  {n:"Maximiliano",o:"Reyes",m:"El más grande de todos",s:"Nombre inventado por Federico III en 1459 mezclando dos generales romanos. Maximiliano I del Sacro Imperio fue conocido como 'el último caballero'.\n\nMaximiliano de México aceptó el trono creyendo que el pueblo le quería. Era una imposición de Napoleón III. Fue fusilado a los 34 años.",santo:"12 de octubre",curioso:"El nombre fue inventado en 1459 por el Emperador Federico III mezclando dos generales romanos: Máximo Fabio y Cornelio Escipión Emiliano.",famosos:["Maximiliano de México","Maximiliano I del S.I.R.","Maximilian Schell","Max von Sydow"]},
+  {n:"Zenobia",o:"Reyes",m:"Vida de Zeus",s:"Zenobia de Palmira (240-274) conquistó Egipto y un tercio del Imperio Romano. Cuando Aureliano la capturó, su dignidad le otorgó una villa en Tívoli.\n\nSe declaró Emperatriz de Oriente en el 272. Su capital, Palmira, era una de las ciudades más ricas del mundo antiguo.",santo:"No establecido",curioso:"Zenobia afirmaba descender de Cleopatra. Conquistó Egipto en el año 269 y llegó a controlar un tercio del Imperio Romano antes de ser derrotada.",famosos:["Zenobia de Palmira","Zenobia Camprubí","Zenobia Shroff","Zenobia Barlow"]},
+  {n:"Natalia",o:"Clásico",m:"Nacida en Navidad",s:"Del latín 'natalis dies Domini', el día del nacimiento del Señor. Fue el nombre tradicional para niñas nacidas el 25 de diciembre.\n\nTolstói eligió Natasha Rostova para 'Guerra y Paz'. El diminutivo Natasha viajó al universo Marvel con la Viuda Negra.",santo:"1 de diciembre",curioso:"Natasha Rostova en 'Guerra y Paz' de Tolstói es considerada uno de los personajes femeninos más complejos y amados de la literatura universal.",famosos:["Natalia Lafourcade","Natalia Oreiro","Natalia Vodianova","Natasha Romanoff"]},
+  {n:"Lucas",o:"Griego",m:"El que trae la luz",s:"Del griego 'Loukas', derivado del latín 'lux'. San Lucas fue el médico evangelista que escribió el tercer Evangelio y pintó, según la tradición, el primer retrato de la Virgen.\n\nEs el único evangelista que narra la Natividad con los pastores. Es patrón de médicos y pintores.",santo:"18 de octubre",curioso:"San Lucas es el patrón de los médicos y también de los pintores, porque según la tradición medieval pintó el primer retrato de la Virgen María.",famosos:["San Lucas","George Lucas","Lucas Cranach","Lucas Vázquez"]},
+  {n:"Diana",o:"Latino",m:"Divina, luminosa como el día",s:"Diana era la diosa romana de la caza y la luna. La princesa Diana de Gales (1961-1997) renovó el nombre con su elegancia y compasión.\n\nSu muerte en 1997 provocó el mayor duelo público en la historia moderna del Reino Unido. Más de un millón de personas se congregaron en Londres.",santo:"No establecido",curioso:"La NASA llamó a su misión lunar 'Artemis' (gemela griega de Diana) para hacer eco del Apolo original. Diana/Artemis preside dos eras espaciales.",famosos:["Diana de Gales","Diana Ross","Diana Krall","Diana Rigg"]},
+  {n:"Adrián",o:"Latino",m:"El que viene del mar Adriático",s:"El Adriático debe su nombre a la ciudad de Adria. Adriano (76-138) construyó el Panteón, la Muralla de Britania y fundó bibliotecas por el Imperio.\n\nEl Panteón tiene una cúpula de 43 metros no superada hasta el siglo XV. Sigue siendo la mayor cúpula de hormigón del mundo.",santo:"8 de septiembre",curioso:"La Muralla de Adriano en Inglaterra, construida en el año 122, mide 117 km y tardó 6 años con 15.000 soldados trabajando a la vez.",famosos:["Adriano (emperador)","Adrián Lastra","Adrian Brody","Adrián Sutil"]},
+  {n:"Victoria",o:"Latino",m:"La que vence",s:"Victoria era la diosa romana de la victoria con alas y corona de laurel. La Reina Victoria reinó 63 años sobre el mayor Imperio de la historia.\n\nTuvo 42 nietos que gobernaron Europa. Entre ellos el Kaiser Guillermo II y el Zar Nicolás II, rivales en la Primera Guerra Mundial.",santo:"23 de diciembre",curioso:"La Reina Victoria tuvo 42 nietos que gobernaron Europa. Entre ellos el Kaiser Guillermo II y el Zar Nicolás II, rivales en la Gran Guerra.",famosos:["Reina Victoria","Victoria Beckham","Victoria Justice","Victoria de Suecia"]},
+  {n:"Rafael",o:"Hebreo",m:"Dios ha curado",s:"Arcángel sanador y guía de viajeros. El pintor Raffaello Sanzio (1483-1520) es uno de los tres grandes maestros del Renacimiento.\n\nRafael murió el mismo día que nació: 6 de abril. El Papa León X le encargó las estancias del Vaticano que llevan su nombre.",santo:"24 de octubre",curioso:"Rafael murió el mismo día que nació: 6 de abril. Según Vasari, fue tan prolífico que pintó más de 300 obras en solo 37 años de vida.",famosos:["Rafael Nadal","Raffaello Sanzio","Rafael Alberti","Rafael Leão"]},
+  {n:"Irene",o:"Griego",m:"Paz",s:"Del griego 'eirene', la paz. Irene de Atenas (752-803) fue la primera mujer en gobernar el Imperio Bizantino en solitario.\n\nFue la primera en grabar su retrato en monedas imperiales sin ningún hombre. Irene Joliot-Curie, hija de Marie Curie, ganó el Nobel de Química.",santo:"5 de abril",curioso:"Irene de Atenas fue la primera mujer en hacer grabar su propio retrato en monedas imperiales sin la imagen de ningún hombre junto a ella.",famosos:["Irene de Atenas","Irene Joliot-Curie","Irene Cara","Irene Dunne"]},
+  {n:"Sebastián",o:"Griego",m:"El venerable, el respetado",s:"Del griego 'sebastos', digno de reverencia. San Sebastián sobrevivió a ser asaeteado antes de ser martirizado hacia el año 288.\n\nJohann Sebastian Bach convirtió el nombre en sinónimo de perfección musical. Sus 'Variaciones Goldberg' son la cima de la música de teclado.",santo:"20 de enero",curioso:"Sobrevivió a ser asaeteado gracias a su resistencia. La ciudad vasca que lleva su nombre tiene más estrellas Michelin por metro cuadrado del mundo.",famosos:["J. S. Bach","San Sebastián","Sebastian Vettel","Sebastian Stan"]},
+  {n:"Clara",o:"Latino",m:"Brillante, transparente",s:"Del latín 'clarus', brillante. Santa Clara de Asís fundó las Clarisas renunciando a toda su fortuna junto a San Francisco de Asís.\n\nEl Papa Pío XII la declaró patrona de la televisión en 1958, por haber 'visto' una misa en la pared de su celda como en una pantalla.",santo:"11 de agosto",curioso:"El Papa Pío XII declaró a Santa Clara patrona de la televisión en 1958, más de 700 años después de su muerte, por haber 'visto' una misa en la pared.",famosos:["Santa Clara de Asís","Clara Schumann","Clara Bow","Clara Lago"]},
+  {n:"Pablo",o:"Latino",m:"Pequeño, humilde",s:"Del latín 'paulus', pequeño. San Pablo recorrió miles de kilómetros difundiendo el cristianismo y escribió catorce epístolas históricas.\n\nPicasso tenía 23 nombres completos. Sus padres se los pusieron para protegerle de los malos espíritus según la tradición andaluza.",santo:"29 de junio",curioso:"Picasso tenía 23 nombres completos. Sus padres le pusieron tantos según la tradición andaluza para protegerle de los malos espíritus.",famosos:["Pablo Picasso","Pablo Neruda","Pablo Alborán","Pablo Casals"]},
+  {n:"Beatriz",o:"Latino",m:"Viajera feliz, la que hace feliz",s:"Dante Alighieri vio a Beatrice Portinari con nueve años. Solo hablaron dos veces, pero ella inspiró toda la 'Divina Comedia'.\n\nLa Beatrice de Dante es un ideal espiritual; la de Shakespeare elige por sí misma. El mismo nombre, dos arquetipos femeninos opuestos.",santo:"13 de febrero",curioso:"La Beatrice de Dante es un ideal espiritual inalcanzable; la de Shakespeare elige por sí misma. El mismo nombre, dos arquetipos femeninos opuestos.",famosos:["Beatrice Portinari","Beatriz de Holanda","Beatriz Luengo","Beatriz Milhazes"]},
+  {n:"Mateo",o:"Hebreo",m:"Don de Dios",s:"Del hebreo 'Mattityahu', regalo de Yahvé. San Mateo pasó de recaudador de impuestos al Evangelio más leído de la historia en pocos años.\n\nBach compuso la 'Pasión según San Mateo' en 1727. Fue olvidada cien años hasta que Mendelssohn la rescató en 1829, redescubriendo a Bach.",santo:"21 de septiembre",curioso:"Bach compuso la 'Pasión según San Mateo' en 1727. Fue olvidada cien años hasta que Mendelssohn la rescató en 1829, redescubriendo a Bach.",famosos:["San Mateo","Matteo Berrettini","Mateo Kovačić","Matteo Romano"]},
+  {n:"Daniela",o:"Hebreo",m:"Dios es mi juez",s:"Forma femenina del profeta Daniel, famoso por sobrevivir en el foso de los leones. Enseñaba que la justicia divina supera cualquier poder terrenal.\n\nDe la historia de Baltasar en el libro de Daniel viene la expresión 'escritura en la pared', usada hoy para anunciar el fin inevitable de algo.",santo:"21 de julio",curioso:"El nombre Daniel/Daniela no aparece una sino dos veces en la Biblia: el profeta Daniel y un sacerdote llamado Daniel mencionado en el libro de Esdras.",famosos:["Daniela Mercury","Daniela Romo","Daniela Chávez","Daniela Vega"]},
+  {n:"Marco",o:"Latino",m:"Consagrado a Marte",s:"Marco Aurelio (121-180) fue el filósofo-emperador, autor de las 'Meditaciones', el libro de filosofía estoica más vendido de la historia.\n\nMarco Polo tardó 24 años en completar su viaje a China. Al volver, su familia no le reconoció. Las especias que trajo cambiaron la economía europea.",santo:"25 de abril",curioso:"Marco Polo tardó 24 años en su viaje a China. Al volver, su familia no le reconoció. Las especias que trajo cambiaron la economía europea.",famosos:["Marco Aurelio","Marco Polo","Marco Asensio","Marco Bellinelli"]},
+  {n:"Catalina",o:"Griego",m:"Pura, inmaculada",s:"Catalina de Alejandría desafió al Emperador Majencio con argumentos tan brillantes que convirtió a sus propios filósofos. Murió mártir en el año 305.\n\nCatalina de Aragón nunca aceptó el divorcio de Enrique VIII. Su firmeza durante siete años causó la ruptura definitiva de Inglaterra con Roma.",santo:"25 de noviembre",curioso:"Catalina de Aragón nunca aceptó el divorcio de Enrique VIII. Su firmeza durante siete años causó la ruptura de Inglaterra con Roma.",famosos:["Catalina la Grande","Catalina de Aragón","Catalina de Médici","Catalina Sandino"]},
+  {n:"Samuel",o:"Hebreo",m:"Su nombre es Dios",s:"Del hebreo 'Shemu'el', Dios lo escuchó. El profeta Samuel ungió a Saúl y David, los dos primeros reyes de Israel.\n\nMorse inventó el telégrafo tras no poder llegar al funeral de su esposa. Beckett escribió 'Esperando a Godot' y ganó el Nobel.",santo:"20 de agosto",curioso:"Morse inventó el telégrafo tras no poder llegar al funeral de su esposa. El dolor personal cambió la comunicación del siglo XIX.",famosos:["Samuel Morse","Samuel Beckett","Samuel Johnson","Samuel L. Jackson"]},
+];
+
+let lastNamedayIdx = 0;
+
+function showNamedayAt(idx, dir = 1) {
+  lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
+  const content = document.getElementById('nameday-content');
+  // fade out
+  content.style.opacity = '0';
+  content.style.transform = `translateX(${dir > 0 ? '-12px' : '12px'})`;
+  content.style.transition = 'opacity .15s ease, transform .15s ease';
+  setTimeout(() => {
+    const d = NAMEDAY_DATA[lastNamedayIdx];
+    document.getElementById('nameday-name').textContent = d.n;
+    document.getElementById('nameday-origin').textContent = d.o;
+    document.getElementById('nameday-meaning').textContent = '"' + d.m + '"';
+    const storyEl = document.getElementById('nameday-story');
+    storyEl.innerHTML = '';
+    d.s.split('\n\n').forEach((para, i) => {
+      const p = document.createElement('p');
+      p.textContent = para;
+      p.style.cssText = i > 0 ? 'margin-top:.7rem' : '';
+      storyEl.appendChild(p);
+    });
+    const curiousSec = document.getElementById('nameday-curious');
+    if(d.curioso) {
+      curiousSec.style.display = '';
+      document.getElementById('nameday-curious-text').textContent = d.curioso;
+    } else curiousSec.style.display = 'none';
+    // famosos
+    const famososSec = document.getElementById('nameday-famosos');
+    famososSec.innerHTML = '';
+    if(d.famosos && d.famosos.length) {
+      famososSec.style.display = '';
+      const lbl = document.createElement('span');
+      lbl.className = 'nameday-famosos-label';
+      lbl.textContent = 'Lo llevan:';
+      famososSec.appendChild(lbl);
+      const four = d.famosos.slice(0,4);
+      [[0,1],[2,3]].forEach(pair => {
+        const row = document.createElement('div');
+        row.className = 'nameday-famosos-row';
+        pair.forEach(i => {
+          if(four[i]) {
+            const chip = document.createElement('span');
+            chip.className = 'nameday-chip';
+            chip.textContent = four[i];
+            row.appendChild(chip);
+          }
+        });
+        famososSec.appendChild(row);
+      });
+    } else famososSec.style.display = 'none';
+    // fade in
+    content.style.transition = 'none';
+    content.style.transform = `translateX(${dir > 0 ? '12px' : '-12px'})`;
+    content.style.opacity = '0';
+    requestAnimationFrame(() => {
+      content.style.transition = 'opacity .2s ease, transform .2s ease';
+      content.style.transform = 'translateX(0)';
+      content.style.opacity = '1';
+    });
+  }, 150);
+}
+
+function openNameOfDay() {
+  document.getElementById('nameday-overlay').style.display = 'flex';
+  const idx = Math.floor(Math.random() * NAMEDAY_DATA.length);
+  document.getElementById('nameday-content').style.opacity = '1';
+  document.getElementById('nameday-content').style.transform = 'translateX(0)';
+  showNamedayAt(idx, 0);
+  setupNamedaySwipe();
+}
+
+let namedaySwipeX = 0;
+function setupNamedaySwipe() {
+  const card = document.getElementById('nameday-card-inner');
+  if(!card || card._swipeSetup) return;
+  card._swipeSetup = true;
+  card.addEventListener('touchstart', e => { namedaySwipeX = e.touches[0].clientX; }, {passive:true});
+  card.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - namedaySwipeX;
+    if(Math.abs(dx) > 50) dx < 0 ? nextNameOfDay() : prevNameOfDay();
+  }, {passive:true});
+}
+
+function nextNameOfDay() { showNamedayAt(lastNamedayIdx + 1, 1); }
+function prevNameOfDay() { showNamedayAt(lastNamedayIdx - 1, -1); }
+
+function closeNameOfDay() {
+  document.getElementById('nameday-overlay').style.display = 'none';
+}
+
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light');
   document.getElementById('theme-btn').textContent = isLight ? '🌑' : '🌙';
@@ -1224,32 +1368,32 @@ function toggleTheme(){
 
 const NAMES_DB = [
   // ── GIRL · griego ──
-  {n:"Sofía",g:"girl",o:"griego",m:"sabiduría divina"},
-  {n:"Elena",g:"girl",o:"griego",m:"antorcha brillante"},
-  {n:"Irene",g:"girl",o:"griego",m:"diosa de la paz"},
+  {n:"Sofía",g:"girl",o:"griego",m:"sabiduría divina",santo:"30 de septiembre",curioso:"La catedral de Estambul (Hagia Sophia) lleva su nombre, pero no está dedicada a ninguna santa, sino a la Sabiduría Divina de Dios.",famosos:["Sofía Loren","Sofía Vergara","Reina Sofía","Sofía Coppola"]},
+  {n:"Elena",g:"girl",o:"griego",m:"antorcha brillante",santo:"18 de agosto",curioso:"Elena Cornaro Piscopia fue en 1678 la primera mujer en recibir un doctorado universitario en la historia del mundo.",famosos:["Elena de Troya","Santa Elena","Elena Anaya","Elena Ferrante"]},
+  {n:"Irene",g:"girl",o:"griego",m:"diosa de la paz",santo:"5 de abril",curioso:"Irene de Atenas fue la primera mujer en hacer grabar su propio retrato en monedas imperiales sin la imagen de ningún hombre junto a ella.",famosos:["Irene de Atenas","Irene Joliot-Curie","Irene Cara","Irene Dunne"]},
   {n:"Chloe",g:"girl",o:"griego",m:"hierba verde, floreciente"},
   {n:"Phoebe",g:"girl",o:"griego",m:"brillante como la luna"},
   {n:"Calista",g:"girl",o:"griego",m:"la más bella"},
   {n:"Zoe",g:"girl",o:"griego",m:"vida"},
   // ── GIRL · latino ──
-  {n:"Valentina",g:"girl",o:"latino",m:"valiente y fuerte"},
+  {n:"Valentina",g:"girl",o:"latino",m:"valiente y fuerte",santo:"14 de febrero",curioso:"Tereshkova voló sola al espacio en 1963 y orbita la Tierra 48 veces. Sigue siendo la única mujer que ha realizado una misión espacial en solitario.",famosos:["Valentina Tereshkova","Valentina Lisitsa","Valentina Greco","Valentina Vignali"]},
   {n:"Lucía",g:"girl",o:"latino",m:"portadora de luz"},
-  {n:"Camila",g:"girl",o:"latino",m:"mensajera de los dioses"},
+  {n:"Camila",g:"girl",o:"latino",m:"mensajera de los dioses",santo:"14 de julio",curioso:"Virgiliana corría tan rápido que sus pies no rozaban el suelo según la Eneida. Virgilio la describió como la mujer más veloz del mundo antiguo.",famosos:["Camila Cabello","Princesa Camila","Camila Morrone","Camille Saint-Saëns"]},
   {n:"Valeria",g:"girl",o:"latino",m:"saludable y fuerte"},
   {n:"Martina",g:"girl",o:"latino",m:"dedicada a Marte"},
   {n:"Luna",g:"girl",o:"latino",m:"la luna, brillante"},
-  {n:"Clara",g:"girl",o:"latino",m:"brillante, clara"},
+  {n:"Clara",g:"girl",o:"latino",m:"brillante, clara",santo:"11 de agosto",curioso:"El Papa Pío XII declaró a Santa Clara patrona de la televisión en 1958, más de 700 años después de su muerte, por haber 'visto' una misa en la pared.",famosos:["Santa Clara de Asís","Clara Schumann","Clara Bow","Clara Lago"]},
   {n:"Paula",g:"girl",o:"latino",m:"pequeña, humilde"},
-  {n:"Aurora",g:"girl",o:"latino",m:"diosa del amanecer"},
+  {n:"Aurora",g:"girl",o:"latino",m:"diosa del amanecer",santo:"15 de junio",curioso:"La aurora boreal fue bautizada 'Aurora Borealis' por Gassendi en 1621 combinando el nombre de la diosa con 'Boreas', el viento del norte.",famosos:["Aurora (cantante)","George Sand","Aurora Disney","Aurora de Noruega"]},
   {n:"Viola",g:"girl",o:"latino",m:"violeta, flor"},
   {n:"Flora",g:"girl",o:"latino",m:"flor, naturaleza"},
   {n:"Silvia",g:"girl",o:"latino",m:"del bosque"},
   {n:"Laura",g:"girl",o:"latino",m:"laureada, victoriosa"},
-  {n:"Beatriz",g:"girl",o:"latino",m:"viajera feliz"},
+  {n:"Beatriz",g:"girl",o:"latino",m:"viajera feliz",santo:"13 de febrero",curioso:"La Beatrice de Dante es un ideal espiritual inalcanzable; la de Shakespeare elige por sí misma. El mismo nombre, dos arquetipos femeninos opuestos.",famosos:["Beatrice Portinari","Beatriz de Holanda","Beatriz Luengo","Beatriz Milhazes"]},
   // ── GIRL · hebreo ──
-  {n:"Isabella",g:"girl",o:"hebreo",m:"consagrada a Dios"},
-  {n:"Noa",g:"girl",o:"hebreo",m:"movimiento, descanso"},
-  {n:"Daniela",g:"girl",o:"hebreo",m:"Dios es mi juez"},
+  {n:"Isabella",g:"girl",o:"hebreo",m:"consagrada a Dios",santo:"4 de julio",curioso:"Isabella I de Castilla fue la primera mujer en aparecer en una moneda de circulación en el mundo occidental.",famosos:["Isabella Rossellini","Isabel la Católica","Isabella d'Este","Bella Hadid"]},
+  {n:"Noa",g:"girl",o:"hebreo",m:"movimiento, descanso",santo:"No establecido",curioso:"Noa y Noé son dos personas distintas en la Biblia. Noa ganó en el año 1400 a.C. el primer caso legal de herencia femenina registrado en la historia.",famosos:["Noa (cantante israelí)","Noa Kirel","Noa Pothoven","Noa Lang"]},
+  {n:"Daniela",g:"girl",o:"hebreo",m:"Dios es mi juez",santo:"21 de julio",curioso:"El nombre Daniel/Daniela no aparece una sino dos veces en la Biblia: el profeta Daniel y un sacerdote llamado Daniel mencionado en el libro de Esdras.",famosos:["Daniela Mercury","Daniela Romo","Daniela Chávez","Daniela Vega"]},
   {n:"Sara",g:"girl",o:"hebreo",m:"princesa"},
   {n:"Hannah",g:"girl",o:"hebreo",m:"llena de gracia"},
   {n:"Abigail",g:"girl",o:"hebreo",m:"alegría del padre"},
@@ -1275,11 +1419,11 @@ const NAMES_DB = [
   // ── GIRL · clásico ──
   {n:"Ariadna",g:"girl",o:"clásico",m:"muy santa"},
   {n:"Iris",g:"girl",o:"clásico",m:"arco iris"},
-  {n:"Diana",g:"girl",o:"clásico",m:"diosa de la caza"},
-  {n:"Victoria",g:"girl",o:"clásico",m:"victoriosa"},
+  {n:"Diana",g:"girl",o:"clásico",m:"diosa de la caza",santo:"No establecido",curioso:"La NASA llamó a su misión lunar 'Artemis' (gemela griega de Diana) para hacer eco del Apolo original. Diana/Artemis preside dos eras espaciales.",famosos:["Diana de Gales","Diana Ross","Diana Krall","Diana Rigg"]},
+  {n:"Victoria",g:"girl",o:"clásico",m:"victoriosa",santo:"23 de diciembre",curioso:"La Reina Victoria tuvo 42 nietos que gobernaron Europa. Entre ellos el Kaiser Guillermo II y el Zar Nicolás II, rivales en la Gran Guerra.",famosos:["Reina Victoria","Victoria Beckham","Victoria Justice","Victoria de Suecia"]},
   {n:"Julia",g:"girl",o:"clásico",m:"joven, llena de vida"},
   {n:"Claudia",g:"girl",o:"clásico",m:"la que camina con dificultad"},
-  {n:"Natalia",g:"girl",o:"clásico",m:"nacida en Navidad"},
+  {n:"Natalia",g:"girl",o:"clásico",m:"nacida en Navidad",santo:"1 de diciembre",curioso:"Natasha Rostova en 'Guerra y Paz' de Tolstói es considerada uno de los personajes femeninos más complejos y amados de la literatura universal.",famosos:["Natalia Lafourcade","Natalia Oreiro","Natalia Vodianova","Natasha Romanoff"]},
   // ── GIRL · inglés ──
   {n:"Olivia",g:"girl",o:"inglés",m:"árbol de olivo"},
   {n:"Isla",g:"girl",o:"inglés",m:"isla"},
@@ -1294,29 +1438,29 @@ const NAMES_DB = [
   {n:"Lena",g:"girl",o:"moderno",m:"luz radiante"},
 
   // ── BOY · clásico ──
-  {n:"Sebastián",g:"boy",o:"clásico",m:"venerable, respetado"},
+  {n:"Sebastián",g:"boy",o:"clásico",m:"venerable, respetado",santo:"20 de enero",curioso:"Sobrevivió a ser asaeteado gracias a su resistencia. La ciudad vasca que lleva su nombre tiene más estrellas Michelin por metro cuadrado del mundo.",famosos:["J. S. Bach","San Sebastián","Sebastian Vettel","Sebastian Stan"]},
   {n:"Nicolás",g:"boy",o:"clásico",m:"victoria del pueblo"},
-  {n:"Lucas",g:"boy",o:"clásico",m:"portador de luz"},
-  {n:"Alejandro",g:"boy",o:"clásico",m:"defensor del pueblo"},
+  {n:"Lucas",g:"boy",o:"clásico",m:"portador de luz",santo:"18 de octubre",curioso:"San Lucas es el patrón de los médicos y también de los pintores, porque según la tradición medieval pintó el primer retrato de la Virgen María.",famosos:["San Lucas","George Lucas","Lucas Cranach","Lucas Vázquez"]},
+  {n:"Alejandro",g:"boy",o:"clásico",m:"defensor del pueblo",santo:"22 de abril",curioso:"Alejandro Magno nunca perdió una sola batalla en toda su vida militar. Fundó más de 20 ciudades llamadas Alejandría.",famosos:["Alejandro Sanz","Alejandro Magno","Alejandro Dumas","A. González Iñárritu"]},
   {n:"Tomás",g:"boy",o:"clásico",m:"gemelo"},
   {n:"Máximo",g:"boy",o:"clásico",m:"el más grande"},
   {n:"Augusto",g:"boy",o:"clásico",m:"majestuoso, venerado"},
   {n:"Víctor",g:"boy",o:"clásico",m:"victorioso"},
   {n:"Julio",g:"boy",o:"clásico",m:"joven, lleno de vida"},
   // ── BOY · hebreo ──
-  {n:"Mateo",g:"boy",o:"hebreo",m:"don de Dios"},
+  {n:"Mateo",g:"boy",o:"hebreo",m:"don de Dios",santo:"21 de septiembre",curioso:"Bach compuso la 'Pasión según San Mateo' en 1727. Fue olvidada cien años hasta que Mendelssohn la rescató en 1829, redescubriendo a Bach.",famosos:["San Mateo","Matteo Berrettini","Mateo Kovačić","Matteo Romano"]},
   {n:"Santiago",g:"boy",o:"hebreo",m:"el que suplanta"},
-  {n:"Samuel",g:"boy",o:"hebreo",m:"escuchado por Dios"},
-  {n:"Rafael",g:"boy",o:"hebreo",m:"Dios ha curado"},
+  {n:"Samuel",g:"boy",o:"hebreo",m:"escuchado por Dios",santo:"20 de agosto",curioso:"Morse inventó el telégrafo tras no poder llegar al funeral de su esposa. El dolor personal cambió la comunicación del siglo XIX.",famosos:["Samuel Morse","Samuel Beckett","Samuel Johnson","Samuel L. Jackson"]},
+  {n:"Rafael",g:"boy",o:"hebreo",m:"Dios ha curado",santo:"24 de octubre",curioso:"Rafael murió el mismo día que nació: 6 de abril. Según Vasari, fue tan prolífico que pintó más de 300 obras en solo 37 años de vida.",famosos:["Rafael Nadal","Raffaello Sanzio","Rafael Alberti","Rafael Leão"]},
   {n:"Daniel",g:"boy",o:"hebreo",m:"Dios es mi juez"},
   {n:"Elías",g:"boy",o:"hebreo",m:"mi Dios es el Señor"},
   {n:"Joel",g:"boy",o:"hebreo",m:"Dios es el Señor"},
   // ── BOY · latino ──
-  {n:"Martín",g:"boy",o:"latino",m:"dedicado a Marte"},
+  {n:"Martín",g:"boy",o:"latino",m:"dedicado a Marte",santo:"11 de noviembre",curioso:"El día de San Martín (11 de noviembre) es la fecha tradicional para abrir el vino nuevo en muchas regiones de Europa.",famosos:["Martín Luther King","Ricky Martin","San Martín de Tours","Martín Fierro"]},
   {n:"Leo",g:"boy",o:"latino",m:"león, valiente"},
-  {n:"Adrián",g:"boy",o:"latino",m:"del mar Adriático"},
-  {n:"Marco",g:"boy",o:"latino",m:"consagrado a Marte"},
-  {n:"Pablo",g:"boy",o:"latino",m:"pequeño, humilde"},
+  {n:"Adrián",g:"boy",o:"latino",m:"del mar Adriático",santo:"8 de septiembre",curioso:"La Muralla de Adriano en Inglaterra, construida en el año 122, mide 117 km y tardó 6 años con 15.000 soldados trabajando a la vez.",famosos:["Adriano (emperador)","Adrián Lastra","Adrian Brody","Adrián Sutil"]},
+  {n:"Marco",g:"boy",o:"latino",m:"consagrado a Marte",santo:"25 de abril",curioso:"Marco Polo tardó 24 años en su viaje a China. Al volver, su familia no le reconoció. Las especias que trajo cambiaron la economía europea.",famosos:["Marco Aurelio","Marco Polo","Marco Asensio","Marco Bellinelli"]},
+  {n:"Pablo",g:"boy",o:"latino",m:"pequeño, humilde",santo:"29 de junio",curioso:"Picasso tenía 23 nombres completos. Sus padres le pusieron tantos según la tradición andaluza para protegerle de los malos espíritus.",famosos:["Pablo Picasso","Pablo Neruda","Pablo Alborán","Pablo Casals"]},
   {n:"Sergio",g:"boy",o:"latino",m:"guardián, protector"},
   {n:"Emilio",g:"boy",o:"latino",m:"trabajador, activo"},
   {n:"Félix",g:"boy",o:"latino",m:"feliz, afortunado"},
@@ -1329,7 +1473,7 @@ const NAMES_DB = [
   {n:"Asier",g:"boy",o:"español",m:"el principio"},
   {n:"Gorka",g:"boy",o:"español",m:"labrador"},
   // ── BOY · germánico ──
-  {n:"Hugo",g:"boy",o:"germánico",m:"mente brillante"},
+  {n:"Hugo",g:"boy",o:"germánico",m:"mente brillante",santo:"1 de abril",curioso:"Victor Hugo escribió 'Los Miserables' en el exilio en la isla de Guernsey, donde vivió 19 años alejado de Francia por oponerse a Napoleón III.",famosos:["Victor Hugo","Hugo Chávez","Hugo Boss","Hugo Sánchez"]},
   {n:"Álvaro",g:"boy",o:"germánico",m:"guardián de todos"},
   {n:"Bruno",g:"boy",o:"germánico",m:"armadura marrón"},
   {n:"Carlos",g:"boy",o:"germánico",m:"hombre libre"},
@@ -1442,7 +1586,7 @@ const NAMES_DB = [
   {n:"Magdalena",g:"girl",o:"hebreo",m:"torre elevada"},
   {n:"Bartolomé",g:"boy",o:"hebreo",m:"hijo del labrador"},
   {n:"Theodora",g:"girl",o:"clásico",m:"don de Dios"},
-  {n:"Alejandro",g:"neutral",o:"clásico",m:"defensor del pueblo"},
+  {n:"Alejandro",g:"neutral",o:"clásico",m:"defensor del pueblo",santo:"22 de abril",curioso:"Alejandro Magno nunca perdió una sola batalla en toda su vida militar. Fundó más de 20 ciudades llamadas Alejandría.",famosos:["Alejandro Sanz","Alejandro Magno","Alejandro Dumas","A. González Iñárritu"]},
   {n:"Margarita",g:"girl",o:"griego",m:"perla preciosa"},
   {n:"Guillermo",g:"boy",o:"germánico",m:"voluntad y protección"},
   {n:"Esperanza",g:"girl",o:"español",m:"esperanza y fe"},
@@ -1507,8 +1651,8 @@ const NAMES_DB = [
   {n:"Dolche",g:"girl",o:"sudamerica",m:"Dolce de Dolce & Gabbana, sin el ampersand — más fácil de escribir"},
   // ── REYES Y EMPERADORES 👑 ──
   {n:"Constantino",g:"boy",o:"reyes",m:"Constantino el Grande — primer emperador cristiano"},
-  {n:"Maximiliano",g:"boy",o:"reyes",m:"Maximiliano I — emperador del Sacro Imperio Romano"},
-  {n:"Leonidas",g:"boy",o:"reyes",m:"Leonidas I — rey espartano que defendió las Termópilas"},
+  {n:"Maximiliano",g:"boy",o:"reyes",m:"Maximiliano I — emperador del Sacro Imperio Romano",santo:"12 de octubre",curioso:"El nombre fue inventado en 1459 por el Emperador Federico III mezclando dos generales romanos: Máximo Fabio y Cornelio Escipión Emiliano.",famosos:["Maximiliano de México","Maximiliano I del S.I.R.","Maximilian Schell","Max von Sydow"]},
+  {n:"Leonidas",g:"boy",o:"reyes",m:"Leonidas I — rey espartano que defendió las Termópilas",santo:"14 de abril",curioso:"Los 300 espartanos de Leonidas en las Termópilas inspiraron al escritor Frank Miller en 1998 para su novela gráfica '300', llevada al cine en 2006.",famosos:["Leonidas I de Esparta","Leonidas Da Silva","Leonidas Kavakos","Leonidas Gómez"]},
   {n:"Carlomagno",g:"boy",o:"reyes",m:"Carlomagno — rey de los francos y padre de Europa"},
   {n:"Napoleón",g:"boy",o:"reyes",m:"Napoleón Bonaparte — emperador de los franceses"},
   {n:"Adriano",g:"boy",o:"reyes",m:"Adriano — emperador romano constructor del Panteón"},
@@ -1521,15 +1665,15 @@ const NAMES_DB = [
   {n:"Solimán",g:"boy",o:"reyes",m:"Solimán el Magnífico — sultán del Imperio Otomano"},
   {n:"Tamerlán",g:"boy",o:"reyes",m:"Tamerlán — conquistador que reunificó el Imperio Mongol"},
   {n:"Augusto",g:"boy",o:"reyes",m:"Octavio Augusto — primer emperador del Imperio Romano"},
-  {n:"Alejandro",g:"boy",o:"reyes",m:"Alejandro Magno — conquistador del mundo conocido"},
-  {n:"Cleopatra",g:"girl",o:"reyes",m:"Cleopatra VII — última reina del Egipto ptolemaico"},
+  {n:"Alejandro",g:"boy",o:"reyes",m:"Alejandro Magno — conquistador del mundo conocido",santo:"22 de abril",curioso:"Alejandro Magno nunca perdió una sola batalla en toda su vida militar. Fundó más de 20 ciudades llamadas Alejandría.",famosos:["Alejandro Sanz","Alejandro Magno","Alejandro Dumas","A. González Iñárritu"]},
+  {n:"Cleopatra",g:"girl",o:"reyes",m:"Cleopatra VII — última reina del Egipto ptolemaico",santo:"No establecido",curioso:"Habló nueve idiomas y fue la primera de su dinastía en aprender el egipcio. Era la única de su familia que podía hablar directamente con sus súbditos.",famosos:["Cleopatra VII","Cleopatra Jones","Cleo de Mérode","Cléopâtre Séméria"]},
   {n:"Nefertiti",g:"girl",o:"reyes",m:"Nefertiti — reina egipcia, 'la bella ha llegado'"},
-  {n:"Zenobia",g:"girl",o:"reyes",m:"Zenobia — reina de Palmira que desafió a Roma"},
+  {n:"Zenobia",g:"girl",o:"reyes",m:"Zenobia — reina de Palmira que desafió a Roma",santo:"No establecido",curioso:"Zenobia afirmaba descender de Cleopatra. Conquistó Egipto en el año 269 y llegó a controlar un tercio del Imperio Romano antes de ser derrotada.",famosos:["Zenobia de Palmira","Zenobia Camprubí","Zenobia Shroff","Zenobia Barlow"]},
   {n:"Boadicea",g:"girl",o:"reyes",m:"Boadicea — reina bretona que lideró la revuelta contra Roma"},
   {n:"Teodora",g:"girl",o:"reyes",m:"Teodora — emperatriz de Bizancio, de actriz a emperatriz"},
   {n:"Hatshepsut",g:"girl",o:"reyes",m:"Hatshepsut — faraona más poderosa del Antiguo Egipto"},
   {n:"Isabela",g:"girl",o:"reyes",m:"Isabel la Católica — reina que financió el viaje de Colón"},
-  {n:"Catalina",g:"girl",o:"reyes",m:"Catalina la Grande — emperatriz de Rusia"},
+  {n:"Catalina",g:"girl",o:"reyes",m:"Catalina la Grande — emperatriz de Rusia",santo:"25 de noviembre",curioso:"Catalina de Aragón nunca aceptó el divorcio de Enrique VIII. Su firmeza durante siete años causó la ruptura de Inglaterra con Roma.",famosos:["Catalina la Grande","Catalina de Aragón","Catalina de Médici","Catalina Sandino"]},
   {n:"Artemisa",g:"girl",o:"reyes",m:"Artemisia I — reina de Halicarnaso que luchó en Salamina"},
   {n:"Roxana",g:"girl",o:"reyes",m:"Roxana — esposa de Alejandro Magno, princesa bactriana"},
   {n:"Matilda",g:"girl",o:"reyes",m:"Matilda — primera mujer en reclamar el trono inglés"},
@@ -1549,12 +1693,8 @@ const state = {
   currentIdx: 0,
   myLikes: {},
   partnerLikes: {},
-  mySuperlikes: {},   // nombres a los que di superlike
-  partnerSuperlikes: {}, // nombres a los que la pareja dio superlike
-  superlikesLeft: 2,
   matches: [],
-  superlikes: [],    // nombres que son superlike (míos o de pareja)
-  filters: {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false, reyes: false},
+  filters: {gender:'all', origin:'all', length:'all', count:20, calorro: false, sudamerica: false, reyes: false},
   streak: 0,
   streakType: null,
 };
@@ -1744,10 +1884,7 @@ function togglePillExtra(el, key) {
   const on = !el.classList.contains('selected');
   el.classList.toggle('selected', on);
   const exclusiveKeys = ['calorro', 'sudamerica', 'reyes'];
-  if(key === 'superlike') {
-    state.filters.superlike = on;
-  } else if(exclusiveKeys.includes(key)) {
-    // desactivar los otros modos exclusivos
+  if(exclusiveKeys.includes(key)) {
     if(on) {
       exclusiveKeys.filter(k=>k!==key).forEach(k => {
         state.filters[k] = false;
@@ -1758,6 +1895,12 @@ function togglePillExtra(el, key) {
       state.filters.origin = 'all';
       document.querySelectorAll('#origin-pills .pill').forEach(p => p.classList.remove('selected'));
       document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
+      // resetear neutro a todos
+      if(state.filters.gender === 'neutral') {
+        state.filters.gender = 'all';
+        document.querySelectorAll('#gender-pills .pill').forEach(p => p.classList.remove('selected'));
+        document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
+      }
     }
     state.filters[key] = on;
   }
@@ -1820,13 +1963,6 @@ async function hostStartSwiping() {
 }
 
 async function startSwiping() {
-  state.superlikesLeft = state.filters.superlike ? 2 : 0;
-  state.mySuperlikes = {};
-  state.superlikes = [];
-  updateSuperBtn();
-  // mostrar/ocultar botón superlike
-  const superBtn = document.getElementById('btn-super');
-  if(superBtn) superBtn.style.display = state.filters.superlike ? '' : 'none';
   buildQueue();
   showScreen('swipe');
   // ocultar elementos de pareja en modo solo
@@ -2098,49 +2234,17 @@ function onDragEnd() {
 async function swipeCard(liked) {
   if(state.currentIdx >= state.queue.length) return;
   const nm = state.queue[state.currentIdx];
-  const isSuper = liked === 'super';
-
-  // superlike: comprobar usos restantes
-  if(isSuper) {
-    if(state.superlikesLeft <= 0) return;
-    state.superlikesLeft--;
-    updateSuperBtn();
-    const b = document.getElementById('btn-super');
-    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
-    setTimeout(()=>b.classList.remove('pop'), 400);
-    triggerSuperLike(nm.n);
-    liked = true; // cuenta como like para el flujo normal
-  } else if(liked === true) {
-    const b = document.getElementById('btn-yes');
-    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
-    setTimeout(()=>b.classList.remove('pop'), 400);
-    spawnHeartParticles(b);
-  } else if(liked === false) {
-    const b = document.getElementById('btn-no');
-    b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
-    setTimeout(()=>b.classList.remove('pop'), 400);
-  }
 
   let isMatch = false;
   if(liked !== null) {
-    if(isSuper) state.mySuperlikes[nm.n] = true;
     if(liked) document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
     if(!state.isSolo) {
       const voteKey = nm._refineKey || nm.n;
-      dbInsert({room_code: state.roomCode, user_id: state.myId, name: voteKey, liked: isSuper ? 'super' : liked});
+      dbInsert({room_code: state.roomCode, user_id: state.myId, name: voteKey, liked});
     }
     // guardar like con la clave original del nombre para el estado local
-    state.myLikes[nm.n] = isSuper ? 'super' : liked;
-    // superlike = match automático sin importar la pareja
-    if(isSuper && !state.matches.includes(nm.n)) {
-      isMatch = true;
-      state.matches.push(nm.n);
-      if(!state.superlikes.includes(nm.n)) state.superlikes.push(nm.n);
-      // si la pareja también dio superlike → disparar animación de match
-      if(state.partnerLikes[nm.n] === 'super' || state.partnerLikes[nm.n]) {
-        isMatch = true; // ya está marcado, aseguramos que triggerMatch se llame
-      }
-    } else if(!state.isSolo && liked && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
+    state.myLikes[nm.n] = liked;
+    if(!state.isSolo && liked && state.partnerLikes[nm.n] && !state.matches.includes(nm.n)) {
       isMatch = true;
       state.matches.push(nm.n);
     }
@@ -2165,67 +2269,22 @@ async function swipeCard(liked) {
     setTimeout(()=>{
       state.currentIdx++;
       renderCards();
-      if(isMatch && (!isSuper || state.partnerLikes[nm.n])) triggerMatch(nm.n);
+      if(isMatch) triggerMatch(nm.n);
     }, 400);
   } else {
     state.currentIdx++;
     renderCards();
-    if(isMatch && (!isSuper || state.partnerLikes[nm.n])) triggerMatch(nm.n);
+    if(isMatch) triggerMatch(nm.n);
   }
 }
 
-function updateSuperBtn() {
-  const btn = document.getElementById('btn-super');
-  const cnt = document.getElementById('super-count');
-  if(!btn) return;
-  if(cnt) cnt.textContent = state.superlikesLeft;
-  if(state.superlikesLeft <= 0) btn.classList.add('used');
-  else btn.classList.remove('used');
-}
 
-function triggerSuperLike(name) {
-  // animación de fuegos artificiales / confeti verde
-  const canvas = document.getElementById('summary-confetti') || document.createElement('canvas');
-  // usar partículas en pantalla
-  const COLORS = ['#22C55E','#86EFAC','#4ADE80','#BBF7D0','#FFD700','#FFF'];
-  for(let i=0;i<24;i++){
-    setTimeout(()=>{
-      const p = document.createElement('span');
-      p.style.cssText = `position:fixed;pointer-events:none;z-index:9999;font-size:${.8+Math.random()*.8}rem;opacity:1`;
-      p.textContent = ['⭐','💚','✨','🌟','💫'][Math.floor(Math.random()*5)];
-      const sx = 20 + Math.random()*60;
-      const sy = 20 + Math.random()*60;
-      p.style.left = sx + 'vw';
-      p.style.top = sy + 'vh';
-      const dx = (Math.random()-.5)*200;
-      const dy = (Math.random()-.5)*200 - 60;
-      p.style.transition = `transform ${.6+Math.random()*.4}s cubic-bezier(.25,.46,.45,.94), opacity .5s ease .3s`;
-      document.body.appendChild(p);
-      requestAnimationFrame(()=>{
-        p.style.transform = `translate(${dx}px,${dy}px) rotate(${Math.random()*360}deg) scale(.3)`;
-        p.style.opacity = '0';
-      });
-      setTimeout(()=>p.remove(), 1200);
-    }, i*35);
-  }
-  // toast superlike
-  const toast = document.getElementById('super-toast');
-  toast.textContent = `⭐ ${name}`;
-  toast.classList.remove('show');
-  void toast.offsetWidth;
-  toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'), 1000);
-}
 
 function checkMatch(name) {
   const iPartnerSuper = state.partnerLikes[name] === 'super';
-  const iMySuper = state.mySuperlikes[name];
   const normalMatch = state.myLikes[name] && state.partnerLikes[name];
   if(iPartnerSuper && !state.matches.includes(name)) {
-    // pareja dio superlike → match automático
     state.matches.push(name);
-    if(!state.superlikes.includes(name)) state.superlikes.push(name);
-    // si además yo también di superlike → animación de match doble
     const top = document.querySelector('.name-card.active');
     if(iMySuper) {
       if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
@@ -2239,6 +2298,17 @@ function checkMatch(name) {
   }
 }
 
+function checkMatch(name) {
+  if(state.myLikes[name] && state.partnerLikes[name]) {
+    if(!state.matches.includes(name)) {
+      state.matches.push(name);
+      const top = document.querySelector('.name-card.active');
+      if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
+      else triggerMatch(name);
+    }
+  }
+}
+
 let rushMode = false;
 function toggleRush(on) {
   rushMode = on;
@@ -2248,7 +2318,6 @@ function toggleRush(on) {
 
 function triggerMatch(name) {
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
-  const isSuperMatch = state.mySuperlikes[name] && state.partnerSuperlikes[name];
   if(rushMode) {
     const toast = document.getElementById('rush-match-toast');
     toast.textContent = `${isSuperMatch?'⭐':'💞'} ${name}`;
@@ -2256,10 +2325,6 @@ function triggerMatch(name) {
     void toast.offsetWidth;
     toast.classList.add('show');
     setTimeout(()=>toast.classList.remove('show'), 800);
-  } else if(isSuperMatch) {
-    document.getElementById('supermatch-name-display').textContent = name;
-    spawnSuperMatchStars();
-    showScreen('supermatch');
   } else {
     document.getElementById('match-name-display').textContent = name;
     spawnHearts();
@@ -2267,21 +2332,6 @@ function triggerMatch(name) {
   }
 }
 
-function spawnSuperMatchStars() {
-  const bg = document.getElementById('supermatch-bg');
-  bg.innerHTML = '';
-  const emojis = ['⭐','🌟','💚','✨','💫','🟢'];
-  for(let i=0;i<30;i++){
-    const el = document.createElement('div');
-    el.className = 'supermatch-star';
-    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    el.style.left = Math.random()*100+'%';
-    el.style.animationDuration = (2.5+Math.random()*3)+'s';
-    el.style.animationDelay = (Math.random()*2)+'s';
-    el.style.fontSize = (.8+Math.random()*1.2)+'rem';
-    bg.appendChild(el);
-  }
-}
 
 function spawnHearts() {
   const bg = document.getElementById('hearts-bg');
@@ -2333,39 +2383,23 @@ function showSummary() {
       const votes = await dbFetchVotes(state.roomCode);
       // sincronizar votos de la pareja
       state.partnerLikes = {};
-      state.partnerSuperlikes = {};
       for(const v of votes.filter(x=>x.user_id!==state.myId && x.name!=='__presence__' && x.name!=='__filters__' && x.name!=='__done__')) {
         state.partnerLikes[v.name] = v.liked;
-        if(v.liked === 'super') state.partnerSuperlikes[v.name] = true;
       }
     } catch(e) {}
 
     // recalcular todo desde cero
     state.matches = [];
-    state.superlikes = [];
-
+  
     const allNames = new Set([
       ...Object.keys(state.myLikes),
       ...Object.keys(state.partnerLikes),
-      ...Object.keys(state.mySuperlikes),
-      ...Object.keys(state.partnerSuperlikes)
     ]);
 
     for(const name of allNames) {
-      const iMySuper = !!state.mySuperlikes[name] || state.myLikes[name] === 'super';
-      const iPartnerSuper = !!state.partnerSuperlikes[name] || state.partnerLikes[name] === 'super';
       const iMyLiked = !!state.myLikes[name];
       const iPartnerLiked = !!state.partnerLikes[name];
-
-      // actualizar registros para que sean consistentes
-      if(iMySuper) state.mySuperlikes[name] = true;
-      if(iPartnerSuper) state.partnerSuperlikes[name] = true;
-
-      if(iMySuper || iPartnerSuper) {
-        // cualquier superlike de cualquiera → entra en superlikes
-        if(!state.superlikes.includes(name)) state.superlikes.push(name);
-        if(!state.matches.includes(name)) state.matches.push(name);
-      } else if(iMyLiked && iPartnerLiked) {
+      if(iMyLiked && iPartnerLiked) {
         // match normal
         if(!state.matches.includes(name)) state.matches.push(name);
       }
@@ -2382,48 +2416,13 @@ function renderSummary() {
   const sub = document.getElementById('summary-sub');
 
   const onlyMe = Object.entries(state.myLikes)
-    .filter(([name, liked]) => liked && !state.partnerLikes[name] && !state.superlikes.includes(name))
+    .filter(([name, liked]) => liked && !state.partnerLikes[name])
     .map(([name]) => name);
   const onlyPartner = Object.entries(state.partnerLikes)
-    .filter(([name, liked]) => liked && !state.myLikes[name] && !state.superlikes.includes(name))
+    .filter(([name, liked]) => liked && !state.myLikes[name])
     .map(([name]) => name);
 
-  // superlikes — tres secciones
-  if(state.superlikes.length > 0) {
-    const mutual       = state.superlikes.filter(n => state.mySuperlikes[n] && state.partnerSuperlikes[n]);
-    const onlyMeSuper  = state.superlikes.filter(n => state.mySuperlikes[n] && !state.partnerSuperlikes[n]);
-    const onlyPSuper   = state.superlikes.filter(n => !state.mySuperlikes[n] && state.partnerSuperlikes[n]);
-
-    const addSuperSection = (names, label, subtext, icon) => {
-      if(!names.length) return;
-      const sec = document.createElement('div');
-      sec.style.cssText = 'width:100%;margin-bottom:.7rem';
-      sec.innerHTML = `<p style="font-size:.7rem;color:#22C55E;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;font-family:'Inter',sans-serif;font-weight:600">${icon} ${label}</p>`;
-      names.forEach(name => {
-        const d = document.createElement('div');
-        d.className = 'liked-item';
-        d.style.borderColor = 'rgba(34,197,94,.35)';
-        d.style.background = 'rgba(34,197,94,.06)';
-        d.innerHTML = `
-          <div style="display:flex;align-items:center;gap:.7rem">
-            <span style="font-size:1rem">${icon}</span>
-            <div>
-              <div class="liked-item-name" style="color:#22C55E">${name}</div>
-              <div class="liked-item-sub">${subtext}</div>
-            </div>
-          </div>
-          <span class="superlike-badge">${icon} Super</span>`;
-        sec.appendChild(d);
-      });
-      list.appendChild(sec);
-    };
-
-    addSuperSection(mutual,      'SuperMatch mutuo',        'Los dos disteis ⭐ 🤩',               '⭐');
-    addSuperSection(onlyMeSuper, 'Tu SuperLike',            'Tú diste ⭐ — tu pareja solo ♥ o ✕',  '💚');
-    addSuperSection(onlyPSuper,  'SuperLike de tu pareja',  'Tu pareja dio ⭐ — tú solo ♥ o ✕',    '🌟');
-  }
-
-  const normalMatches = state.matches.filter(n => !state.superlikes.includes(n));
+  const normalMatches = state.matches;
   if(state.matches.length === 0) {
     title.textContent = 'Habéis terminado 🙈';
     sub.textContent = 'Ningún match esta vez... ¡seguid explorando!';
@@ -2515,7 +2514,7 @@ function restartFromSetup() {
   state.queue = [];
   state.currentIdx = 0;
   state.myLikes = {};
-  state.filters = {gender:'all', origin:'all', length:'all', count:20, superlike: false, calorro: false, sudamerica: false, reyes: false};
+  state.filters = {gender:'all', origin:'all', length:'all', count:20, calorro: false, sudamerica: false, reyes: false};
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
@@ -2553,10 +2552,6 @@ function goHome() {
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
-  state.superlikes = [];
-  state.mySuperlikes = {};
-  state.partnerSuperlikes = {};
-  state.superlikesLeft = 2;
   state.streak = 0;
   state.streakType = null;
   clearInterval(partnerPollTimer);
@@ -2644,9 +2639,6 @@ function startRefineMode() {
   state.myLikes = {};
   state.partnerLikes = {};
   state.matches = [];
-  state.superlikes = [];
-  state.mySuperlikes = {};
-  state.partnerSuperlikes = {};
   state.streak = 0;
   state.streakType = null;
   // cola = solo los matches anteriores, con prefijo en el nombre interno para Supabase
@@ -2655,9 +2647,6 @@ function startRefineMode() {
     return {...orig, _refineKey: prefix + n}; // key único para Supabase
   });
   state.currentIdx = 0;
-  state.superlikesLeft = 0;
-  const superBtn = document.getElementById('btn-super');
-  if(superBtn) superBtn.style.display = 'none';
   document.getElementById('liked-count').textContent = '0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('partner-progress-bar').style.width = '0%';
@@ -2924,6 +2913,7 @@ function showScreen(name) {
   const showEggs = name === 'home';
   document.getElementById('egg-btn').style.display = showEggs ? '' : 'none';
   document.getElementById('egg-btn2').style.display = showEggs ? '' : 'none';
+  document.getElementById('nameday-btn').style.display = showEggs ? '' : 'none';
   // guardar sala activa en localStorage
   if(name === 'waiting' || name === 'setup' || name === 'swipe') {
     if(state.roomCode) localStorage.setItem('bm_room', state.roomCode);
