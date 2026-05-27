@@ -483,15 +483,15 @@ body.light .btn-secondary:hover{background:var(--surface2)}
       <div style="display:flex;align-items:center;gap:.4rem;flex-shrink:0">
         <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
         <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
-        <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
       </div>
       <div style="display:flex;align-items:center;gap:.4rem;position:absolute;left:50%;transform:translateX(-50%)">
-        <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
         <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
           <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
           <div class="rush-track"></div>
           <span class="rush-label" id="rush-label">RUSH</span>
         </label>
+        <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
+        <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
       </div>
     </div>
   </div>
@@ -602,7 +602,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v14.0</div>
+<div class="version-tag">v14.2</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2115,10 +2115,13 @@ async function startSwiping() {
   const cfBtn = document.getElementById('btn-change-filters');
   const matchCount = document.getElementById('match-count');
   const rushWrap = document.getElementById('rush-toggle-wrap');
+  const streakBadge = document.getElementById('streak-badge');
   if(state.isSolo) {
     if(cfBtn) cfBtn.style.display = 'flex';
     if(matchCount) matchCount.style.display = 'none';
     if(rushWrap) rushWrap.style.display = 'none';
+    // en modo solo el streak va junto al botón ⚙️
+    if(streakBadge && cfBtn) cfBtn.parentNode.insertBefore(streakBadge, cfBtn.nextSibling);
     if(state._midGameLikes) {
       state.myLikes = {...state._midGameLikes};
       state.matches = [...(state._midGameMatches||[])];
@@ -2129,6 +2132,8 @@ async function startSwiping() {
     if(cfBtn) cfBtn.style.display = 'none';
     if(matchCount) matchCount.style.display = '';
     if(rushWrap) rushWrap.style.display = '';
+    // en modo parejas el streak va en el grupo central
+    if(streakBadge && matchCount) matchCount.parentNode.appendChild(streakBadge);
   }
   // ocultar elementos de pareja en modo solo
   const partnerStatus = document.querySelector('.partner-status');
