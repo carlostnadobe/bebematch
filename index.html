@@ -195,13 +195,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 
 /* THEME TOGGLE */
 .theme-toggle{position:fixed;top:1.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;color:var(--text2)}
-.name-of-day-btn{position:fixed;top:5.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
+.name-of-day-btn{position:fixed;top:1.2rem;right:4.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
 .name-of-day-btn:hover{border-color:rgba(232,115,90,.5);animation:none;transform:scale(1.1)}
 @keyframes giftWiggle{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-12deg) scale(1.1)}30%{transform:rotate(10deg) scale(1.05)}45%{transform:rotate(-6deg) scale(1.08)}60%{transform:rotate(0) scale(1)}}
 @keyframes consejoIn{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
 @keyframes consejoTilt{0%,80%,100%{transform:rotate(0deg)}85%{transform:rotate(2deg)}90%{transform:rotate(-1deg)}95%{transform:rotate(1.5deg)}}
-.name-of-day-btn{position:fixed;top:5.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
-.name-of-day-btn:hover{border-color:rgba(232,115,90,.5);animation:none;transform:scale(1.1)}
 @keyframes giftWiggle{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-12deg) scale(1.1)}30%{transform:rotate(10deg) scale(1.05)}45%{transform:rotate(-6deg) scale(1.08)}60%{transform:rotate(0) scale(1)}}
 .nameday-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto}
 .nameday-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;padding:1.6rem 1.8rem 1.4rem;position:relative;animation:screenIn .4s cubic-bezier(.34,1.56,.64,1);height:720px;display:flex;flex-direction:column;overflow:hidden}
@@ -301,7 +299,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
 <button class="name-of-day-btn" id="nameday-btn" onclick="openNameOfDay()" title="Nombre del día">🎁</button>
 
-<!-- NOMBRE DEL DÍA OVERLAY -->
+<!-- NOMBRE DEL DÍA -->
 <div class="nameday-overlay" id="nameday-overlay" onclick="closeNameOfDay()">
   <div class="nameday-card" onclick="event.stopPropagation()" id="nameday-card-inner">
     <button onclick="closeNameOfDay()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;z-index:1">✕</button>
@@ -324,46 +322,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     </div>
   </div>
 </div>
-<button class="name-of-day-btn" id="nameday-btn" onclick="openNameOfDay()" title="Nombre del día">🎁</button>
 
-<!-- NOMBRE DEL DÍA OVERLAY -->
-<div class="nameday-overlay" id="nameday-overlay" onclick="closeNameOfDay()">
-  <div class="nameday-card" onclick="event.stopPropagation()" id="nameday-card-inner">
-    <button onclick="closeNameOfDay()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;z-index:1">✕</button>
-
-    <!-- Cabecera fija -->
-    <div style="flex-shrink:0;margin-bottom:.6rem">
-      <div class="nameday-badge" style="margin-right:2rem">✨ Inspírate hoy</div>
-    </div>
-
-    <!-- Contenido animado -->
-    <div class="nameday-content" id="nameday-content">
-      <!-- Nombre -->
-      <div class="nameday-name" id="nameday-name">—</div>
-      <!-- Origen debajo del nombre -->
-      <div class="nameday-origin" id="nameday-origin" style="margin-top:.3rem;margin-bottom:0">—</div>
-      <!-- Significado -->
-      <div class="nameday-meaning" id="nameday-meaning" style="margin-top:.5rem;margin-bottom:0">—</div>
-      <!-- Divider -->
-      <div class="nameday-divider"></div>
-      <!-- Historia -->
-      <div class="nameday-story" id="nameday-story"></div>
-      <!-- ¿Sabías que? -->
-      <div class="nameday-curious" id="nameday-curious" style="display:none">
-        <div class="nameday-curious-label">¿Sabías que...?</div>
-        <div class="nameday-curious-text" id="nameday-curious-text"></div>
-      </div>
-      <!-- Lo llevan -->
-      <div class="nameday-famosos" id="nameday-famosos" style="display:none"></div>
-    </div>
-
-    <!-- Botones de navegación -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem;flex-shrink:0;gap:.6rem;padding-top:.8rem;border-top:1px solid var(--border)">
-      <button onclick="prevNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.45rem 1rem;font-size:.8rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">← Anterior</button>
-      <button onclick="nextNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.45rem 1rem;font-size:.8rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">Siguiente →</button>
-    </div>
-  </div>
-</div>
 <button class="egg-btn" id="egg-btn" title="">
   <div class="egg-fill" id="egg-fill"></div>
   <span id="egg-baby" style="position:relative;z-index:1">👶</span>
@@ -582,16 +541,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<!-- TARJETA MODAL -->
-<div id="card-overlay" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:1rem" onclick="closeCard()">
-  <canvas id="match-card-canvas" style="border-radius:16px;max-width:90vw;max-height:70vh;box-shadow:0 8px 40px rgba(0,0,0,.5)"></canvas>
-  <div style="display:flex;gap:.6rem" onclick="event.stopPropagation()">
-    <button class="egg-close" style="opacity:1" onclick="downloadCard()">⬇ Descargar</button>
-    <button class="egg-close" style="opacity:1" onclick="shareCard()">📤 Compartir</button>
-    <button class="egg-close" style="opacity:1" onclick="closeCard()">cerrar</button>
-  </div>
-</div>
-
 <!-- SUMMARY SOLO -->
 <div class="screen" id="screen-summary-solo" style="position:relative;overflow:hidden">
   <canvas id="summary-solo-confetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
@@ -613,7 +562,6 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <p class="subtitle" id="summary-sub">Estos son todos vuestros matches</p>
     <div class="liked-list" id="summary-list" style="max-height:48vh"></div>
     <button class="btn btn-primary" onclick="shareMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir matches 💞</button>
-    <button class="btn btn-secondary" onclick="generateMatchCard()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">🎨 Generar tarjeta</button>
     <button class="btn btn-secondary" id="btn-refine" onclick="startRefineMode()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;background:var(--surface2);color:var(--text);border:1px solid var(--border2)">🎯 Afinar — votar solo los matches</button>
     <button class="btn btn-secondary" onclick="restartFromSetup()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más nombres →</button>
     <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
@@ -624,7 +572,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <div id="confirm-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem 1.5rem;max-width:300px;width:90%;text-align:center">
     <p style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--text);margin-bottom:.5rem">¿Volver al inicio?</p>
-    <p id="confirm-msg" style="font-size:.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6">Los matches se perderán.</p>
+    <p id="confirm-msg" style="font-size:.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6">Si tu pareja sigue jugando se desconectará de tu sesión. Los matches se perderán.</p>
     <div style="display:flex;gap:.6rem">
       <button class="btn btn-secondary" onclick="closeConfirm()" style="flex:1">Cancelar</button>
       <button class="btn btn-primary" onclick="goHome()" style="flex:1">Salir</button>
@@ -645,7 +593,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v11.0</div>
+<div class="version-tag">v11.3</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -1063,105 +1011,6 @@ function checkMineWin() {
 }
 
 /* ── TARJETA DE MATCHES ── */
-async function generateMatchCard() {
-  const matches = [...state.matches];
-  const allNames = [...matches];
-  if(allNames.length === 0) { showToast('No hay matches que mostrar'); return; }
-
-  const canvas = document.getElementById('match-card-canvas');
-  const W = 420, H = Math.max(540, 200 + allNames.length * 44);
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  const isDark = !document.body.classList.contains('light');
-
-  // fondo
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  if(isDark) { bg.addColorStop(0, '#0f0f0f'); bg.addColorStop(1, '#1a0f0d'); }
-  else { bg.addColorStop(0, '#FDF8F4'); bg.addColorStop(1, '#F5EDE6'); }
-  ctx.fillStyle = bg;
-  ctx.beginPath(); ctx.roundRect(0, 0, W, H, 20); ctx.fill();
-
-  // borde decorativo
-  ctx.strokeStyle = isDark ? 'rgba(232,115,90,.25)' : 'rgba(232,115,90,.3)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.roundRect(8, 8, W-16, H-16, 16); ctx.stroke();
-
-  // logo
-  const textColor = isDark ? '#F5F5F5' : '#1a1a1a';
-  const salmonColor = '#E8735A';
-  const mutedColor = isDark ? '#808080' : '#9a8a82';
-
-  ctx.font = 'italic 700 26px serif';
-  ctx.fillStyle = textColor;
-  ctx.fillText('bebé', 30, 52);
-  ctx.fillStyle = salmonColor;
-  ctx.fillText('match', 30 + ctx.measureText('bebé').width, 52);
-
-  // corazón decorativo
-  ctx.font = '18px serif';
-  ctx.fillText('🩷', W - 54, 52);
-
-  // línea separadora
-  ctx.strokeStyle = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)';
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(30, 68); ctx.lineTo(W-30, 68); ctx.stroke();
-
-  // título
-  ctx.font = '500 13px Inter, sans-serif';
-  ctx.fillStyle = mutedColor;
-  ctx.letterSpacing = '0.08em';
-  ctx.fillText('NUESTROS NOMBRES FAVORITOS', 30, 95);
-
-  let y = 120;
-
-  // matches
-  if(matches.length > 0) {
-      for(let i = 0; i < matches.length; i++) {
-      y += 36;
-      ctx.fillStyle = isDark ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.04)';
-      ctx.beginPath(); ctx.roundRect(30, y - 24, W - 60, 34, 8); ctx.fill();
-      ctx.font = '500 12px Inter, sans-serif';
-      ctx.fillStyle = mutedColor;
-      ctx.fillText(`#${i+1}`, 44, y - 4);
-      ctx.font = 'italic 600 20px serif';
-      ctx.fillStyle = textColor;
-      ctx.fillText(matches[i], 72, y - 2);
-      ctx.font = '12px serif'; ctx.fillText('💞', W - 56, y - 2);
-    }
-  }
-
-  // footer
-  y = H - 28;
-  ctx.font = '11px Inter, sans-serif';
-  ctx.fillStyle = mutedColor;
-  ctx.fillText('bebématch.carlostn-adobe.workers.dev', 30, y);
-
-  // mostrar modal
-  document.getElementById('card-overlay').style.display = 'flex';
-}
-
-function closeCard() {
-  document.getElementById('card-overlay').style.display = 'none';
-}
-
-function downloadCard() {
-  const canvas = document.getElementById('match-card-canvas');
-  const a = document.createElement('a');
-  a.href = canvas.toDataURL('image/png');
-  a.download = 'bebematch-nombres.png';
-  a.click();
-}
-
-async function shareCard() {
-  const canvas = document.getElementById('match-card-canvas');
-  canvas.toBlob(async blob => {
-    if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],'bebematch.png',{type:'image/png'})]})) {
-      await navigator.share({files:[new File([blob],'bebematch.png',{type:'image/png'})], title:'Nuestros nombres favoritos'}).catch(()=>{});
-    } else {
-      downloadCard();
-    }
-  }, 'image/png');
-}
 function startSolo() {
   state.isSolo = true;
   state.isHost = true;
@@ -1325,6 +1174,158 @@ const NAMEDAY_DATA = [
 
 let lastNamedayIdx = 0;
 
+function showNamedayAt(idx, dir = 1) {
+  lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
+  const content = document.getElementById('nameday-content');
+  // fade out
+  content.style.opacity = '0';
+  content.style.transform = `translateX(${dir > 0 ? '-12px' : '12px'})`;
+  content.style.transition = 'opacity .15s ease, transform .15s ease';
+  setTimeout(() => {
+    const d = NAMEDAY_DATA[lastNamedayIdx];
+    document.getElementById('nameday-name').textContent = d.n;
+    document.getElementById('nameday-origin').textContent = d.o;
+    document.getElementById('nameday-meaning').textContent = '"' + d.m + '"';
+    const storyEl = document.getElementById('nameday-story');
+    storyEl.innerHTML = '';
+    d.s.split('\n\n').forEach((para, i) => {
+      const p = document.createElement('p');
+      p.textContent = para;
+      p.style.cssText = i > 0 ? 'margin-top:.7rem' : '';
+      storyEl.appendChild(p);
+    });
+    const curiousSec = document.getElementById('nameday-curious');
+    if(d.curioso) {
+      curiousSec.style.display = '';
+      document.getElementById('nameday-curious-text').textContent = d.curioso;
+    } else curiousSec.style.display = 'none';
+    // famosos
+    const famososSec = document.getElementById('nameday-famosos');
+    famososSec.innerHTML = '';
+    if(d.famosos && d.famosos.length) {
+      famososSec.style.display = '';
+      const lbl = document.createElement('span');
+      lbl.className = 'nameday-famosos-label';
+      lbl.textContent = 'Lo llevan:';
+      famososSec.appendChild(lbl);
+      const CHIP_COLORS = [
+        {bg:'rgba(232,115,90,.1)',dot:'#E8735A'},
+        {bg:'rgba(124,109,222,.1)',dot:'#7C6DDE'},
+        {bg:'rgba(45,184,138,.1)',dot:'#2DB88A'},
+        {bg:'rgba(224,155,61,.1)',dot:'#E09B3D'},
+      ];
+      // emojis por categoría según palabras clave en el nombre
+      function chipEmoji(name) {
+        const n = name.toLowerCase();
+        // Religión / Santos
+        if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
+        // Reyes / nobles
+        if(/rey |reina |emperor|kaiser|zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|del s\.i\.r\.|de bisanzio|de dinamarca|cristián x|adriano \(emp|zarina|bolena/.test(n)) return '👑';
+        // Música
+        if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
+        // Cine / TV
+        if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage/.test(n)) return '🎬';
+        // Arte / Pintura / Moda
+        if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
+        // Literatura / Escritura
+        if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
+        // Ciencia / Tecnología
+        if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
+        // Deporte (fútbol, tenis, etc.)
+        if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
+        // Hockey
+        if(/huet/.test(n)) return '🏒';
+        // Motor
+        if(/vettel|sutil/.test(n)) return '🏎️';
+        if(/alejandro magno|leonidas i|julio césar|cleopatra vii|adriano \(emp|elena de troya/.test(n)) return '⚔️';
+        if(/jesús gil/.test(n)) return '👯';
+        if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|celia de cáceres|zenobia barlow|beckham/.test(n)) return '🌍';
+        if(/tereshkova/.test(n)) return '🚀';
+        if(/matteo romano|noa \(cantante|noa kirel/.test(n)) return '🎵';
+        if(/bella hadid|valentina greco|valentina vignali|natalia vodianova/.test(n)) return '💃';
+        if(/victor hugo|noa pothoven|zenobia camprubí|marco aurelio/.test(n)) return '📖';
+        if(/hugo boss/.test(n)) return '🧥';
+        if(/leonidas gómez/.test(n)) return '⚽';
+        if(/cléopâtre séméria/.test(n)) return '👑';
+        if(/aurora disney|zenobia shroff|george lucas|diana rigg/.test(n)) return '🎬';
+        return '';
+      }
+      function abbrevName(full) {
+        const parts = full.trim().split(' ');
+        if(parts.length === 1) return full;
+        return parts[0] + ' ' + parts.slice(1).map(p => p[0] + '.').join(' ');
+      }
+      const four = d.famosos.slice(0,4);
+      [[0,1],[2,3]].forEach(pair => {
+        const row = document.createElement('div');
+        row.className = 'nameday-famosos-row';
+        pair.forEach(i => {
+          if(four[i] !== undefined) {
+            const col = CHIP_COLORS[i % CHIP_COLORS.length];
+            const chip = document.createElement('span');
+            chip.className = 'nameday-chip';
+            chip.style.background = col.bg;
+            // punto de color
+            const dot = document.createElement('span');
+            dot.style.cssText = `width:6px;height:6px;min-width:6px;min-height:6px;border-radius:50%;background:${col.dot};flex-shrink:0;align-self:center`;
+            // emoji solo si hay categoría
+            const emojiStr = chipEmoji(four[i]);
+            const txt = document.createElement('span');
+            txt.textContent = four[i];
+            txt.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+            chip.appendChild(dot);
+            if(emojiStr) {
+              const em = document.createElement('span');
+              em.textContent = emojiStr;
+              em.style.cssText = 'font-size:.7rem;flex-shrink:0;line-height:1;display:flex;align-items:center';
+              chip.appendChild(em);
+            }
+            chip.appendChild(txt);
+            row.appendChild(chip);
+          }
+        });
+        famososSec.appendChild(row);
+      });
+    } else famososSec.style.display = 'none';
+    // fade in
+    content.style.transition = 'none';
+    content.style.transform = `translateX(${dir > 0 ? '12px' : '-12px'})`;
+    content.style.opacity = '0';
+    requestAnimationFrame(() => {
+      content.style.transition = 'opacity .2s ease, transform .2s ease';
+      content.style.transform = 'translateX(0)';
+      content.style.opacity = '1';
+    });
+  }, 150);
+}
+
+function openNameOfDay() {
+  document.getElementById('nameday-overlay').style.display = 'flex';
+  const idx = Math.floor(Math.random() * NAMEDAY_DATA.length);
+  document.getElementById('nameday-content').style.opacity = '1';
+  document.getElementById('nameday-content').style.transform = 'translateX(0)';
+  showNamedayAt(idx, 0);
+  setupNamedaySwipe();
+}
+
+let namedaySwipeX = 0;
+function setupNamedaySwipe() {
+  const card = document.getElementById('nameday-card-inner');
+  if(!card || card._swipeSetup) return;
+  card._swipeSetup = true;
+  card.addEventListener('touchstart', e => { namedaySwipeX = e.touches[0].clientX; }, {passive:true});
+  card.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - namedaySwipeX;
+    if(Math.abs(dx) > 50) dx < 0 ? nextNameOfDay() : prevNameOfDay();
+  }, {passive:true});
+}
+
+function nextNameOfDay() { showNamedayAt(lastNamedayIdx + 1, 1); }
+function prevNameOfDay() { showNamedayAt(lastNamedayIdx - 1, -1); }
+
+function closeNameOfDay() {
+  document.getElementById('nameday-overlay').style.display = 'none';
+}
 
 function toggleTheme(){
   const isLight = document.body.classList.toggle('light');
@@ -1649,6 +1650,165 @@ const NAMES_DB = [
   {n:"Artemisa",g:"girl",o:"reyes",m:"Artemisia I — reina de Halicarnaso que luchó en Salamina"},
   {n:"Roxana",g:"girl",o:"reyes",m:"Roxana — esposa de Alejandro Magno, princesa bactriana"},
   {n:"Matilda",g:"girl",o:"reyes",m:"Matilda — primera mujer en reclamar el trono inglés"},
+  {n:"Olimpia",g:"girl",o:"reyes",m:"madre de Alejandro Magno, reina de Macedonia"},
+  {n:"Livia",g:"girl",o:"reyes",m:"Livia Drusila — esposa del emperador Augusto"},
+  {n:"Agripina",g:"girl",o:"reyes",m:"madre de Nerón, la emperatriz más ambiciosa de Roma"},
+  {n:"Berenice",g:"girl",o:"reyes",m:"reina judía que enamoró al futuro emperador Tito"},
+  {n:"Urraca",g:"girl",o:"reyes",m:"primera reina soberana de Europa, reina de León"},
+  {n:"Juana",g:"girl",o:"reyes",m:"Juana I de Castilla — la Loca, heredera de dos imperios"},
+  {n:"Boudicca",g:"girl",o:"reyes",m:"reina bretona que casi expulsó a Roma de Britania"},
+  {n:"Justiniano",g:"boy",o:"reyes",m:"Justiniano I — recopiló todo el derecho romano"},
+  {n:"Vespasiano",g:"boy",o:"reyes",m:"el emperador que construyó el Coliseo"},
+  {n:"Diocleciano",g:"boy",o:"reyes",m:"reorganizó el Imperio Romano dividiéndolo en cuatro"},
+  {n:"Yenifer",g:"girl",o:"sudamerica",m:"Jennifer con acento caribeño"},
+  // ── ESPAÑOL (completar a ≥20) ──
+  {n:"Diana",g:"girl",o:"español",m:"diosa de la caza"},
+  {n:"Victoria",g:"girl",o:"español",m:"la victoriosa"},
+  {n:"Julia",g:"girl",o:"español",m:"perteneciente al clan Julio"},
+  {n:"Claudia",g:"girl",o:"español",m:"la que camina con dificultad"},
+  {n:"Natalia",g:"girl",o:"español",m:"nacida en Navidad"},
+  {n:"Alejandra",g:"girl",o:"español",m:"defensora del pueblo"},
+  {n:"Adriana",g:"girl",o:"español",m:"la que viene del Adriático"},
+  {n:"Raquel",g:"girl",o:"español",m:"oveja"},
+  {n:"Pilar",g:"girl",o:"español",m:"columna, apoyo"},
+  {n:"Rosa",g:"girl",o:"español",m:"la rosa"},
+  {n:"Carmen",g:"girl",o:"español",m:"jardín, viña"},
+  {n:"Sebastián",g:"boy",o:"español",m:"el venerable"},
+  {n:"Nicolás",g:"boy",o:"español",m:"victoria del pueblo"},
+  {n:"Lucas",g:"boy",o:"español",m:"el que trae la luz"},
+  {n:"Tomás",g:"boy",o:"español",m:"gemelo"},
+  {n:"Víctor",g:"boy",o:"español",m:"el victorioso"},
+  {n:"Julio",g:"boy",o:"español",m:"perteneciente al clan Julio"},
+  {n:"Alejandro",g:"boy",o:"español",m:"defensor del pueblo"},
+  {n:"Rafael",g:"boy",o:"español",m:"Dios ha curado"},
+  {n:"Daniel",g:"boy",o:"español",m:"Dios es mi juez"},
+  {n:"Carlos",g:"boy",o:"español",m:"hombre libre"},
+  {n:"Fernando",g:"boy",o:"español",m:"el que se atreve con la paz"},
+  {n:"Rodrigo",g:"boy",o:"español",m:"glorioso por su fama"},
+  {n:"Álvaro",g:"boy",o:"español",m:"el que alerta"},
+  {n:"Gonzalo",g:"boy",o:"español",m:"el que está en camino de la batalla"},
+  // ── INGLÉS (completar a ≥20) ──
+  {n:"Charlotte",g:"girl",o:"inglés",m:"mujer libre"},
+  {n:"Grace",g:"girl",o:"inglés",m:"gracia, elegancia"},
+  {n:"Violet",g:"girl",o:"inglés",m:"violeta"},
+  {n:"Alice",g:"girl",o:"inglés",m:"de noble linaje"},
+  {n:"Rose",g:"girl",o:"inglés",m:"la rosa"},
+  {n:"Stella",g:"girl",o:"inglés",m:"estrella"},
+  {n:"Emily",g:"girl",o:"inglés",m:"que trabaja con esmero"},
+  {n:"Sophie",g:"girl",o:"inglés",m:"sabiduría"},
+  {n:"Lucy",g:"girl",o:"inglés",m:"luz"},
+  {n:"Poppy",g:"girl",o:"inglés",m:"amapola"},
+  {n:"Daisy",g:"girl",o:"inglés",m:"la margarita del día"},
+  {n:"Eleanor",g:"girl",o:"inglés",m:"compasiva, brillante"},
+  {n:"Florence",g:"girl",o:"inglés",m:"floreciente, próspera"},
+  {n:"Harriet",g:"girl",o:"inglés",m:"señora del hogar"},
+  {n:"Beatrice",g:"girl",o:"inglés",m:"viajera feliz"},
+  {n:"Penelope",g:"girl",o:"inglés",m:"la que teje y desteje"},
+  {n:"George",g:"boy",o:"inglés",m:"el que trabaja la tierra"},
+  {n:"Henry",g:"boy",o:"inglés",m:"señor de su hogar"},
+  {n:"Arthur",g:"boy",o:"inglés",m:"oso, guerrero"},
+  {n:"Edward",g:"boy",o:"inglés",m:"guardián de la riqueza"},
+  {n:"James",g:"boy",o:"inglés",m:"el que suplanta"},
+  {n:"William",g:"boy",o:"inglés",m:"voluntad fuerte"},
+  {n:"Thomas",g:"boy",o:"inglés",m:"gemelo"},
+  {n:"Jack",g:"boy",o:"inglés",m:"Dios es misericordioso"},
+  {n:"Charles",g:"boy",o:"inglés",m:"hombre libre"},
+  {n:"Frederick",g:"boy",o:"inglés",m:"gobernante pacífico"},
+  {n:"Edmund",g:"boy",o:"inglés",m:"protector de la riqueza"},
+  {n:"Alfred",g:"boy",o:"inglés",m:"consejo de los elfos"},
+  {n:"Leonard",g:"boy",o:"inglés",m:"fuerte como un león"},
+  {n:"Walter",g:"boy",o:"inglés",m:"comandante del ejército"},
+  {n:"Harold",g:"boy",o:"inglés",m:"jefe del ejército"},
+  {n:"Rupert",g:"boy",o:"inglés",m:"famosa brillantez"},
+  // ── HEBREO (completar a ≥20) ──
+  {n:"Esther",g:"girl",o:"hebreo",m:"estrella"},
+  {n:"Judith",g:"girl",o:"hebreo",m:"alabada"},
+  {n:"Naomi",g:"girl",o:"hebreo",m:"mi dulzura"},
+  {n:"Ruth",g:"girl",o:"hebreo",m:"amiga, compañera"},
+  {n:"Eva",g:"girl",o:"hebreo",m:"la que da vida"},
+  {n:"Lea",g:"girl",o:"hebreo",m:"la fatigada"},
+  {n:"Salomé",g:"girl",o:"hebreo",m:"la que trae la paz"},
+  {n:"Débora",g:"girl",o:"hebreo",m:"abeja"},
+  {n:"Raquel",g:"girl",o:"hebreo",m:"oveja"},
+  {n:"Rebeca",g:"girl",o:"hebreo",m:"la que ata"},
+  {n:"Aarón",g:"boy",o:"hebreo",m:"el iluminado"},
+  {n:"Ezequiel",g:"boy",o:"hebreo",m:"Dios le dará fuerza"},
+  {n:"Jonás",g:"boy",o:"hebreo",m:"paloma"},
+  {n:"Josué",g:"boy",o:"hebreo",m:"Dios es mi salvación"},
+  {n:"Levi",g:"boy",o:"hebreo",m:"unido, acompañante"},
+  {n:"Tobías",g:"boy",o:"hebreo",m:"Dios es bueno"},
+  {n:"Rubén",g:"boy",o:"hebreo",m:"he aquí un hijo"},
+  {n:"Simón",g:"boy",o:"hebreo",m:"el que escucha"},
+  {n:"Noé",g:"boy",o:"hebreo",m:"descanso, alivio"},
+  {n:"Moisés",g:"boy",o:"hebreo",m:"salvado de las aguas"},
+  // ── GRIEGO (completar a ≥20) ──
+  {n:"Dafne",g:"girl",o:"griego",m:"laurel sagrado"},
+  {n:"Penélope",g:"girl",o:"griego",m:"la que teje y desteje"},
+  {n:"Cassandra",g:"girl",o:"griego",m:"la que brilla sobre los hombres"},
+  {n:"Melisa",g:"girl",o:"griego",m:"la abeja"},
+  {n:"Alexia",g:"girl",o:"griego",m:"la que protege"},
+  {n:"Olimpia",g:"girl",o:"griego",m:"la del Olimpo"},
+  {n:"Anastasia",g:"girl",o:"griego",m:"la que resucita"},
+  {n:"Electra",g:"girl",o:"griego",m:"brillante como el ámbar"},
+  {n:"Hermione",g:"girl",o:"griego",m:"mensajera de los dioses"},
+  {n:"Ariadna",g:"girl",o:"griego",m:"la más pura"},
+  {n:"Iris",g:"girl",o:"griego",m:"arcoíris, mensajera"},
+  {n:"Calista",g:"girl",o:"griego",m:"la más bella"},
+  {n:"Felipe",g:"boy",o:"griego",m:"amante de los caballos"},
+  {n:"Andrés",g:"boy",o:"griego",m:"hombre fuerte y varonil"},
+  {n:"Ángel",g:"boy",o:"griego",m:"mensajero de Dios"},
+  {n:"Teodoro",g:"boy",o:"griego",m:"don de Dios"},
+  {n:"Basilio",g:"boy",o:"griego",m:"rey"},
+  {n:"Cristóbal",g:"boy",o:"griego",m:"portador de Cristo"},
+  {n:"Marcos",g:"boy",o:"griego",m:"consagrado a Marte"},
+  {n:"Timoteo",g:"boy",o:"griego",m:"el que honra a Dios"},
+  {n:"Esteban",g:"boy",o:"griego",m:"corona, guirnalda"},
+  {n:"Héctor",g:"boy",o:"griego",m:"el que sostiene firme"},
+  {n:"Aquiles",g:"boy",o:"griego",m:"el que alivia el dolor del pueblo"},
+  {n:"Damián",g:"boy",o:"griego",m:"el que doma"},
+  {n:"Alejandro",g:"boy",o:"griego",m:"defensor del pueblo"},
+  // ── GERMÁNICO (completar a ≥20) ──
+  {n:"Matilde",g:"girl",o:"germánico",m:"fuerza en la batalla"},
+  {n:"Ingrid",g:"girl",o:"germánico",m:"el más amado de Ing"},
+  {n:"Freya",g:"girl",o:"germánico",m:"diosa nórdica del amor"},
+  {n:"Sigrid",g:"girl",o:"germánico",m:"victoria hermosa"},
+  {n:"Hildegard",g:"girl",o:"germánico",m:"guardiana de la guerra"},
+  {n:"Berta",g:"girl",o:"germánico",m:"brillante, ilustre"},
+  {n:"Hilda",g:"girl",o:"germánico",m:"guerrera"},
+  {n:"Adela",g:"girl",o:"germánico",m:"noble"},
+  {n:"Willa",g:"girl",o:"germánico",m:"voluntad resuelta"},
+  {n:"Hedvig",g:"girl",o:"germánico",m:"combate, refugio"},
+  {n:"Ludwig",g:"boy",o:"germánico",m:"guerrero glorioso"},
+  {n:"Wolfgang",g:"boy",o:"germánico",m:"camino del lobo"},
+  {n:"Leopoldo",g:"boy",o:"germánico",m:"valiente entre el pueblo"},
+  {n:"Konrad",g:"boy",o:"germánico",m:"consejo valiente"},
+  {n:"Siegfried",g:"boy",o:"germánico",m:"paz victoriosa"},
+  {n:"Dietrich",g:"boy",o:"germánico",m:"gobernante del pueblo"},
+  {n:"Heinrich",g:"boy",o:"germánico",m:"señor del hogar"},
+  {n:"Adalbert",g:"boy",o:"germánico",m:"noble y brillante"},
+  {n:"Gottfried",g:"boy",o:"germánico",m:"paz de Dios"},
+  {n:"Arnulf",g:"boy",o:"germánico",m:"águila lobo"},
+  // ── COMPLETAR ÚLTIMOS HUECOS ──
+  {n:"Clara",g:"girl",o:"inglés",m:"brillante, clara"},
+  {n:"Violet",g:"girl",o:"inglés",m:"violeta"},
+  {n:"Gertrude",g:"girl",o:"germánico",m:"lanza fuerte"},
+  {n:"Milda",g:"girl",o:"germánico",m:"tierna, amable"},
+  {n:"Rosamund",g:"girl",o:"germánico",m:"protectora del caballo"},
+  {n:"Hedvig",g:"girl",o:"germánico",m:"combate, refugio"},
+  {n:"Brunhild",g:"girl",o:"germánico",m:"armadura de batalla"},
+  {n:"Isaías",g:"boy",o:"hebreo",m:"salvación de Dios"},
+  {n:"Josué",g:"boy",o:"hebreo",m:"Dios es mi salvación"},
+  {n:"Bartolomé",g:"boy",o:"hebreo",m:"hijo de Tolomeo"},
+  {n:"Dionisio",g:"boy",o:"griego",m:"consagrado a Dioniso"},
+  {n:"Néstor",g:"boy",o:"griego",m:"el que regresa a casa"},
+  {n:"Perseo",g:"boy",o:"griego",m:"el destructor"},
+  {n:"Apolo",g:"boy",o:"griego",m:"el luminoso"},
+  {n:"Orión",g:"boy",o:"griego",m:"el que vive en la montaña"},
+  {n:"Ulrich",g:"boy",o:"germánico",m:"señor de la herencia"},
+  {n:"Reinhardt",g:"boy",o:"germánico",m:"consejo fuerte"},
+  {n:"Otón",g:"boy",o:"germánico",m:"el que tiene riqueza"},
+  {n:"Teseo",g:"boy",o:"griego",m:"el que funda"},
+  {n:"Leónidas",g:"boy",o:"griego",m:"hijo del león"},
 ];
 
 
@@ -1943,16 +2103,16 @@ async function startSwiping() {
   if(state.isSolo) {
     if(cfBtn) cfBtn.style.display = '';
     if(matchCount) matchCount.style.display = 'none';
+    // restaurar likes si venimos de cambio de filtros mid-game
+    if(state._midGameLikes) {
+      state.myLikes = {...state._midGameLikes};
+      state.matches = [...(state._midGameMatches||[])];
+      state._midGameLikes = null; state._midGameMatches = null;
+      document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
+    }
   } else {
     if(cfBtn) cfBtn.style.display = 'none';
     if(matchCount) matchCount.style.display = '';
-  }
-  // restaurar likes si venimos de cambio de filtros mid-game
-  if(state.isSolo && state._midGameLikes) {
-    state.myLikes = {...state._midGameLikes};
-    state.matches = [...(state._midGameMatches||[])];
-    state._midGameLikes = null; state._midGameMatches = null;
-    document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
   }
   // ocultar elementos de pareja en modo solo
   const partnerStatus = document.querySelector('.partner-status');
@@ -1983,12 +2143,6 @@ async function startSwiping() {
   }, 5000);
 }
 
-function changeFiltersMidGame() {
-  state._midGameLikes = {...state.myLikes};
-  state._midGameMatches = [...state.matches];
-  showScreen('setup');
-}
-
 /* ── QUEUE ── */
 function buildQueue() {
   let pool;
@@ -2001,7 +2155,7 @@ function buildQueue() {
   } else if(state.filters.reyes) {
     pool = NAMES_DB.filter(n => n.o === 'reyes');
   } else {
-    // pool normal sin extras
+    // pool normal sin calorro ni sudamerica
     pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes' && n.o !== 'clásico' && n.o !== 'moderno');
     // filtro origen estándar
     if(state.filters.origin !== 'all') {
@@ -2276,24 +2430,6 @@ async function swipeCard(liked) {
 
 
 function checkMatch(name) {
-  const iPartnerSuper = state.partnerLikes[name] === 'super';
-  const normalMatch = state.myLikes[name] && state.partnerLikes[name];
-  if(iPartnerSuper && !state.matches.includes(name)) {
-    state.matches.push(name);
-    const top = document.querySelector('.name-card.active');
-    if(iMySuper) {
-      if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
-      else triggerMatch(name);
-    }
-  } else if(normalMatch && !state.matches.includes(name)) {
-    state.matches.push(name);
-    const top = document.querySelector('.name-card.active');
-    if(top && top.style.opacity === '0') setTimeout(()=>triggerMatch(name), 420);
-    else triggerMatch(name);
-  }
-}
-
-function checkMatch(name) {
   if(state.myLikes[name] && state.partnerLikes[name]) {
     if(!state.matches.includes(name)) {
       state.matches.push(name);
@@ -2534,6 +2670,11 @@ function confirmGoHome() {
     ? ''
     : 'Si tu pareja sigue jugando se desconectará de tu sesión. Los matches se perderán.';
   document.getElementById('confirm-overlay').style.display = 'flex';
+}
+function changeFiltersMidGame() {
+  state._midGameLikes = {...state.myLikes};
+  state._midGameMatches = [...state.matches];
+  showScreen('setup');
 }
 function closeConfirm() {
   document.getElementById('confirm-overlay').style.display = 'none';
@@ -2952,128 +3093,6 @@ if(urlJoin) {
   joinRoom();
 } else {
   checkResumeRoom();
-}
-
-/* ── NOMBRE DEL DÍA ── */
-lastNamedayIdx = 0;
-
-function chipEmoji(name) {
-    const n = name.toLowerCase();
-    if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
-    if(/rey |reina |zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|de bisanzio|de dinamarca|cristián x|zarina|bolena/.test(n)) return '👑';
-    if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
-    if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage|diana rigg/.test(n)) return '🎬';
-    if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
-    if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
-    if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
-    if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
-    if(/huet/.test(n)) return '🏒';
-    if(/vettel|sutil/.test(n)) return '🏎️';
-    if(/alejandro magno|leonidas i|julio césar|cleopatra vii/.test(n)) return '⚔️';
-    if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|beckham/.test(n)) return '🌍';
-    if(/tereshkova/.test(n)) return '🚀';
-    if(/matteo romano/.test(n)) return '🎵';
-    if(/bella hadid/.test(n)) return '💃';
-    if(/elena de troya/.test(n)) return '⚔️';
-    if(/valentina greco|valentina vignali/.test(n)) return '💃';
-    if(/victor hugo/.test(n)) return '📖';
-    if(/hugo boss/.test(n)) return '🧥';
-    if(/leonidas gómez/.test(n)) return '⚽';
-    if(/noa \(cantante|noa kirel/.test(n)) return '🎵';
-    if(/noa pothoven/.test(n)) return '📖';
-    if(/cléopâtre séméria/.test(n)) return '👑';
-    if(/aurora disney/.test(n)) return '🎬';
-    if(/maximiliano i del s/.test(n)) return '👑';
-    if(/zenobia camprubí/.test(n)) return '📖';
-    if(/zenobia shroff/.test(n)) return '🎬';
-    if(/zenobia barlow/.test(n)) return '🌍';
-    if(/natalia vodianova/.test(n)) return '💃';
-    if(/george lucas/.test(n)) return '🎬';
-    if(/adriano \(emp/.test(n)) return '👑';
-    if(/marco aurelio/.test(n)) return '📖';
-    if(/celia de cáceres/.test(n)) return '🌍';
-    if(/jesús gil/.test(n)) return '👯';
-    return '';
-}
-
-function showNamedayAt(idx, dir=1) {
-  lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
-  const content = document.getElementById('nameday-content');
-  content.style.opacity = '0';
-  content.style.transform = `translateX(${dir>0?'-12px':'12px'})`;
-  content.style.transition = 'opacity .15s ease,transform .15s ease';
-  setTimeout(() => {
-    const d = NAMEDAY_DATA[lastNamedayIdx];
-    document.getElementById('nameday-name').textContent = d.n;
-    document.getElementById('nameday-origin').textContent = d.o;
-    document.getElementById('nameday-meaning').textContent = '"' + d.m + '"';
-    const storyEl = document.getElementById('nameday-story');
-    storyEl.innerHTML = '';
-    d.s.split('\n\n').forEach((para, i) => {
-      const p = document.createElement('p');
-      p.textContent = para;
-      p.style.cssText = i > 0 ? 'margin-top:.7rem' : '';
-      storyEl.appendChild(p);
-    });
-    const curiousSec = document.getElementById('nameday-curious');
-    if(d.curioso) { curiousSec.style.display=''; document.getElementById('nameday-curious-text').textContent=d.curioso; }
-    else curiousSec.style.display = 'none';
-    const famososSec = document.getElementById('nameday-famosos');
-    famososSec.innerHTML = '';
-    if(d.famosos && d.famosos.length) {
-      famososSec.style.display = '';
-      const CHIP_COLORS = [{bg:'rgba(232,115,90,.1)',dot:'#E8735A'},{bg:'rgba(124,109,222,.1)',dot:'#7C6DDE'},{bg:'rgba(45,184,138,.1)',dot:'#2DB88A'},{bg:'rgba(224,155,61,.1)',dot:'#E09B3D'}];
-      const lbl = document.createElement('span');
-      lbl.className = 'nameday-famosos-label'; lbl.textContent = 'Lo llevan:';
-      famososSec.appendChild(lbl);
-      const four = d.famosos.slice(0,4);
-      [[0,1],[2,3]].forEach(pair => {
-        const row = document.createElement('div'); row.className = 'nameday-famosos-row';
-        pair.forEach(i => {
-          if(four[i] !== undefined) {
-            const col = CHIP_COLORS[i % CHIP_COLORS.length];
-            const chip = document.createElement('span'); chip.className = 'nameday-chip'; chip.style.background = col.bg;
-            const dot = document.createElement('span');
-            dot.style.cssText = `width:6px;height:6px;min-width:6px;min-height:6px;border-radius:50%;background:${col.dot};flex-shrink:0;align-self:center`;
-            const emojiStr = chipEmoji(four[i]); const txt = document.createElement('span');
-            txt.textContent = four[i]; txt.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-            chip.appendChild(dot);
-            if(emojiStr) { const em=document.createElement('span');em.textContent=emojiStr;em.style.cssText='font-size:.7rem;flex-shrink:0;line-height:1;display:flex;align-items:center';chip.appendChild(em); }
-            chip.appendChild(txt); row.appendChild(chip);
-          }
-        });
-        famososSec.appendChild(row);
-      });
-    } else famososSec.style.display = 'none';
-    content.style.transition = 'none';
-    content.style.transform = `translateX(${dir>0?'12px':'-12px'})`;
-    content.style.opacity = '0';
-    requestAnimationFrame(() => {
-      content.style.transition = 'opacity .2s ease,transform .2s ease';
-      content.style.transform = 'translateX(0)';
-      content.style.opacity = '1';
-    });
-  }, 150);
-}
-
-function openNameOfDay() {
-  document.getElementById('nameday-overlay').style.display = 'flex';
-  const idx = Math.floor(Math.random() * NAMEDAY_DATA.length);
-  const content = document.getElementById('nameday-content');
-  content.style.opacity = '1'; content.style.transform = 'translateX(0)';
-  showNamedayAt(idx, 0);
-  setupNamedaySwipe();
-}
-function nextNameOfDay() { showNamedayAt(lastNamedayIdx + 1, 1); }
-function prevNameOfDay() { showNamedayAt(lastNamedayIdx - 1, -1); }
-function closeNameOfDay() { document.getElementById('nameday-overlay').style.display = 'none'; }
-
-namedaySwipeX = 0;
-function setupNamedaySwipe() {
-  const card = document.getElementById('nameday-card-inner');
-  if(!card || card._swipeSetup) return; card._swipeSetup = true;
-  card.addEventListener('touchstart', e => { namedaySwipeX = e.touches[0].clientX; }, {passive:true});
-  card.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - namedaySwipeX; if(Math.abs(dx)>50) dx<0?nextNameOfDay():prevNameOfDay(); }, {passive:true});
 }
 </script>
 </body>
