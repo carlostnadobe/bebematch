@@ -593,7 +593,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v12.0</div>
+<div class="version-tag">v12.1</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2100,9 +2100,11 @@ async function startSwiping() {
   // botón filtros y contador según modo
   const cfBtn = document.getElementById('btn-change-filters');
   const matchCount = document.getElementById('match-count');
+  const rushLabel = document.querySelector('.rush-toggle');
   if(state.isSolo) {
     if(cfBtn) cfBtn.style.display = '';
     if(matchCount) matchCount.style.display = 'none';
+    if(rushLabel) rushLabel.style.display = 'none';
     // restaurar likes si venimos de cambio de filtros mid-game
     if(state._midGameLikes) {
       state.myLikes = {...state._midGameLikes};
@@ -2113,6 +2115,7 @@ async function startSwiping() {
   } else {
     if(cfBtn) cfBtn.style.display = 'none';
     if(matchCount) matchCount.style.display = '';
+    if(rushLabel) rushLabel.style.display = '';
   }
   // ocultar elementos de pareja en modo solo
   const partnerStatus = document.querySelector('.partner-status');
