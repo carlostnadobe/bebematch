@@ -603,7 +603,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v15.1</div>
+<div class="version-tag">v15.3</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2590,6 +2590,30 @@ function renderSummary() {
   const onlyPartner = Object.entries(state.partnerLikes)
     .filter(([name, liked]) => liked && !state.myLikes[name])
     .map(([name]) => name);
+
+  // Estadísticas
+  const totalSeen = Object.keys(state.myLikes).length;
+  const myLikeCount = Object.values(state.myLikes).filter(v=>v).length;
+  const partnerLikeCount = Object.values(state.partnerLikes).filter(v=>v).length;
+  const matchCount = state.matches.length;
+  const pct = totalSeen > 0 ? Math.round((matchCount / Math.max(myLikeCount, partnerLikeCount, 1)) * 100) : 0;
+
+  // Bloque de estadísticas
+  const statsEl = document.createElement('div');
+  statsEl.style.cssText = 'display:flex;gap:.5rem;width:100%;margin-bottom:1rem;flex-wrap:wrap';
+  const stats = [
+    {label:'Nombres vistos', val: totalSeen},
+    {label:'Tus likes', val: myLikeCount + ' ♥'},
+    {label:'Sus likes', val: partnerLikeCount + ' ♥'},
+    {label:'Coincidencia', val: pct + '%'},
+  ];
+  stats.forEach(s => {
+    const pill = document.createElement('div');
+    pill.style.cssText = 'flex:1;min-width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.5rem .4rem;text-align:center';
+    pill.innerHTML = `<div style="font-size:1rem;font-weight:600;color:var(--text);font-family:'Instrument Serif',serif;font-style:italic">${s.val}</div><div style="font-size:.62rem;color:var(--text3);font-family:'Inter',sans-serif;margin-top:.1rem;letter-spacing:.04em;text-transform:uppercase">${s.label}</div>`;
+    statsEl.appendChild(pill);
+  });
+  list.appendChild(statsEl);
 
   const normalMatches = state.matches;
   if(state.matches.length === 0) {
