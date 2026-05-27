@@ -198,6 +198,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .name-of-day-btn{position:fixed;top:5.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
 .name-of-day-btn:hover{border-color:rgba(232,115,90,.5);animation:none;transform:scale(1.1)}
 @keyframes giftWiggle{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-12deg) scale(1.1)}30%{transform:rotate(10deg) scale(1.05)}45%{transform:rotate(-6deg) scale(1.08)}60%{transform:rotate(0) scale(1)}}
+@keyframes consejoIn{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes consejoTilt{0%,80%,100%{transform:rotate(0deg)}85%{transform:rotate(2deg)}90%{transform:rotate(-1deg)}95%{transform:rotate(1.5deg)}}
+.name-of-day-btn{position:fixed;top:5.2rem;right:1.2rem;z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;animation:giftWiggle 3s ease-in-out infinite}
+.name-of-day-btn:hover{border-color:rgba(232,115,90,.5);animation:none;transform:scale(1.1)}
+@keyframes giftWiggle{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-12deg) scale(1.1)}30%{transform:rotate(10deg) scale(1.05)}45%{transform:rotate(-6deg) scale(1.08)}60%{transform:rotate(0) scale(1)}}
 .nameday-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto}
 .nameday-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;max-width:400px;width:100%;padding:1.6rem 1.8rem 1.4rem;position:relative;animation:screenIn .4s cubic-bezier(.34,1.56,.64,1);height:720px;display:flex;flex-direction:column;overflow:hidden}
 .nameday-content{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -294,6 +299,31 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 </head>
 <body>
 <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">🌙</button>
+<button class="name-of-day-btn" id="nameday-btn" onclick="openNameOfDay()" title="Nombre del día">🎁</button>
+
+<!-- NOMBRE DEL DÍA OVERLAY -->
+<div class="nameday-overlay" id="nameday-overlay" onclick="closeNameOfDay()">
+  <div class="nameday-card" onclick="event.stopPropagation()" id="nameday-card-inner">
+    <button onclick="closeNameOfDay()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;z-index:1">✕</button>
+    <div class="nameday-badge" style="margin-right:2rem">✨ Inspírate hoy</div>
+    <div class="nameday-content" id="nameday-content">
+      <div class="nameday-name" id="nameday-name">—</div>
+      <div class="nameday-origin" id="nameday-origin" style="margin-top:.3rem;margin-bottom:0">—</div>
+      <div class="nameday-meaning" id="nameday-meaning" style="margin-top:.5rem;margin-bottom:0">—</div>
+      <div class="nameday-divider"></div>
+      <div class="nameday-story" id="nameday-story"></div>
+      <div class="nameday-curious" id="nameday-curious" style="display:none">
+        <div class="nameday-curious-label">¿Sabías que...?</div>
+        <div class="nameday-curious-text" id="nameday-curious-text"></div>
+      </div>
+      <div class="nameday-famosos" id="nameday-famosos" style="display:none"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.2rem;flex-shrink:0;gap:.6rem;padding-top:.8rem;border-top:1px solid var(--border)">
+      <button onclick="prevNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.45rem 1rem;font-size:.8rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">← Anterior</button>
+      <button onclick="nextNameOfDay()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:.45rem 1rem;font-size:.8rem;color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s">Siguiente →</button>
+    </div>
+  </div>
+</div>
 <button class="name-of-day-btn" id="nameday-btn" onclick="openNameOfDay()" title="Nombre del día">🎁</button>
 
 <!-- NOMBRE DEL DÍA OVERLAY -->
@@ -436,9 +466,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   <div class="pill-row" id="origin-pills">
     <div class="pill selected" data-v="all" onclick="togglePill(this,'origin')">Todos</div>
     <div class="pill" data-v="español" onclick="togglePill(this,'origin')">Español</div>
+    <div class="pill" data-v="hebreo" onclick="togglePill(this,'origin')">Hebreo</div>
+    <div class="pill" data-v="griego" onclick="togglePill(this,'origin')">Griego</div>
+    <div class="pill" data-v="germánico" onclick="togglePill(this,'origin')">Germánico</div>
     <div class="pill" data-v="inglés" onclick="togglePill(this,'origin')">Inglés</div>
-    <div class="pill" data-v="clásico" onclick="togglePill(this,'origin')">Clásico</div>
-    <div class="pill" data-v="moderno" onclick="togglePill(this,'origin')">Moderno</div>
   </div>
   <p style="font-size:.85rem;color:var(--text2);font-weight:500;margin-top:1.2rem;margin-bottom:.5rem">Duración del juego</p>
   <div class="pill-row" id="count-pills">
@@ -454,6 +485,10 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
   <button class="btn btn-primary" onclick="hostStartSwiping()" style="margin-top:2rem;width:100%;max-width:300px;justify-content:center">¡Empezar! →</button>
   <button class="btn btn-secondary" onclick="confirmGoHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center;font-size:.82rem">← Volver al inicio</button>
+  <div style="display:flex;align-items:flex-start;gap:.5rem;background:rgba(232,115,90,.07);border:1px solid rgba(232,115,90,.2);border-radius:10px;padding:.65rem .8rem;margin-top:1.2rem;width:100%;max-width:420px;box-sizing:border-box;animation:consejoIn .5s ease .3s both, consejoTilt 4s ease-in-out 2s 1">
+    <span style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--salmon);font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap;padding-top:.05rem">💡 Consejo</span>
+    <span style="font-size:.75rem;color:var(--text2);font-family:'Inter',sans-serif;line-height:1.5">Al final de cada partida podrás explorar más nombres y cambiar los filtros. ¡No te preocupes demasiado!</span>
+  </div>
   <p style="font-size:.72rem;color:var(--text3);margin-top:1rem">Solo tú eliges los filtros — tu pareja recibirá los mismos</p>
 </div>
 
@@ -488,6 +523,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <div style="display:flex;align-items:center;gap:.5rem">
       <button onclick="confirmGoHome()" style="background:var(--surface2);border:1px solid var(--border2);font-size:.72rem;color:var(--text2);cursor:pointer;padding:.3rem .7rem;font-family:'Inter',sans-serif;border-radius:7px;font-weight:500;transition:all .15s" onmouseover="this.style.borderColor='var(--salmon)';this.style.color='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← inicio</button>
       <div class="score-badge" id="match-count" onclick="showLiked()" style="cursor:pointer">💞 0 matches</div>
+      <button id="btn-change-filters" onclick="changeFiltersMidGame()" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:.72rem;color:var(--text2);cursor:pointer;padding:.3rem .7rem;font-family:'Inter',sans-serif;border-radius:7px;font-weight:500;transition:all .15s" onmouseover="this.style.borderColor='var(--salmon)';this.style.color='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⚙️ filtros</button>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;margin:.2rem 0 .1rem">
@@ -588,7 +624,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <div id="confirm-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:2rem 1.5rem;max-width:300px;width:90%;text-align:center">
     <p style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--text);margin-bottom:.5rem">¿Volver al inicio?</p>
-    <p style="font-size:.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6">Si tu pareja sigue jugando se desconectará de tu sesión. Los matches se perderán.</p>
+    <p id="confirm-msg" style="font-size:.82rem;color:var(--text2);margin-bottom:1.5rem;line-height:1.6">Los matches se perderán.</p>
     <div style="display:flex;gap:.6rem">
       <button class="btn btn-secondary" onclick="closeConfirm()" style="flex:1">Cancelar</button>
       <button class="btn btn-primary" onclick="goHome()" style="flex:1">Salir</button>
@@ -609,7 +645,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v10.5</div>
+<div class="version-tag">v11.0</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2051,6 +2087,23 @@ async function hostStartSwiping() {
 async function startSwiping() {
   buildQueue();
   showScreen('swipe');
+  // botón filtros y contador según modo
+  const cfBtn = document.getElementById('btn-change-filters');
+  const matchCount = document.getElementById('match-count');
+  if(state.isSolo) {
+    if(cfBtn) cfBtn.style.display = '';
+    if(matchCount) matchCount.style.display = 'none';
+  } else {
+    if(cfBtn) cfBtn.style.display = 'none';
+    if(matchCount) matchCount.style.display = '';
+  }
+  // restaurar likes si venimos de cambio de filtros mid-game
+  if(state.isSolo && state._midGameLikes) {
+    state.myLikes = {...state._midGameLikes};
+    state.matches = [...(state._midGameMatches||[])];
+    state._midGameLikes = null; state._midGameMatches = null;
+    document.getElementById('liked-count').textContent = Object.values(state.myLikes).filter(v=>v).length;
+  }
   // ocultar elementos de pareja en modo solo
   const partnerStatus = document.querySelector('.partner-status');
   const partnerProgressWrap = document.getElementById('partner-progress-bar');
@@ -2080,6 +2133,12 @@ async function startSwiping() {
   }, 5000);
 }
 
+function changeFiltersMidGame() {
+  state._midGameLikes = {...state.myLikes};
+  state._midGameMatches = [...state.matches];
+  showScreen('setup');
+}
+
 /* ── QUEUE ── */
 function buildQueue() {
   let pool;
@@ -2092,8 +2151,8 @@ function buildQueue() {
   } else if(state.filters.reyes) {
     pool = NAMES_DB.filter(n => n.o === 'reyes');
   } else {
-    // pool normal sin calorro ni sudamerica
-    pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
+    // pool normal sin extras
+    pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes' && n.o !== 'clásico' && n.o !== 'moderno');
     // filtro origen estándar
     if(state.filters.origin !== 'all') {
       pool = pool.filter(n => n.o === state.filters.origin);
@@ -2121,13 +2180,13 @@ function buildQueue() {
     else if(state.filters.sudamerica) pool = NAMES_DB.filter(n => n.o === 'sudamerica');
     else if(state.filters.reyes) pool = NAMES_DB.filter(n => n.o === 'reyes');
     else {
-      pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
+      pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes' && n.o !== 'clásico' && n.o !== 'moderno');
       if(state.filters.origin !== 'all') pool = pool.filter(n => n.o === state.filters.origin);
     }
     if(state.filters.gender !== 'all') pool = pool.filter(n => n.g === state.filters.gender);
   }
 
-  if(pool.length === 0) pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes');
+  if(pool.length === 0) pool = NAMES_DB.filter(n => n.o !== 'calorro' && n.o !== 'sudamerica' && n.o !== 'reyes' && n.o !== 'clásico' && n.o !== 'moderno');
 
   // ordenar con seed determinista para que ambos jugadores vean los mismos nombres
   const seed = state.filters._seed;
@@ -2620,6 +2679,10 @@ function restartFromSetup() {
 }
 
 function confirmGoHome() {
+  const msg = document.getElementById('confirm-msg');
+  if(msg) msg.textContent = state.isSolo
+    ? ''
+    : 'Si tu pareja sigue jugando se desconectará de tu sesión. Los matches se perderán.';
   document.getElementById('confirm-overlay').style.display = 'flex';
 }
 function closeConfirm() {
@@ -3039,6 +3102,108 @@ if(urlJoin) {
   joinRoom();
 } else {
   checkResumeRoom();
+}
+
+/* ── NOMBRE DEL DÍA ── */
+lastNamedayIdx = 0;
+
+function showNamedayAt(idx, dir=1) {
+  lastNamedayIdx = ((idx % NAMEDAY_DATA.length) + NAMEDAY_DATA.length) % NAMEDAY_DATA.length;
+  const content = document.getElementById('nameday-content');
+  content.style.opacity = '0';
+  content.style.transform = `translateX(${dir>0?'-12px':'12px'})`;
+  content.style.transition = 'opacity .15s ease,transform .15s ease';
+  setTimeout(() => {
+    const d = NAMEDAY_DATA[lastNamedayIdx];
+    document.getElementById('nameday-name').textContent = d.n;
+    document.getElementById('nameday-origin').textContent = d.o;
+    document.getElementById('nameday-meaning').textContent = '"' + d.m + '"';
+    const storyEl = document.getElementById('nameday-story');
+    storyEl.innerHTML = '';
+    d.s.split('\n\n').forEach((para, i) => {
+      const p = document.createElement('p');
+      p.textContent = para;
+      p.style.cssText = i > 0 ? 'margin-top:.7rem' : '';
+      storyEl.appendChild(p);
+    });
+    const curiousSec = document.getElementById('nameday-curious');
+    if(d.curioso) { curiousSec.style.display=''; document.getElementById('nameday-curious-text').textContent=d.curioso; }
+    else curiousSec.style.display = 'none';
+    const famososSec = document.getElementById('nameday-famosos');
+    famososSec.innerHTML = '';
+    if(d.famosos && d.famosos.length) {
+      famososSec.style.display = '';
+      const CHIP_COLORS = [{bg:'rgba(232,115,90,.1)',dot:'#E8735A'},{bg:'rgba(124,109,222,.1)',dot:'#7C6DDE'},{bg:'rgba(45,184,138,.1)',dot:'#2DB88A'},{bg:'rgba(224,155,61,.1)',dot:'#E09B3D'}];
+      function chipEmoji(name) {
+        const n = name.toLowerCase();
+        if(/san |santa |san mateo|san lucas|san sebastián|santa clara|san martín de tours|santa elena|san nicolás|san cristóbal|san josé|santa ana|jesucristo/.test(n)) return '✝️';
+        if(/rey |reina |zar|farao|sultán|príncipe|princesa|magno|católica|grande|aragón|médici|palmira|atenas|esparta|d'este|de gales|de holanda|de suecia|de noruega|de méxico|de bisanzio|de dinamarca|cristián x|zarina|bolena/.test(n)) return '👑';
+        if(/sanz|ricky martin|bach|cabello|saint-saëns|kavakos|aurora \(|lafourcade|oreiro|diana ross|diana krall|schumann|alborán|casals|luengo|mercury|daniela romo|valentina lisitsa|celia cruz|céline dion|alejandra guzmán|cristian de castro/.test(n)) return '🎵';
+        if(/rossellini|coppola|vergara|sofía loren|iñárritu|elena anaya|morrone|cleopatra jones|schell|von sydow|natasha romanoff|lastra|adrian brody|victoria justice|irene cara|irene dunne|clara bow|clara lago|sebastian stan|daniela vega|catalina sandino|samuel l\. jackson|julia roberts|ana de armas|nicolas cage|diana rigg/.test(n)) return '🎬';
+        if(/picasso|raffaello|cranach|milhazes|cleo de mérode|balenciaga/.test(n)) return '🎨';
+        if(/dumas|ferrante|neruda|alberti|beckett|johnson|samuel johnson|beatrice portinari|martín fierro|george sand|h\. c\. andersen|julia ward howe|ana frank|saramago|alejandra pizarnik/.test(n)) return '📖';
+        if(/morse|joliot-curie|copérnico/.test(n)) return '🔬';
+        if(/nadal|vázquez|asensio|leão|berrettini|kovačić|bellinelli|noa lang|leonidas da silva|hugo sánchez|cristiano ronaldo|mourinho|jesús navas/.test(n)) return '⚽';
+        if(/huet/.test(n)) return '🏒';
+        if(/vettel|sutil/.test(n)) return '🏎️';
+        if(/alejandro magno|leonidas i|julio césar|cleopatra vii/.test(n)) return '⚔️';
+        if(/marco polo|colón|martí|luther king|chávez|celia sánchez|jesús hermida|beckham/.test(n)) return '🌍';
+        if(/tereshkova/.test(n)) return '🚀';
+        if(/matteo romano/.test(n)) return '🎵';
+        if(/jesús gil/.test(n)) return '👯';
+        return '';
+      }
+      const lbl = document.createElement('span');
+      lbl.className = 'nameday-famosos-label'; lbl.textContent = 'Lo llevan:';
+      famososSec.appendChild(lbl);
+      const four = d.famosos.slice(0,4);
+      [[0,1],[2,3]].forEach(pair => {
+        const row = document.createElement('div'); row.className = 'nameday-famosos-row';
+        pair.forEach(i => {
+          if(four[i] !== undefined) {
+            const col = CHIP_COLORS[i % CHIP_COLORS.length];
+            const chip = document.createElement('span'); chip.className = 'nameday-chip'; chip.style.background = col.bg;
+            const dot = document.createElement('span');
+            dot.style.cssText = `width:6px;height:6px;min-width:6px;min-height:6px;border-radius:50%;background:${col.dot};flex-shrink:0;align-self:center`;
+            const emojiStr = chipEmoji(four[i]); const txt = document.createElement('span');
+            txt.textContent = four[i]; txt.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+            chip.appendChild(dot);
+            if(emojiStr) { const em=document.createElement('span');em.textContent=emojiStr;em.style.cssText='font-size:.7rem;flex-shrink:0;line-height:1;display:flex;align-items:center';chip.appendChild(em); }
+            chip.appendChild(txt); row.appendChild(chip);
+          }
+        });
+        famososSec.appendChild(row);
+      });
+    } else famososSec.style.display = 'none';
+    content.style.transition = 'none';
+    content.style.transform = `translateX(${dir>0?'12px':'-12px'})`;
+    content.style.opacity = '0';
+    requestAnimationFrame(() => {
+      content.style.transition = 'opacity .2s ease,transform .2s ease';
+      content.style.transform = 'translateX(0)';
+      content.style.opacity = '1';
+    });
+  }, 150);
+}
+
+function openNameOfDay() {
+  document.getElementById('nameday-overlay').style.display = 'flex';
+  const idx = Math.floor(Math.random() * NAMEDAY_DATA.length);
+  const content = document.getElementById('nameday-content');
+  content.style.opacity = '1'; content.style.transform = 'translateX(0)';
+  showNamedayAt(idx, 0);
+  setupNamedaySwipe();
+}
+function nextNameOfDay() { showNamedayAt(lastNamedayIdx + 1, 1); }
+function prevNameOfDay() { showNamedayAt(lastNamedayIdx - 1, -1); }
+function closeNameOfDay() { document.getElementById('nameday-overlay').style.display = 'none'; }
+
+namedaySwipeX = 0;
+function setupNamedaySwipe() {
+  const card = document.getElementById('nameday-card-inner');
+  if(!card || card._swipeSetup) return; card._swipeSetup = true;
+  card.addEventListener('touchstart', e => { namedaySwipeX = e.touches[0].clientX; }, {passive:true});
+  card.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - namedaySwipeX; if(Math.abs(dx)>50) dx<0?nextNameOfDay():prevNameOfDay(); }, {passive:true});
 }
 </script>
 </body>
