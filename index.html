@@ -1028,6 +1028,7 @@ function startSolo() {
   state.isHost = true;
   state.roomCode = null;
   resetGameState();
+  // adaptar UI para solo
   document.getElementById('setup-subtitle').textContent = 'Elige qué nombres quieres ver';
   document.getElementById('partner-label').textContent = 'Modo un jugador';
   showScreen('setup');
@@ -1846,9 +1847,10 @@ function createLikedItem(name, {rank=null, badge='', sub='', dim=false}={}) {
   const d = document.createElement('div');
   d.className = 'liked-item';
   if(dim) d.style.opacity = '.6';
+  const nameHtml = `<div class="liked-item-name">${name}</div>${sub ? `<div class="liked-item-sub">${sub}</div>` : ''}`;
   const left = rank != null
-    ? `<div style="display:flex;align-items:center;gap:.7rem"><span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${rank}</span><div>${name}${sub?`<div class="liked-item-sub">${sub}</div>`:''}</div></div>`
-    : `<div class="liked-item-name">${name}${sub?`<div class="liked-item-sub">${sub}</div>`:''}</div>`;
+    ? `<div style="display:flex;align-items:center;gap:.7rem"><span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${rank}</span><div>${nameHtml}</div></div>`
+    : nameHtml;
   d.innerHTML = left + (badge ? `<span class="match-badge">${badge}</span>` : '');
   return d;
 }
@@ -2634,9 +2636,7 @@ function renderSummary() {
   } else {
     title.textContent = `${state.matches.length} match${state.matches.length>1?'es':''} encontrado${state.matches.length>1?'s':''}! 💞`;
     sub.textContent = 'Los nombres que os gustan a los dos';
-    normalMatches.forEach((name, i) => {
-      list.appendChild(createLikedItem(name, {rank:i+1, badge:'💞 Match', sub:'Match de los dos 💞'}));
-    });
+    normalMatches.forEach((name, i) => { list.appendChild(createLikedItem(name, {rank:i+1, badge:'💞 Match', sub:'Match de los dos 💞'})); });
   }
 
   // solo a mí
@@ -2759,10 +2759,7 @@ function showLiked() {
   } else {
     liked.forEach(name=>{
       const isMatch = state.matches.includes(name);
-      list.appendChild(createLikedItem(name, {
-        sub: isMatch?'¡Match con tu pareja! 🎉':'Solo tú lo has elegido',
-        badge: isMatch?'💞 Match':''
-      }));
+      list.appendChild(createLikedItem(name, {sub:isMatch?'¡Match con tu pareja! 🎉':'Solo tú lo has elegido', badge:isMatch?'💞 Match':''}));
     });
   }
   showScreen('liked');
@@ -2920,7 +2917,17 @@ async function renderRefineResult() {
     // 2-3 nombres: fase final — mostrar y ofrecer elección opcional
     title.textContent = `🎯 ${refined.length} finalistas`;
     sub.textContent = '¡Estos son los que más os gustan a los dos!';
-    refined.forEach((name, i) => { list.appendChild(createLikedItem(name, {rank:i+1, badge:'🎯'})); });
+    refined.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div class="liked-item-name">${name}</div>
+        </div>
+        <span style="font-size:1rem">🎯</span>`;
+      list.appendChild(d);
+    });
     if(refineAgainBtn) refineAgainBtn.style.display = 'none';
     // ofrecer elección final opcional
     pickSection.style.display = '';
@@ -2928,7 +2935,17 @@ async function renderRefineResult() {
   } else {
     title.textContent = `${refined.length} afinados 🎯`;
     sub.textContent = 'Los que os gustan a los dos en esta ronda';
-    refined.forEach((name, i) => { list.appendChild(createLikedItem(name, {rank:i+1, badge:'🎯'})); });
+    refined.forEach((name, i) => {
+      const d = document.createElement('div');
+      d.className = 'liked-item';
+      d.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text3);min-width:18px">#${i+1}</span>
+          <div class="liked-item-name">${name}</div>
+        </div>
+        <span style="font-size:1rem">🎯</span>`;
+      list.appendChild(d);
+    });
     if(refineAgainBtn) refineAgainBtn.style.display = '';
   }
   state.isRefining = false;
