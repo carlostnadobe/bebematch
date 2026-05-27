@@ -94,7 +94,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 .partner-status{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--text3)}
 .partner-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background .3s}
 .partner-dot.online{background:var(--green)}
-.score-badge{display:flex;align-items:center;gap:.3rem;background:var(--surface2);border:1px solid var(--border);padding:.25rem .55rem;border-radius:6px;font-size:.72rem;color:var(--text2);font-weight:500;white-space:nowrap}
+.score-badge{display:flex;align-items:center;gap:.3rem;background:var(--surface2);border:1px solid var(--border);padding:0 .6rem;border-radius:8px;font-size:.72rem;color:var(--text2);font-weight:500;white-space:nowrap;height:44px;box-sizing:border-box;cursor:pointer}
 .progress{width:100%;max-width:380px;height:2px;background:var(--surface3);border-radius:1px;margin:.4rem 0}
 .progress-bar{height:100%;border-radius:1px;background:var(--salmon);transition:width .35s ease}
 
@@ -154,7 +154,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;color:
 40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{transform:translate(-50%,-50%) scale(.95)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
 
 /* RUSH MODE */
-.rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.rush-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0 .6rem;height:44px;box-sizing:border-box}
 .rush-toggle input{display:none}
 .rush-track{width:30px;height:17px;border-radius:9px;background:var(--border2);transition:background .2s;position:relative;flex-shrink:0}
 .rush-track::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
@@ -479,16 +479,20 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- SWIPE -->
 <div class="screen" id="screen-swipe" style="padding-top:1rem;overflow:hidden;touch-action:pan-y">
   <div class="swipe-header">
-    <div style="display:flex;align-items:center;gap:.4rem;width:100%">
-      <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
-      <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:36px;height:36px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
-      <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
-      <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
-        <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
-        <div class="rush-track"></div>
-        <span class="rush-label" id="rush-label">RUSH</span>
-      </label>
-      <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
+    <div style="display:flex;align-items:center;width:100%;position:relative">
+      <div style="display:flex;align-items:center;gap:.4rem;flex-shrink:0">
+        <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
+        <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:44px;height:44px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
+        <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;position:absolute;left:50%;transform:translateX(-50%)">
+        <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
+        <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
+          <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
+          <div class="rush-track"></div>
+          <span class="rush-label" id="rush-label">RUSH</span>
+        </label>
+      </div>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;margin:.2rem 0 .1rem">
@@ -598,7 +602,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v13.6</div>
+<div class="version-tag">v14.0</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
