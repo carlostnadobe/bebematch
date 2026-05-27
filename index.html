@@ -479,18 +479,16 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- SWIPE -->
 <div class="screen" id="screen-swipe" style="padding-top:1rem;overflow:hidden;touch-action:pan-y">
   <div class="swipe-header">
-    <div style="display:flex;align-items:center;gap:.4rem">
+    <div style="display:flex;align-items:center;gap:.4rem;width:100%">
       <button onclick="confirmGoHome()" title="Volver al inicio" style="background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">🏠</button>
       <button id="btn-change-filters" onclick="changeFiltersMidGame()" title="Cambiar filtros" style="display:none;background:var(--surface2);border:1px solid var(--border2);font-size:1rem;color:var(--text2);cursor:pointer;width:36px;height:36px;align-items:center;justify-content:center;border-radius:8px;transition:all .15s;flex-shrink:0" onmouseover="this.style.borderColor='var(--salmon)'" onmouseout="this.style.borderColor='var(--border2)'">⚙️</button>
-      <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.4rem">
-      <div class="score-badge" id="match-count" onclick="showLiked()" style="cursor:pointer">💞 0 matches</div>
-      <label class="rush-toggle" title="Modo Rush">
+      <div class="score-badge" id="match-count" onclick="showLiked()" style="display:none;cursor:pointer">💞 0 matches</div>
+      <label class="rush-toggle" id="rush-toggle-wrap" title="Modo Rush" style="display:none">
         <input type="checkbox" id="rush-toggle" onchange="toggleRush(this.checked)">
         <div class="rush-track"></div>
         <span class="rush-label" id="rush-label">RUSH</span>
       </label>
+      <span id="streak-badge" style="font-size:.75rem;color:var(--text3);font-family:'Inter',sans-serif;display:none"></span>
     </div>
   </div>
   <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;margin:.2rem 0 .1rem">
@@ -600,7 +598,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v13.1</div>
+<div class="version-tag">v13.4</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2109,22 +2107,21 @@ async function startSwiping() {
   // botón filtros y contador según modo
   const cfBtn = document.getElementById('btn-change-filters');
   const matchCount = document.getElementById('match-count');
-  const rushLabel = document.querySelector('.rush-toggle');
+  const rushWrap = document.getElementById('rush-toggle-wrap');
   if(state.isSolo) {
     if(cfBtn) cfBtn.style.display = 'flex';
     if(matchCount) matchCount.style.display = 'none';
-    if(rushLabel) rushLabel.style.display = 'none';
-    // restaurar likes si venimos de cambio de filtros mid-game
+    if(rushWrap) rushWrap.style.display = 'none';
     if(state._midGameLikes) {
       state.myLikes = {...state._midGameLikes};
       state.matches = [...(state._midGameMatches||[])];
       state._midGameLikes = null; state._midGameMatches = null;
-      const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent = Object.values(state.myLikes).filter(v=>v).length;
+      const lc = document.getElementById('liked-count'); if(lc) lc.textContent = Object.values(state.myLikes).filter(v=>v).length;
     }
   } else {
     if(cfBtn) cfBtn.style.display = 'none';
     if(matchCount) matchCount.style.display = '';
-    if(rushLabel) rushLabel.style.display = '';
+    if(rushWrap) rushWrap.style.display = '';
   }
   // ocultar elementos de pareja en modo solo
   const partnerStatus = document.querySelector('.partner-status');
@@ -2138,6 +2135,7 @@ async function startSwiping() {
   }
   renderCards();
   updateStreakBadge();
+  clearInterval(partnerPollTimer);
   clearInterval(filterPollTimer);
   setInterval(async()=>{
     if(!state.roomCode || !document.getElementById('screen-swipe').classList.contains('active')) return;
@@ -2658,7 +2656,7 @@ function restartFromSetup() {
   state.currentIdx = 0;
   state.myLikes = {};
   state.filters = {gender:'all', origin:'all', length:'all', count:20, calorro: false, sudamerica: false, reyes: false};
-  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent = '0';
+  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
   document.querySelectorAll('#gender-pills .pill, #origin-pills .pill, #length-pills .pill').forEach(p => p.classList.remove('selected'));
@@ -2708,7 +2706,7 @@ function goHome() {
   state.streakType = null;
   clearInterval(partnerPollTimer);
   if(realtimeWs) { try { realtimeWs.close(); } catch(e) {} realtimeWs = null; }
-  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent = '0';
+  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = '💞 0 matches';
   document.getElementById('join-code').value = '';
@@ -2799,7 +2797,7 @@ function startRefineMode() {
     return {...orig, _refineKey: prefix + n}; // key único para Supabase
   });
   state.currentIdx = 0;
-  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent = '0';
+  const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('partner-progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = '💞 0 matches';
