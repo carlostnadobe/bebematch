@@ -605,7 +605,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v15.8</div>
+<div class="version-tag">v15.9</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -2602,17 +2602,17 @@ function renderSummary() {
 
   // Bloque de estadísticas
   const statsEl = document.createElement('div');
-  statsEl.style.cssText = 'display:flex;gap:.5rem;width:100%;margin-bottom:1rem;flex-wrap:wrap';
+  statsEl.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;width:100%;margin-bottom:1rem;box-sizing:border-box';
   const stats = [
-    {label:'Nombres vistos', val: totalSeen},
-    {label:'Tus likes', val: myLikeCount + ' ♥'},
-    {label:'Sus likes', val: partnerLikeCount + ' ♥'},
-    {label:'Coincidencia', val: pct + '%'},
+    {label:'Vistos', val: totalSeen},
+    {label:'Tus ♥', val: myLikeCount},
+    {label:'Sus ♥', val: partnerLikeCount},
+    {label:'Match', val: pct + '%'},
   ];
   stats.forEach(s => {
     const pill = document.createElement('div');
-    pill.style.cssText = 'flex:1;min-width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.5rem .4rem;text-align:center';
-    pill.innerHTML = `<div style="font-size:1rem;font-weight:600;color:var(--text);font-family:'Instrument Serif',serif;font-style:italic">${s.val}</div><div style="font-size:.62rem;color:var(--text3);font-family:'Inter',sans-serif;margin-top:.1rem;letter-spacing:.04em;text-transform:uppercase">${s.label}</div>`;
+    pill.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.45rem .2rem;text-align:center;min-width:0;overflow:hidden';
+    pill.innerHTML = `<div style="font-size:.95rem;font-weight:600;color:var(--text);font-family:'Instrument Serif',serif;font-style:italic">${s.val}</div><div style="font-size:.58rem;color:var(--text3);font-family:'Inter',sans-serif;margin-top:.1rem;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.label}</div>`;
     statsEl.appendChild(pill);
   });
   list.appendChild(statsEl);
