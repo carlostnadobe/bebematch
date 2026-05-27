@@ -270,7 +270,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .mine-wrap{display:flex;flex-direction:column;align-items:center;gap:.7rem;transform:scale(.85);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);max-width:380px;width:92%;box-sizing:border-box}
 .mine-overlay.show .mine-wrap{transform:scale(1);opacity:1}
 .mine-overlay.show .egg-close{opacity:1}
-.mine-title{font-family:'Instrument Serif',serif;font-size:1.8rem;color:#fff;font-style:italic}
+.mine-title{font-family:'Instrument Serif',serif;font-size:1.8rem;color:#fff;font-style:normal}
 .mine-info{display:flex;gap:1.2rem;font-size:.8rem;color:rgba(255,255,255,.6);font-family:'Inter',sans-serif;letter-spacing:.04em}
 .mine-grid{display:grid;gap:3px;background:rgba(255,255,255,.06);padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,.1)}
 .mine-cell{width:34px;height:34px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;cursor:pointer;transition:all .12s;user-select:none;font-family:'Inter',sans-serif;font-weight:600}
@@ -285,10 +285,16 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 .n1{color:#60A5FA}.n2{color:#4ADE80}.n3{color:#F87171}.n4{color:#A78BFA}.n5{color:#FB923C}.n6{color:#34D399}.n7{color:#F5F5F5}.n8{color:#9CA3AF}
 .game-wrap{display:none;flex-direction:column;align-items:center;gap:.7rem;width:100%;max-width:420px;box-sizing:border-box}
 .game-wrap.show{display:flex}
-.game-arena{position:relative;width:100%;height:280px;border-radius:12px;overflow:hidden;background:#FDF8F4;border:1px solid rgba(44,31,26,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;max-width:100%}
-.game-ground{position:absolute;bottom:54px;left:0;right:0;height:1.5px;background:rgba(44,31,26,.2)}
+.game-arena{position:relative;width:100%;height:420px;border-radius:12px;overflow:hidden;background:#FDF8F4;border:1px solid rgba(44,31,26,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;max-width:100%}
+.game-ground{position:absolute;bottom:54px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(232,115,90,.35),transparent)}
 .game-baby{position:absolute;font-size:36px;line-height:1;bottom:54px;left:40px;transition:none;user-select:none}
 .game-obstacle{position:absolute;font-size:30px;line-height:1;bottom:54px;user-select:none}
+.game-baby-shadow{position:absolute;background:rgba(0,0,0,.18);border-radius:50%;pointer-events:none;transition:width .1s,left .1s}
+.game-powerup{position:absolute;font-size:26px;user-select:none;animation:powerupFloat 1s ease-in-out infinite alternate,powerupGlow 1.2s ease-in-out infinite alternate;pointer-events:none;filter:drop-shadow(0 0 6px gold)}
+@keyframes powerupFloat{from{transform:translateY(0) scale(1)}to{transform:translateY(-8px) scale(1.15)}}
+@keyframes powerupGlow{from{filter:drop-shadow(0 0 4px gold)}to{filter:drop-shadow(0 0 12px gold) drop-shadow(0 0 20px rgba(255,200,0,.6))}}
+@keyframes msgSlideOut{0%{opacity:1;transform:translateX(0)}70%{opacity:1;transform:translateX(-8px)}100%{opacity:0;transform:translateX(-50px)}}
+@keyframes msgSlideOutRight{0%{opacity:1;transform:translateX(0)}70%{opacity:1;transform:translateX(8px)}100%{opacity:0;transform:translateX(50px)}}
 .game-score{font-size:.8rem;color:rgba(255,255,255,.7);letter-spacing:.06em;font-family:'Inter',sans-serif}
 .game-msg{font-family:'Instrument Serif',serif;font-size:1.6rem;color:#fff;font-style:italic;text-align:center;min-height:2rem}
 .game-hint{font-size:.75rem;color:rgba(255,255,255,.5);font-family:'Inter',sans-serif;letter-spacing:.04em}
@@ -338,7 +344,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
 <!-- BUSCAMINAS OVERLAY -->
 <div class="mine-overlay" id="mine-overlay" onclick="closeMines()">
   <div class="mine-wrap" onclick="event.stopPropagation()">
-    <div class="mine-title">👶🏾 Bebéminas</div>
+    <div class="mine-title">👶🏾 bebé<span style="color:var(--salmon);font-style:italic">minas</span></div>
     <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 .2rem;box-sizing:border-box">
       <div style="display:flex;align-items:center;gap:1rem;font-size:.82rem;color:rgba(255,255,255,.7);font-family:'Inter',sans-serif;letter-spacing:.03em">
         <span style="display:flex;align-items:center;gap:.3rem">👶🏾 <span id="mine-count-left">0</span> bebés</span>
@@ -370,20 +376,34 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 
   <div class="game-wrap" id="game-wrap" onclick="event.stopPropagation()">
-    <div class="mine-title">👶 Martinsillo Volador</div>
     <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 .2rem;box-sizing:border-box">
-      <div class="game-msg" id="game-msg" style="font-size:1.3rem;min-height:1.6rem">¡Salta los obstáculos!</div>
-      <div class="game-score" style="text-align:right;white-space:nowrap">
-        <div>puntos: <span id="game-score">0</span></div>
-        <div style="opacity:.6">récord: <span id="game-best">0</span></div>
+      <div class="mine-title" style="margin:0;font-size:1.6rem">👶 Martinsillo<span style="color:var(--salmon);font-style:italic">Fly</span></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.25rem">
+        <div style="display:flex;gap:.35rem;align-items:center">
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.2rem .55rem;font-size:.75rem;color:rgba(255,255,255,.9);font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">⭐ <span id="game-stars">0</span></div>
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.2rem .55rem;font-size:.75rem;color:rgba(255,255,255,.9);font-family:'Inter',sans-serif;font-weight:600;white-space:nowrap">✦ <span id="game-score">0</span></div>
+        </div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.45);font-family:'Inter',sans-serif;letter-spacing:.04em;white-space:nowrap">récord: <span id="game-best">0</span> &nbsp;⭐ <span id="game-best-stars">0</span></div>
       </div>
+    </div>
+    <div style="position:relative;width:100%;height:1.8rem">
+      <div id="game-msg" style="display:none;position:absolute;top:0;left:10%;font-family:'Instrument Serif',serif;font-size:1.2rem;font-style:italic;color:#fff;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.4);white-space:nowrap"></div>
+      <div id="game-achievement" style="display:none;position:absolute;top:0;right:10%;white-space:nowrap;font-size:.7rem;color:rgba(255,255,255,.9);font-family:'Inter',sans-serif;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:.2rem .7rem;pointer-events:none;z-index:10"></div>
     </div>
     <div class="game-arena" id="game-arena">
       <div class="game-ground"></div>
       <div class="game-baby" id="game-baby">👶</div>
     </div>
-    <div class="game-hint" id="game-hint">pulsa / toca para saltar</div>
-    <button class="egg-close" onclick="closeEgg()" style="margin-top:0;opacity:1">Cerrar</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 .2rem;box-sizing:border-box;gap:.5rem">
+      <div class="game-hint" id="game-hint">pulsa / toca para saltar</div>
+      <div id="invinc-bar-wrap" style="display:none;flex:1;max-width:80px">
+        <div style="height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden">
+          <div id="invinc-bar" style="height:100%;width:100%;background:gold;border-radius:2px;transition:width .1s linear"></div>
+        </div>
+      </div>
+      <div style="font-size:.62rem;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;letter-spacing:.03em;text-align:right">⭐ invencibilidad temporal</div>
+    </div>
+    <button class="egg-close" onclick="closeEgg()" style="margin-top:0;opacity:1;width:100%">Cerrar</button>
   </div>
 
   <canvas id="confetti-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
@@ -561,7 +581,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
     <p class="subtitle" id="solo-summary-sub">Los nombres que te han gustado</p>
     <div class="liked-list" id="solo-summary-list" style="max-height:55vh"></div>
     <button class="btn btn-primary" onclick="shareSoloMatches()" style="margin-top:1.2rem;width:100%;max-width:300px;justify-content:center">Compartir ♥</button>
-    <button class="btn btn-secondary" onclick="startSolo()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más →</button>
+    <button class="btn btn-secondary" onclick="startSolo(true)" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Explorar más →</button>
     <button class="btn btn-secondary" onclick="goHome()" style="margin-top:.6rem;width:100%;max-width:300px;justify-content:center">Volver al inicio</button>
   </div>
 </div>
@@ -605,7 +625,7 @@ body.light .btn-secondary:hover{background:var(--surface2)}
   </div>
 </div>
 
-<div class="version-tag">v16.0</div>
+<div class="version-tag">v20.1</div>
 <div class="toast" id="toast"></div>
 <div class="rush-match-toast" id="rush-match-toast">💞 Match!</div>
 
@@ -658,7 +678,7 @@ function closeEgg() {
   setTimeout(()=>{
     document.getElementById('egg-box-wrap').style.display = '';
     document.getElementById('game-wrap').classList.remove('show');
-    document.getElementById('game-msg').textContent = '¡Salta los obstáculos!';
+    showGameMsg('¡Salta los obstáculos!');
     document.getElementById('game-score').textContent = '0';
     document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
   }, 300);
@@ -726,25 +746,80 @@ function openGift() {
 
 /* ── MINIJUEGO (DOM-based, sin canvas) ── */
 let gameLoop = null, gameOver = false;
-let babyY, babyVY, babyOnGround;
-let obstacles, gameFrame, gameSpd, gameBest = 0, gamePoints;
-let lastTime = 0;
-const ARENA_H = 220, GROUND_Y = 90, BABY_SIZE = 36, OBS_SIZE = 30;
+let babyY, babyVY, babyOnGround, jumpCount;
+let obstacles, gameFrame, gameSpd, gameBest = 0, gamePoints, gameBestStars = 0;
+let lastTime = 0, nightMode = false, countdownActive = false;
+let invincible = false, invincibleTimer = null, invincibleStart = 0;
+let powerUp = null, nearMissShown = false, lastMilestoneScore = 0, starsCollected = 0;
+let achievements = {firstStar:false, nearMiss:false, pts100:false};
+let turboUnlocked = false, turboMode = false, speedLines = [];
+const INVINC_DURATION = 3000;
+const ARENA_H = 360, GROUND_Y = 90, BABY_SIZE = 36, OBS_SIZE = 30;
 
 const OBS_EMOJIS = ['🧸','🍼','🧷','💩'];
+const OBS_TYPES = [
+  {emoji: null, y: GROUND_Y, high: false},    // normal (suelo)
+  {emoji: null, y: GROUND_Y, high: false},    // normal x2 más frecuente
+  {emoji: '🎈', y: GROUND_Y + 55, high: true}, // flotante — hay que pasar por debajo
+];
 
 function initGame() {
   const arena = document.getElementById('game-arena');
-  // limpiar obstáculos anteriores
-  arena.querySelectorAll('.game-obstacle').forEach(e=>e.remove());
+  arena.querySelectorAll('.game-obstacle,.game-particle,.game-cloud,.game-baby-shadow,.game-powerup').forEach(e=>e.remove());
+  arena.style.background = '#FDF8F4';
+  nightMode = false; invincible = false; powerUp = null; lastMilestoneScore = 0;
+  if(invincibleTimer) { clearTimeout(invincibleTimer); invincibleTimer = null; }
+  // crear sombra
+  const shadow = document.createElement('div');
+  shadow.className = 'game-baby-shadow';
+  shadow.id = 'game-baby-shadow';
+  shadow.style.cssText = `width:28px;height:8px;bottom:${GROUND_Y - 4}px;left:34px`;
+  arena.appendChild(shadow);
+  spawnClouds(arena);
+  countdownActive = false;
   resetGame();
+  hideGameMsg();
+  document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
   arena.onclick = jump;
   arena.addEventListener('touchstart', e=>{ e.preventDefault(); jump(); }, {passive:false});
   document.addEventListener('keydown', onGameKey);
-  document.getElementById('game-msg').textContent = '¡Salta los obstáculos!';
-  document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
   lastTime = performance.now();
   gameLoop = requestAnimationFrame(gameStep);
+}
+
+function spawnClouds(arena) {
+  arena.querySelectorAll('.game-cloud').forEach(e=>e.remove());
+  ['☁️','☁️','🌤️'].forEach((em, i) => {
+    const c = document.createElement('div');
+    c.className = 'game-cloud';
+    c.textContent = em;
+    c.style.cssText = `position:absolute;font-size:${18+i*4}px;top:${10+i*18}px;left:${20+i*110}px;opacity:.5;pointer-events:none;transition:none`;
+    arena.appendChild(c);
+  });
+}
+
+function countdownStart() {
+  countdownActive = true;
+  gameOver = false;
+  resetGame();
+  const msg = document.getElementById('game-msg');
+  const hint = document.getElementById('game-hint');
+  hint.textContent = '';
+  let count = 3;
+  msg.textContent = count + '…';
+  const iv = setInterval(() => {
+    count--;
+    if(count > 0) { msg.textContent = count + '…'; }
+    else if(count === 0) { msg.textContent = '🏃 ¡Ya!'; }
+    else {
+      clearInterval(iv);
+      countdownActive = false;
+      msg.textContent = '';
+      hint.textContent = 'pulsa / toca para saltar';
+      lastTime = performance.now();
+      gameLoop = requestAnimationFrame(gameStep);
+    }
+  }, 700);
 }
 
 function onGameKey(e) {
@@ -752,29 +827,60 @@ function onGameKey(e) {
 }
 
 function resetGame() {
-  babyY = 0;
-  babyVY = 0;
-  babyOnGround = true;
-  obstacles = [];
-  gameFrame = 0;
-  gameSpd = 4;
-  gamePoints = 0;
-  gameOver = false;
+  babyY = 0; babyVY = 0; babyOnGround = true; jumpCount = 0;
+  obstacles = []; gameFrame = 0; gameSpd = 4; gamePoints = 0; gameOver = false;
+  invincible = false; nearMissShown = false; lastMilestoneScore = 0; starsCollected = 0;
+  achievements = {firstStar:false, nearMiss:false, pts100:false};
+  speedLines = [];
+  if(invincibleTimer) { clearTimeout(invincibleTimer); invincibleTimer = null; }
+  if(powerUp) { powerUp.el.remove(); powerUp = null; }
   const baby = document.getElementById('game-baby');
-  if(baby){ baby.style.bottom = GROUND_Y + 'px'; baby.style.opacity = '1'; }
+  if(baby){ baby.style.bottom = GROUND_Y + 'px'; baby.style.opacity = '1'; baby.textContent = '👶'; baby.style.filter = ''; }
   const arena = document.getElementById('game-arena');
-  if(arena) arena.querySelectorAll('.game-obstacle').forEach(e=>e.remove());
+  if(arena) arena.querySelectorAll('.game-obstacle,.game-particle,.game-powerup').forEach(e=>e.remove());
   document.getElementById('game-score').textContent = '0';
+  const gs = document.getElementById('game-stars'); if(gs) gs.textContent = '0';
 }
 
 function jump() {
+  if(countdownActive) return;
   if(gameOver) {
+    const arena = document.getElementById('game-arena');
+    arena.querySelectorAll('.game-obstacle,.game-particle,.game-powerup').forEach(e=>e.remove());
+    arena.style.background = '#FDF8F4';
+    nightMode = false;
+    spawnClouds(arena);
     resetGame();
-    document.getElementById('game-msg').textContent = '';
+    hideGameMsg();
     document.getElementById('game-hint').textContent = 'pulsa / toca para saltar';
+    lastTime = performance.now();
+    gameLoop = requestAnimationFrame(gameStep);
     return;
   }
-  if(babyOnGround) { babyVY = 12; babyOnGround = false; }
+  // doble salto
+  if(babyOnGround) {
+    babyVY = 12; babyOnGround = false; jumpCount = 1;
+  } else {
+    babyVY = 10; jumpCount++;
+  }
+}
+
+function spawnParticles(arena, x, y) {
+  ['💥','⭐','✨','💫'].forEach((em, i) => {
+    const p = document.createElement('div');
+    p.className = 'game-particle';
+    p.textContent = em;
+    p.style.cssText = `position:absolute;font-size:18px;left:${x}px;bottom:${y}px;pointer-events:none;transition:all .6s ease-out;opacity:1`;
+    arena.appendChild(p);
+    const angle = (i / 4) * Math.PI * 2;
+    const dist = 30 + Math.random() * 20;
+    requestAnimationFrame(() => {
+      p.style.left = (x + Math.cos(angle) * dist) + 'px';
+      p.style.bottom = (y + Math.sin(angle) * dist + 20) + 'px';
+      p.style.opacity = '0';
+    });
+    setTimeout(() => p.remove(), 700);
+  });
 }
 
 function gameStep(ts) {
@@ -783,35 +889,152 @@ function gameStep(ts) {
 
   const dt = Math.min((ts - lastTime) / 16, 3);
   lastTime = ts;
+  const score = Math.floor(gamePoints / 6);
+  const arena = document.getElementById('game-arena');
+  if(!arena) { gameLoop = requestAnimationFrame(gameStep); return; }
 
-  gameSpd = 4 + gamePoints * 0.005;
+  // barra de invencibilidad
+  if(invincible && invincibleStart > 0) {
+    const elapsed = performance.now() - invincibleStart;
+    const pct = Math.max(0, 100 - (elapsed / INVINC_DURATION) * 100);
+    const bar = document.getElementById('invinc-bar');
+    if(bar) bar.style.width = pct + '%';
+  }
+
+  // líneas de velocidad a partir de 200 pts
+  if(score >= 200 && gameFrame % 12 === 0) {
+    const arenaEl = document.getElementById('game-arena');
+    if(arenaEl) {
+      const line = document.createElement('div');
+      const lineY = GROUND_Y + 10 + Math.random() * (ARENA_H - GROUND_Y - 30);
+      line.style.cssText = `position:absolute;height:1px;width:${20+Math.random()*30}px;background:rgba(232,115,90,${0.1+Math.random()*.2});right:0;bottom:${lineY}px;pointer-events:none;transition:all ${0.2+Math.random()*.15}s linear;opacity:1`;
+      arenaEl.appendChild(line);
+      requestAnimationFrame(() => { line.style.right = '110%'; line.style.opacity = '0'; });
+      setTimeout(() => line.remove(), 400);
+    }
+  }
+
+  // dificultad progresiva
+  gameSpd = 3 * Math.pow(1.03, Math.floor(score / 10));
+
+  // modo noche a 20 puntos
+  if(score >= 300 && !nightMode) {
+    nightMode = true;
+    
+    arena.style.transition = 'background 1.5s';
+    arena.style.background = '#1a1a2e';
+    arena.querySelectorAll('.game-cloud').forEach(c => {
+      c.textContent = '⭐'; c.style.opacity = '.8';
+    });
+  }
+
+  // parallax nubes
+  if(gameFrame % 2 === 0) {
+    
+    arena.querySelectorAll('.game-cloud').forEach((c, i) => {
+      const spd = 0.3 + i * 0.15;
+      let x = parseFloat(c.style.left) - spd * dt;
+      if(x < -60) x = arena.offsetWidth + 20;
+      c.style.left = x + 'px';
+    });
+  }
 
   // baby physics
   babyVY -= 0.7 * dt;
   babyY += babyVY * dt;
-  if(babyY <= 0) { babyY = 0; babyVY = 0; babyOnGround = true; }
+  const MAX_BABY_Y = ARENA_H - GROUND_Y - BABY_SIZE;
+  if(babyY >= MAX_BABY_Y) { babyY = MAX_BABY_Y; babyVY = 0; }
+  if(babyY <= 0) { babyY = 0; babyVY = 0; babyOnGround = true; jumpCount = 0; }
 
   const baby = document.getElementById('game-baby');
   if(baby) baby.style.bottom = (GROUND_Y + babyY) + 'px';
 
-  // spawn obstacles
-  gameFrame++;
-  const gap = Math.max(50, 90 - gamePoints * 0.3);
-  if(gameFrame % Math.floor(gap) === 0) {
-    const arena = document.getElementById('game-arena');
-    const el = document.createElement('div');
-    el.className = 'game-obstacle';
-    el.textContent = OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)];
-    el.style.right = '-40px';
-    el.style.bottom = GROUND_Y + 'px';
-    arena.appendChild(el);
-    obstacles.push({el, x: arena.offsetWidth + 40});
+  // sombra del bebé — se achica al subir
+  const shadow = document.getElementById('game-baby-shadow');
+  if(shadow) {
+    const maxH = ARENA_H - GROUND_Y - BABY_SIZE;
+    const ratio = 1 - (babyY / maxH) * 0.7;
+    const w = Math.round(28 * ratio);
+    shadow.style.width = w + 'px';
+    shadow.style.left = (40 + (28 - w) / 2) + 'px';
+    shadow.style.opacity = (0.18 * ratio).toFixed(2);
   }
 
-  // move & collision
-  const arena = document.getElementById('game-arena');
-  const arenaW = arena.offsetWidth || 360;
-  const BABY_LEFT = 40;
+  // spawn power-up cada ~50 puntos de score
+  const milestoneEvery50 = Math.floor(score / 50);
+  if(milestoneEvery50 > lastMilestoneScore && !powerUp) {
+    lastMilestoneScore = milestoneEvery50;
+    
+    const pu = document.createElement('div');
+    pu.className = 'game-powerup';
+    const puY = GROUND_Y + 60 + Math.random() * 80;
+    pu.textContent = '⭐';
+    pu.style.left = (arena.offsetWidth + 20) + 'px';
+    pu.style.bottom = puY + 'px';
+    arena.appendChild(pu);
+    powerUp = {el: pu, x: arena.offsetWidth + 20, y: puY - GROUND_Y};
+  }
+
+  // mover power-up y detectar colisión con él
+  if(powerUp) {
+    powerUp.x -= gameSpd * dt * 0.85;
+    powerUp.el.style.left = powerUp.x + 'px';
+    const BABY_LEFT = 40;
+    if(powerUp.x < BABY_LEFT + BABY_SIZE && powerUp.x + 26 > BABY_LEFT &&
+       babyY + BABY_SIZE > powerUp.y && babyY < powerUp.y + 26) {
+      // recogido!
+      const puX = powerUp.x, puY = powerUp.y;
+      powerUp.el.remove(); powerUp = null;
+      starsCollected++;
+      const gs = document.getElementById('game-stars'); if(gs) gs.textContent = starsCollected;
+      // explosión dorada
+      ['⭐','✨','💛','🌟','✦'].forEach((em, i) => {
+        const p = document.createElement('div');
+        p.style.cssText = `position:absolute;font-size:16px;left:${puX + 13}px;bottom:${GROUND_Y + puY + 13}px;pointer-events:none;transition:all .5s ease-out;opacity:1;z-index:10`;
+        p.textContent = em;
+        arena.appendChild(p);
+        const angle = (i / 5) * Math.PI * 2;
+        requestAnimationFrame(() => {
+          p.style.left = (puX + 13 + Math.cos(angle) * 35) + 'px';
+          p.style.bottom = (GROUND_Y + puY + 13 + Math.sin(angle) * 35) + 'px';
+          p.style.opacity = '0'; p.style.fontSize = '22px';
+        });
+        setTimeout(() => p.remove(), 600);
+      });
+      invincible = true; invincibleStart = performance.now();
+      const invBar = document.getElementById('invinc-bar-wrap');
+      if(invBar) invBar.style.display = '';
+      if(baby) baby.style.filter = 'drop-shadow(0 0 6px gold) brightness(1.3)';
+      showMilestoneMsg('¡Invencible! ⭐', '#f5c518');
+      if(!achievements.firstStar) { achievements.firstStar = true; showAchievement('🏆 Primera estrella ⭐'); }
+      if(invincibleTimer) clearTimeout(invincibleTimer);
+      invincibleTimer = setTimeout(() => {
+        invincible = false; invincibleStart = 0;
+        if(baby) baby.style.filter = '';
+        if(invBar) invBar.style.display = 'none';
+        invincibleTimer = null;
+      }, INVINC_DURATION);
+    } else if(powerUp.x < -40) {
+      powerUp.el.remove(); powerUp = null;
+    }
+  }
+
+  // spawn obstacles — primer obstáculo rápido
+  gameFrame++;
+  const gap = Math.max(100, 180 - score * 0.4);
+  if(gameFrame === 60 || (gameFrame > 60 && gameFrame % Math.floor(gap) === 0)) {
+    
+    const type = OBS_TYPES[Math.floor(Math.random() * OBS_TYPES.length)];
+    const el = document.createElement('div');
+    el.className = 'game-obstacle';
+    el.textContent = type.emoji || OBS_EMOJIS[Math.floor(Math.random() * OBS_EMOJIS.length)];
+    el.style.right = '-40px';
+    el.style.bottom = type.y + 'px';
+    arena.appendChild(el);
+    obstacles.push({el, x: arena.offsetWidth + 40, high: type.high, y: type.y});
+  }
+
+  // move obstacles
 
   obstacles.forEach(o => {
     o.x -= gameSpd * dt;
@@ -824,32 +1047,171 @@ function gameStep(ts) {
   });
 
   // collision check
+  
+  const BABY_LEFT = 40;
   for(const o of obstacles) {
     const bLeft = BABY_LEFT, bRight = BABY_LEFT + BABY_SIZE - 8;
     const bBottom = babyY, bTop = babyY + BABY_SIZE;
+    const obsBottomPx = o.y - GROUND_Y;
     const oLeft = o.x + 4, oRight = o.x + OBS_SIZE - 4;
-    const oBottom = 0, oTop = OBS_SIZE;
-    if(bRight > oLeft && bLeft < oRight && bTop > oBottom && bBottom < oTop) {
+    const oBottom = obsBottomPx, oTop = obsBottomPx + OBS_SIZE;
+    const hit = bRight > oLeft && bLeft < oRight && bTop > oBottom && bBottom < oTop;
+    if(hit) {
+      if(invincible) continue; // inmune
       gameOver = true;
-      if(baby) baby.style.opacity = '0.4';
+      if(baby) baby.style.opacity = '0.3';
+      spawnParticles(arena, BABY_LEFT, GROUND_Y + babyY);
       const sc = Math.floor(gamePoints / 6);
-      if(sc > gameBest) { gameBest = sc; document.getElementById('game-best').textContent = gameBest; }
-      document.getElementById('game-msg').textContent = sc > 10 ? '¡Imparable Martinsillo! 🏆' : '¡Auch! Inténtalo de nuevo 😅';
+      const isNewRecord = sc > gameBest;
+      if(isNewRecord) { gameBest = sc; document.getElementById('game-best').textContent = gameBest; }
+      if(starsCollected > gameBestStars) { gameBestStars = starsCollected; const gbs = document.getElementById('game-best-stars'); if(gbs) gbs.textContent = gameBestStars; }
+      showGameMsg(isNewRecord ? '🏆 ¡Nuevo récord!' : (sc > 10 ? '¡Imparable Martinsillo! 🏆' : '¡Auch! Inténtalo de nuevo 😅'));
       document.getElementById('game-hint').textContent = 'toca para reiniciar';
       break;
+    }
+    // near miss: obstáculo pasó al bebé por menos de 5px sin colisionar
+    if(!nearMissShown && o.x + OBS_SIZE < BABY_LEFT && o.x + OBS_SIZE > BABY_LEFT - 5 &&
+       bTop > obsBottomPx - 5 && bBottom < oTop + 5) {
+      nearMissShown = true;
+      gamePoints += 12;
+      if(!achievements.nearMiss) { achievements.nearMiss = true; showAchievement('😅 ¡Near miss!'); }
+      else showMilestoneMsg('¡Near miss! 😅', 'var(--salmon)');
+      setTimeout(() => { nearMissShown = false; }, 1500);
     }
   }
 
   gamePoints++;
-  if(gamePoints % 6 === 0) document.getElementById('game-score').textContent = Math.floor(gamePoints/6);
+  if(gamePoints % 6 === 0) {
+    const sc = Math.floor(gamePoints/6);
+    document.getElementById('game-score').textContent = sc;
+    if(sc === 100) { triggerMilestone100(); if(!achievements.pts100){ achievements.pts100=true; setTimeout(()=>showAchievement('🔥 ¡100 puntos!'),1200); } }
+    else if(sc === 200) triggerMilestone200();
+    else if(sc === 300) triggerMilestone300();
+    else if(sc === 500) { triggerPulse500(); turboUnlocked = true; showAchievement('🚀 ¡Modo Turbo desbloqueado!'); }
+    else if(sc >= 500 && sc % 30 === 0) triggerPulse500();
+  }
 
   gameLoop = requestAnimationFrame(gameStep);
 }
 
+function showGameMsg(text, color='#fff') {
+  const msg = document.getElementById('game-msg');
+  if(!msg) return;
+  msg.textContent = text;
+  msg.style.color = color;
+  msg.style.display = '';
+}
+function hideGameMsg() {
+  const msg = document.getElementById('game-msg');
+  if(msg) { msg.style.display = 'none'; msg.textContent = ''; }
+}
+
+function showAchievement(text) {
+  const el = document.getElementById('game-achievement');
+  if(!el) return;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.textContent = text;
+  el.style.display = '';
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => {
+    el.style.animation = 'msgSlideOutRight .6s ease-in forwards';
+    setTimeout(() => { el.style.display = 'none'; el.style.animation = 'none'; }, 650);
+  }, 2200);
+}
+
+function showMilestoneMsg(text, color='#fff') {
+  const msg = document.getElementById('game-msg');
+  if(!msg) return;
+  msg.style.animation = 'none';
+  void msg.offsetWidth;
+  msg.textContent = text;
+  msg.style.color = color;
+  msg.style.display = '';
+  msg.style.opacity = '1';
+  msg.style.transform = 'translateX(0)';
+  clearTimeout(msg._timer);
+  msg._timer = setTimeout(() => {
+    msg.style.animation = 'msgSlideOut .6s ease-in forwards';
+    setTimeout(() => { msg.style.display = 'none'; msg.style.animation = 'none'; msg.textContent = ''; }, 650);
+  }, 1600);
+}
+
+function milestoneConfetti(arena, emojis, count=20) {
+  for(let i=0; i<count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'game-particle';
+      p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      p.style.cssText = `position:absolute;font-size:20px;left:${Math.random()*100}%;top:-20px;pointer-events:none;transition:all ${0.8+Math.random()*0.8}s ease-in;opacity:1`;
+      arena.appendChild(p);
+      requestAnimationFrame(() => {
+        p.style.top = (60 + Math.random() * 60) + '%';
+        p.style.opacity = '0';
+      });
+      setTimeout(() => p.remove(), 1800);
+    }, i * 80);
+  }
+}
+
+function triggerMilestone100() {
+  const arena = document.getElementById('game-arena');
+  const baby = document.getElementById('game-baby');
+  // destello dorado en el bebé
+  if(baby) {
+    baby.style.filter = 'drop-shadow(0 0 8px gold)';
+    setTimeout(() => { baby.style.filter = ''; }, 1200);
+  }
+  milestoneConfetti(arena, ['🎉','⭐','✨','🎊'], 18);
+  showMilestoneMsg('¡100! 🔥', '#f5a623');
+}
+
+function triggerMilestone200() {
+  const arena = document.getElementById('game-arena');
+  // pulso de fondo salmón
+  arena.style.transition = 'background .2s';
+  arena.style.background = 'rgba(232,115,90,.15)';
+  setTimeout(() => {
+    arena.style.background = nightMode ? '#1a1a2e' : '#FDF8F4';
+  }, 500);
+  milestoneConfetti(arena, ['⚡','🚀','💫','🔥'], 22);
+  showMilestoneMsg('¡200! ⚡', '#E8735A');
+}
+
+function triggerPulse500() {
+  const arena = document.getElementById('game-arena');
+  if(!arena) return;
+  // 3 pulsos rápidos
+  let i = 0;
+  const pulse = () => {
+    arena.style.transition = 'background .15s';
+    arena.style.background = 'rgba(232,115,90,.2)';
+    setTimeout(() => {
+      arena.style.background = nightMode ? '#1a1a2e' : '#FDF8F4';
+      i++;
+      if(i < 3) setTimeout(pulse, 200);
+    }, 150);
+  };
+  pulse();
+}
+
+function triggerMilestone300() {
+  const arena = document.getElementById('game-arena');
+  const baby = document.getElementById('game-baby');
+  if(baby) baby.textContent = '👑';
+  milestoneConfetti(arena, ['👑','⭐','🏆','✨','🎊'], 35);
+  showMilestoneMsg('¡LEYENDA! 👑', '#f5c518');
+  // mensaje permanece más tiempo
+  setTimeout(() => {
+    const msg = document.getElementById('game-msg');
+    if(msg && msg.textContent === '¡LEYENDA! 👑') msg.textContent = '';
+  }, 4000);
+}
+
 function stopGame() {
   if(gameLoop) cancelAnimationFrame(gameLoop);
-  gameLoop = null;
-  gameOver = false;
+  gameLoop = null; gameOver = false; countdownActive = false;
   document.removeEventListener('keydown', onGameKey);
 }
 
@@ -1023,12 +1385,16 @@ function checkMineWin() {
 }
 
 /* ── TARJETA DE MATCHES ── */
-function startSolo() {
+function startSolo(keepFilters=false) {
   state.isSolo = true;
   state.isHost = true;
   state.roomCode = null;
+  const savedFilters = keepFilters ? {...state.filters} : null;
   resetGameState();
-  // adaptar UI para solo
+  if(savedFilters) {
+    state.filters = savedFilters;
+    applyFiltersToPills(savedFilters);
+  }
   document.getElementById('setup-subtitle').textContent = 'Elige qué nombres quieres ver';
   document.getElementById('partner-label').textContent = 'Modo un jugador';
   showScreen('setup');
@@ -1841,6 +2207,18 @@ function resetGameState() {
   state.streakType = null;
   state._midGameLikes = null;
   state._midGameMatches = null;
+}
+
+function applyFiltersToPills(f) {
+  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
+  const gp = document.querySelector(`#gender-pills .pill[data-v="${f.gender}"]`); if(gp) gp.classList.add('selected');
+  const op = document.querySelector(`#origin-pills .pill[data-v="${f.origin}"]`); if(op) op.classList.add('selected');
+  document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
+  const cp = document.querySelector(`#count-pills .pill[data-v="${f.count}"]`); if(cp) cp.classList.add('selected');
+  document.querySelectorAll('#super-pills .pill').forEach(p => p.classList.remove('selected'));
+  if(f.calorro) { const p=document.querySelector('#super-pills .pill[data-v="calorro"]'); if(p) p.classList.add('selected'); }
+  if(f.sudamerica) { const p=document.querySelector('#super-pills .pill[data-v="sudamerica"]'); if(p) p.classList.add('selected'); }
+  if(f.reyes) { const p=document.querySelector('#super-pills .pill[data-v="reyes"]'); if(p) p.classList.add('selected'); }
 }
 
 function createLikedItem(name, {rank=null, badge='', sub='', dim=false}={}) {
@@ -2694,17 +3072,13 @@ function launchSummaryConfetti() {
 }
 
 function restartFromSetup() {
+  const savedFilters = {...state.filters};
   resetGameState();
-  state.filters = {gender:'all', origin:'all', count:20, calorro: false, sudamerica: false, reyes: false};
+  state.filters = savedFilters;
   const _lc=document.getElementById('liked-count'); if(_lc) _lc.textContent='0';
   document.getElementById('progress-bar').style.width = '0%';
   document.getElementById('match-count').innerHTML = `💞 ${state.matches.length} match${state.matches.length>1?'es':''}`;
-  document.querySelectorAll('#gender-pills .pill, #origin-pills .pill').forEach(p => p.classList.remove('selected'));
-  document.querySelector('#gender-pills .pill[data-v="all"]').classList.add('selected');
-  document.querySelector('#origin-pills .pill[data-v="all"]').classList.add('selected');
-  document.querySelectorAll('#count-pills .pill').forEach(p => p.classList.remove('selected'));
-  document.querySelector('#count-pills .pill[data-v="20"]').classList.add('selected');
-  document.querySelectorAll('#super-pills .pill').forEach(p => p.classList.remove('selected'));
+  applyFiltersToPills(savedFilters);
   if(state.isHost) {
     showScreen('setup');
   } else {
