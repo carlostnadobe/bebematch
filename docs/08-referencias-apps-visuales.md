@@ -54,7 +54,7 @@
   - ✅ Audio (opcional, pero está)
 - **Por qué:** Celebraciones crean emoción; no es neutral
 
-> 📸 **Captura de referencia:** `docs/assets/image-20260905-124028.png`
+> ![](assets/image-20260905-125138.png)
 
 ---
 
@@ -94,7 +94,7 @@
   - ✅ Iconografía clara (no emojis, iconos simples)
 - **Por qué:** Claridad sin sobrerecargar
 
-> 📸 **Captura de referencia:** `docs/assets/image-20260905-124135.png`
+> ![](assets/image-20260905-125215.png)
 
 ---
 
@@ -135,7 +135,7 @@
   - ✅ Información mínima (solo nombre, sin extras)
 - **Por qué:** Menos es más
 
-> 📸 **Captura de referencia:** `docs/assets/image-20260905-124456.png`
+> ![](assets/image-20260905-130406.png)
 
 ---
 
@@ -176,6 +176,8 @@
   - ✅ Copy personalizado según estado
   - ✅ Tonalidad amigable y conversacional
 - **Por qué:** Personalidad hace que la app sea menos "corporativa"
+
+> ![](assets/image-20260905-125648.png)
 
 ---
 
@@ -265,6 +267,8 @@
   - ✅ Mensajes de error con humor
   - ✅ Notificaciones que celebran acciones
 - **Por qué:** Tonalidad amigable y lúdica no parece "corporativa"
+
+> ![](assets/image-20260905-130220.png)
 
 ---
 
