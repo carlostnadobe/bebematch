@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>BebéMatch</Text>
-      <Text style={styles.subtitle}>Tinder de nombres de bebé</Text>
+      <Text style={styles.subtitle}>Explorador de nombres para parejas</Text>
 
       <View style={styles.content}>
         <Link href="/waiting" style={[styles.button, styles.buttonPrimary]}>

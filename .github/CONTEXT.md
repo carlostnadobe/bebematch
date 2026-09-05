@@ -312,4 +312,23 @@ Una funcionalidad se considera **hecho** cuando:
 
 ---
 
+## 🚫 Store Compliance — No mencionar apps competidoras
+
+**CRÍTICO:** El build final (producción) NO debe contener referencias a otras apps:
+- ❌ NO: "Tinder de nombres", "como Tinder", "estilo Bumble"
+- ❌ NO: Nombres de apps competidoras (Tinder, Bumble, Hinge, etc.)
+- ✅ SÍ: "Explorador de nombres", "Descubre nombres para tu bebé", "App de nombres"
+
+**Por qué:** iOS App Store y Google Play Store rechazarán la app si mencionas competencia explícitamente.
+
+**Cómo prevenir:**
+- En código (app/, src/): usa descripciones genéricas
+- En docs/ y .github/: es OK mencionar "inspirado en", usamos eso para contexto
+- En package.json, app.json, strings de UI: **limpio de referencias**
+- Pre-submit: ejecutar `grep -r "Tinder\|Bumble\|Hinge" app/ src/` para verificar
+
+**Documentación es segura:** Los archivos en docs/ y .github/ no van en el build, así que OK documentar la "inspiración" ahí.
+
+---
+
 **Usa este archivo como referencia antes de cada consulta de desarrollo. Mantén este contexto en mente siempre.**

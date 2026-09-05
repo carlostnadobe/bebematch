@@ -1,7 +1,7 @@
 {
   "name": "bebematch",
   "version": "0.1.0",
-  "description": "Tinder de nombres de bebé — App nativa iOS + Android",
+  "description": "App para descubrir y compartir nombres de bebé — iOS + Android",
   "main": "expo-router/build/index.js",
   "scripts": {
     "start": "expo start",
