@@ -2,6 +2,8 @@
 
 > Este documento te guía sobre **QUÉ capturar** de cada app de referencia y **POR QUÉ**.
 > Abre cada app en tu móvil/web y captura los elementos específicos mencionados.
+> 
+> **6 apps recomendadas:** Tinder, Bumble, Spotify, Duolingo, Figma, Snapchat
 
 ---
 
@@ -211,43 +213,52 @@
 
 ---
 
-## 6️⃣ HOTSPOT — Lúdico, colores vibrantes, animaciones constantes
+## 6️⃣ SNAPCHAT — Lúdico, colores vibrantes, micro-animaciones constantes
 
 ### URL / Dónde acceder
-- **Web:** Limitado o no disponible
-- **Mejor:** App iOS/Android (HotSpot - Music Social App)
+- **Web:** https://www.snapchat.com (versión limitada)
+- **Mejor:** App iOS/Android (Snapchat)
 
 ### QUÉ capturar
 
-#### Elemento 1: Paleta de colores (Home / Feed)
-- **Qué:** Pantalla principal de la app
+#### Elemento 1: Paleta de colores (Home / Discover)
+- **Qué:** Pantalla principal y sección de Discover
 - **Detalles a notar:**
-  - ✅ Múltiples colores vibrantes (púrpura, rosa, naranja, azul)
-  - ✅ Gradientes frecuentes
-  - ✅ Colores se usan por "estado" o "emoción"
-  - ✅ Fondo oscuro, colores pop enfrente
-  - ✅ No es monótono
-- **Por qué:** Variedad cromática transmite energía
+  - ✅ Múltiples colores vibrantes (amarillo, azul, rojo, púrpura)
+  - ✅ Gradientes en cards y botones
+  - ✅ Colores asociados a emociones/acciones
+  - ✅ Fondo oscuro o claro según pantalla, colores pop enfrente
+  - ✅ Uso audaz de color sin parecer caótico
+- **Por qué:** Variedad cromática transmite energía sin perder coherencia
 
 #### Elemento 2: Cards y elementos interactivos
-- **Qué:** Cards de canciones, usuarios, o posts
+- **Qué:** Cards de snaps, filtros, o stories
 - **Detalles a notar:**
-  - ✅ Border-radius generoso (∼20-28px)
-  - ✅ Sombra visible (profundidad)
-  - ✅ Gradiente o color background en la card misma
-  - ✅ Iconos/botones dentro de la card (play, like, share)
-  - ✅ Hover/press: escala + sombra más intensa
-- **Por qué:** Cards que se "elevan" invitan a interactuar
+  - ✅ Border-radius generoso (∼16-24px)
+  - ✅ Sombra visible (profundidad, especialmente en hover)
+  - ✅ Gradiente o color background dentro de la card
+  - ✅ Botones de acción flotantes (send, delete, share)
+  - ✅ Hover/press: scale + shadow increase
+- **Por qué:** Cards elevadas invitan a tocar e interactuar
 
-#### Elemento 3: Micro-animaciones playful
-- **Qué:** Animaciones de like, play, o transiciones
+#### Elemento 3: Micro-animaciones y feedback
+- **Qué:** Transiciones, animaciones de botones, efectos
 - **Detalles a notar:**
-  - ✅ Like: corazón crece + glow + confeti pequeño
-  - ✅ Play: icono play anima (rotate + scale)
-  - ✅ Transiciones entre pantallas: fade + slide (no instantáneo)
-  - ✅ Nada se siente "stiff" o robótico
-  - ✅ Audio feedback (sonidos cortos, no invasivos)
-- **Por qué:** Animaciones hacen la app sentirse "viva"
+  - ✅ Botón "Send": animación con check-mark o corazón
+  - ✅ Reacciones emoji: escala + glow animation
+  - ✅ Transiciones entre pantallas: smooth, sin lag (∼200ms)
+  - ✅ Elementos flotan/bouncean suavemente
+  - ✅ Sonidos cortos y no invasivos (haptics en mobile)
+- **Por qué:** Animaciones constantes mantienen el engagement sin ser molestas
+
+#### Elemento 4: Copy y tonalidad
+- **Qué:** Textos, notificaciones, hints
+- **Detalles a notar:**
+  - ✅ Copy juguetón y conversacional
+  - ✅ Emojis usados de forma estratégica (pero no en botones)
+  - ✅ Mensajes de error con humor
+  - ✅ Notificaciones que celebran acciones
+- **Por qué:** Tonalidad amigable y lúdica no parece "corporativa"
 
 ---
 
@@ -260,7 +271,7 @@
 | **Spotify** | Minimalismo, transiciones rápidas, contraste alto | Reducir borde, acelerar transiciones, líneas limpias |
 | **Duolingo** | Celebraciones, copy conversacional, micro-animaciones | Confeti en match, copy amigable, botones con bounce |
 | **Figma** | Jerarquía visual, estados claros, espaciado | Más tamaños de fuente diferenciados, hover states claros |
-| **HotSpot** | Colores vibrantes, cards elevadas, playful | Gradientes salmón→púrpura, sombras, animaciones lúdicas |
+| **Snapchat** | Colores vibrantes, cards elevadas, playful, copy lúdico | Gradientes salmón→púrpura, sombras, animaciones lúdicas, copy conversacional |
 
 ---
 
@@ -292,7 +303,7 @@
 - [ ] **Spotify:** Now Playing + grid de álbumes + hover effect
 - [ ] **Duolingo:** Lesson Complete screen + celebración + micro-animación
 - [ ] **Figma:** Navegación + estados de botones + cards
-- [ ] **HotSpot:** Home (colores) + card con gradient + like animation
+- [ ] **Snapchat:** Home + Discover (colores) + card con gradient + transición suave + reacciones emoji
 
 ---
 

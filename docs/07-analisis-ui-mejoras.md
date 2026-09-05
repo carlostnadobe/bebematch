@@ -430,13 +430,17 @@
 - ✅ **Por qué:** cards dinámicas, feedback claro, animaciones rápidas.
 - 🎨 **Estilo:** colores vibrantes (rojo + blanco), cards grandes con sombra, transiciones ágiles.
 - 💡 **Lecciones:** profundidad visual, micro-animaciones, feedback inmediato.
-- **Diferencia clave:** BebéMatch es más "amable" que Tinder; menos "sexual", más "collaborative".
+- **Diferencia clave:** BebéMatch es más "amable" que Tinder; menos "sexual", más "collaborative".\
+  \
+  ![](assets/image-20260905-124028.png)
 
 ### 2. **Bumble**
 - ✅ **Por qué:** UI moderna, femenina, con personalidad.
 - 🎨 **Estilo:** amarillo + negro, cards grandes, bordes suaves pero no extremos, tipografía bold.
 - 💡 **Lecciones:** uso de color para diferenciarse; iconografía clara; transiciones rápidas.
-- **Diferencia clave:** Bumble es más "diseño" que BebéMatch, pero BebéMatch puede ser igual de polido.
+- **Diferencia clave:** Bumble es más "diseño" que BebéMatch, pero BebéMatch puede ser igual de polido.\
+  \
+  ![](assets/image-20260905-124135.png)
 
 ### 3. **HotSpot** (app de música social)
 - ✅ **Por qué:** interfaz lúdica, animaciones juguetones, colores vibrantes.
