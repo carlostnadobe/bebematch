@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "BebéMatch",
+    "slug": "bebematch",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/app-icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
+    "ios": {
+      "supportsTabletMode": false,
+      "bundleIdentifier": "com.carlostnadobe.bebematch"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/app-icon.png",
+        "backgroundColor": "#0A0A0A"
+      },
+      "package": "com.carlostnadobe.bebematch"
+    },
+    "web": {
+      "favicon": "./assets/app-icon.png"
+    },
+    "plugins": [
+      "react-native-reanimated/plugin",
+      "react-native-gesture-handler/plugin"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "placeholder-project-id"
+      }
+    }
+  }
+}
