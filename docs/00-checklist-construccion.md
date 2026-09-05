@@ -87,8 +87,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 
 ## 8. Rendimiento
 
-- [ ] Arranque rápido; splash no eterno.
-- [ ] Listas/baraja fluidas (60 fps en swipe) en gama media.
+- [x] Arranque rápido; splash no eterno.
+- [x] Listas/baraja fluidas (60 fps en swipe) en gama media.
 - [ ] Imágenes y assets optimizados; tamaño del bundle controlado.
 - [ ] Sin fugas de memoria en sesiones largas (realtime, timers, listeners liberados).
 
@@ -117,8 +117,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 
 - [ ] Tests unitarios de la lógica crítica (match, sala, validación de dataset).
 - [ ] Tests de integración de la capa de datos (Supabase).
-- [ ] Pruebas end-to-end de los flujos principales (crear/unir/swipe/match/resumen).
-- [ ] Prueba real con **dos dispositivos** en la misma sala.
+- [x] Pruebas end-to-end de los flujos principales (crear/unir/swipe/match/resumen).
+- [x] Prueba real con **dos dispositivos** en la misma sala.
 - [ ] Matriz de dispositivos: iOS y Android, pantallas pequeñas y grandes, versiones de SO.
 - [ ] Pruebas manuales de casos límite (sección 1).
 - [ ] QA de regresión antes de cada publicación.
@@ -127,7 +127,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 
 - [x] `app.json` / `app.config.ts`: nombre, bundle id (iOS) y package (Android), versión.
 - [ ] **Permisos** solo los necesarios (¿cámara para escanear QR? justificarlo con texto de uso).
-- [ ] Orientación, safe areas, barra de estado.
+- [x] Orientación, safe areas, barra de estado.
 - [ ] Deep links / esquema de la app si se necesita para unirse por enlace.
 - [ ] Versionado y build number con estrategia clara.
 
