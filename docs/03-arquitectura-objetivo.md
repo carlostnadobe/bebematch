@@ -83,6 +83,7 @@ interface Vote {
 - **`fetch` REST a Supabase** → `supabase-js` (`.from('votes')...`).
 - **WebSocket manual** → `supabase.channel(...)` con suscripción a `postgres_changes`.
 - **`qrcodejs`** → componente QR nativo.
+- **Emojis (❤️, ✕, etc.)** → **iconos vectoriales** de Feather Icons o Heroicons (SVG, gratis).
 - **Tema claro/oscuro** → tokens en `src/theme` + `useColorScheme`.
 
 ## Requisitos para publicar (pendiente detallar en el plan)

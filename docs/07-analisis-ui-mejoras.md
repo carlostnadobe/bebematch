@@ -101,11 +101,11 @@
    - Padding: aumentar de 0.3rem a 0.5rem.
    - Hover: fondo sutil, sin border cambio.
    - Selected: gradiente púrpura→salmón, font-weight 600.
-3. **Secciones con icono + título:**
-   - 👧 Género
-   - 🌍 Origen
-   - ⏱ Duración
-   - ✨ Extras
+3. **Secciones con icono + título (iconos vectoriales Feather):**
+   - 👤 (User icon) Género
+   - 🌍 (Globe icon) Origen
+   - ⏱ (Clock icon) Duración
+   - ✨ (Sparkles icon) Extras
 4. **Consejo reposicionado:** como "hint" debajo del título, en gris claro (no naranja).
 5. **Botón "¡Empezar!":** gradiente verde→salmón, size 1.1rem, padding 1.2rem.
 6. **Transición:** fade out + slide up (150ms) a la pantalla de swipe.
@@ -191,6 +191,53 @@
 
 ---
 
+## ⚠️ Directriz clave: SIN EMOJIS - Iconos vectoriales únicamente
+
+**Desde la migración a Expo, la app NO usará emojis.** Se reemplazarán por **iconos vectoriales de una librería gratuita y profesional.**
+
+### Librerías de iconos recomendadas (todas gratis, SVG, open-source)
+
+1. **Feather Icons** (recomendada)
+   - URL: https://feathericons.com/
+   - Características: minimalista, 24x24px, stroke 2px, excelente para mobile
+   - Licencia: MIT
+   - Instalación Expo: `npm install feather-react-native`
+
+2. **Heroicons** (también excelente)
+   - URL: https://heroicons.com/
+   - Características: limpio, varias tamaños, stroke/solid, diseñado por Tailwind
+   - Licencia: MIT
+   - Instalación Expo: `npm install heroicons` (versión React Native compatible)
+
+3. **Remix Icon** (alternativa)
+   - URL: https://remixicon.com/
+   - Características: 2500+ iconos, stroke/fill, versatile
+   - Licencia: Apache 2.0
+
+### Mapeo: Emojis actuales → Iconos a usar
+
+| Uso actual | Emoji | Ícono (Feather) | Tamaño |
+|---|---|---|---|
+| Crear sala | ✨ | Star | 24px |
+| Modo un jugador | 🧍 | User | 24px |
+| Corazón (me gusta) | ❤️ | Heart | 62px (botón) |
+| Rechazo | ✕ | X / Close | 48px (botón) |
+| Avanzar | → | ChevronRight | 24px |
+| Volver | ← | ChevronLeft | 24px |
+| Configuración | ⚙️ | Settings / Sliders | 20px |
+| Compartir | 📤 | Share2 | 20px |
+| QR | 📱 | Smartphone / Zap | 24px |
+| Tema (luna) | 🌙 | Moon | 20px |
+| Tema (sol) | ☀️ | Sun | 20px |
+| Favoritos | ⭐ | Star | 16px-24px |
+| Casa (pareja) | 🏠 | Home | 16px |
+| Éxito | ✓ | Check | 16px |
+| Error | ✗ | AlertCircle | 16px |
+
+**Importante:** todos los iconos **heredan el color del CSS** (var(--salmon), var(--secondary), etc.) y **se escalan responsivamente**.
+
+---
+
 ## 💡 Propuestas de mejora por área
 
 ### 1. Variedad de `border-radius` y shapes
@@ -270,20 +317,33 @@
 
 ### 5. Iconografía y micro-interacciones
 
-**Actual:** emojis (❤️, ✕, 💞...) — funcional pero genérico.
+**Actual:** emojis (❤️, ✕, 💞...) — funcional pero genérico y no profesional.
 
-**Propuesta:**
+**Propuesta: ICONOS VECTORIALES de librería gratuita (NO emojis)**
 
-- **Reemplazar emojis por iconos vectoriales** (SVG) con estilo coherente.
-  - Corazón: estilo minimalista (outline o filled con animación).
-  - Ícono de rechazo (X): más suave, no agresivo.
-  - Star: para favoritos.
+- **Librería recomendada:** Feather Icons / Heroicons (ambas gratis, SVG, minimalistas).
+  - Corazón (Heart): estilo outline o filled con animación.
+  - Rechazo (X / Close): línea suave y moderna.
+  - Avanzar (ArrowRight / ChevronRight): para "siguiente".
+  - Configuración (Settings / Sliders): para filtros.
+  - Casa (Home): para modo en pareja.
+  - Usuario (User / Person): para modo solitario.
+  - Compartir (Share): para compartir favoritos.
+  - Star: para favoritos/ranking.
+  - QR / Scanner: para escanear sala.
+- **Características:**
+  - Tamaño: scalable (24px-64px según contexto).
+  - Color: heredan del CSS (var(--salmon), var(--secondary), etc.).
+  - Stroke: 2-2.5px para consistencia.
+  - Sin fill decorativo: líneas limpias, minimalistas.
+
 - **Micro-animaciones:**
-  - Al hacer hover en un botón: `scale(1.08) + rotate(2deg)` (leve rotación juguetona).
-  - Al hacer click: `scale(0.95)` (presionado) → `scale(1.1)` (rebote).
-  - Corazones que flotan al hacer match (ya existe, mantener mejorado).
+  - Al hacer hover: `scale(1.12) + rotate(2deg)` (leve rotación, no exagerada).
+  - Al hacer click: `scale(0.9)` (presionado) → `scale(1.15)` (rebote elástico).
+  - Animación en match: corazón crece y brilla (glow + scale).
+  - Transición suave: `200ms cubic-bezier(0.34, 1.56, 0.64, 1)` (bouncy).
 
-**Efecto:** más personalidad, más divertido, menos "corporate".
+**Efecto:** profesional, limpio, coherente, sin parecer "AI" o "corporativo".
 
 ---
 
@@ -311,18 +371,22 @@
 
 **Propuesta:**
 
-- Usar emojis estratégicos en textos (no en UI buttons).
-- Copy más divertido y conversacional:
+- Copy más divertido y conversacional (sin emojis — los iconos los comunican):
   - Actual: "Pareja conectada ✓"
-  - Propuesto: "¡Tu pareja llegó! 🎉"
+  - Propuesto: "¡Tu pareja llegó!"
 - Errores con tono ligero:
   - Actual: "Sala no encontrada"
   - Propuesto: "Hmm, ese código no existe. ¿Lo escribiste bien?"
 - Mensajes de success:
   - Actual: "Match!"
-  - Propuesto: "¡Match! 💕 Ambos amamos este nombre"
+  - Propuesto: "¡Match! Ambos amamos este nombre"
+- Instrucciones claras:
+  - Actual: "Desliza"
+  - Propuesto: "Desliza ← o →" (con iconos de flechas)
 
-**Efecto:** app con personalidad, amigable, no genérica.
+**Iconografía en copy:** los emojis se reemplazan con iconos vectoriales (Feather/Heroicons).
+
+**Efecto:** app con personalidad, amigable, profesional, no genérica.
 
 ---
 
