@@ -1,0 +1,30 @@
+{
+  "name": "bebematch",
+  "version": "0.1.0",
+  "description": "App nativa para iOS y Android. Tinder de nombres de bebé — modo en pareja con match en tiempo real y modo en solitario.",
+  "main": "expo-router/build/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "build:ios": "eas build --platform ios",
+    "build:android": "eas build --platform android",
+    "submit:ios": "eas submit --platform ios",
+    "submit:android": "eas submit --platform android"
+  },
+  "keywords": [
+    "baby",
+    "names",
+    "tinder",
+    "pairing",
+    "match",
+    "couples"
+  ],
+  "author": "BebéMatch Team",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
