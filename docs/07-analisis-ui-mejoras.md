@@ -430,29 +430,29 @@
 - ✅ **Por qué:** cards dinámicas, feedback claro, animaciones rápidas.
 - 🎨 **Estilo:** colores vibrantes (rojo + blanco), cards grandes con sombra, transiciones ágiles.
 - 💡 **Lecciones:** profundidad visual, micro-animaciones, feedback inmediato.
-- **Diferencia clave:** BebéMatch es más "amable" que Tinder; menos "sexual", más "collaborative".\
-  \
-  ![](assets/image-20260905-124028.png)
+- **Diferencia clave:** BebéMatch es más "amable" que Tinder; menos "sexual", más "collaborative".
+- 📸 **Ver capturas:** [Guía visual de referencias - Tinder](./08-referencias-apps-visuales.md#1️⃣-tinder)
 
 ### 2. **Bumble**
 - ✅ **Por qué:** UI moderna, femenina, con personalidad.
 - 🎨 **Estilo:** amarillo + negro, cards grandes, bordes suaves pero no extremos, tipografía bold.
 - 💡 **Lecciones:** uso de color para diferenciarse; iconografía clara; transiciones rápidas.
-- **Diferencia clave:** Bumble es más "diseño" que BebéMatch, pero BebéMatch puede ser igual de polido.\
-  \
-  ![](assets/image-20260905-124135.png)
+- **Diferencia clave:** Bumble es más "diseño" que BebéMatch, pero BebéMatch puede ser igual de polido.
+- 📸 **Ver capturas:** [Guía visual de referencias - Bumble](./08-referencias-apps-visuales.md#2️⃣-bumble)
 
-### 3. **HotSpot** (app de música social)
-- ✅ **Por qué:** interfaz lúdica, animaciones juguetones, colores vibrantes.
-- 🎨 **Estilo:** púrpura, rosa, naranja; cards redondeadas pero no extremas; botones grandes.
-- 💡 **Lecciones:** micro-animaciones que dan vida; iconografía vectorial personalizada; feedback visual claro.
-- **Diferencia clave:** HotSpot es "social"; BebéMatch es "pareja", pero comparten energía.
+### 3. **Snapchat**
+- ✅ **Por qué:** interfaz lúdica, animaciones juguetones, colores vibrantes, copy conversacional.
+- 🎨 **Estilo:** múltiples colores vibrantes (amarillo, azul, rojo, púrpura); cards con gradientes; botones grandes.
+- 💡 **Lecciones:** micro-animaciones que dan vida; copy playful; celebraciones constantes; feedback visual claro.
+- **Diferencia clave:** Snapchat es "social y lúdico"; BebéMatch es "colaborativo", pero comparten la energía playful.
+- 📸 **Ver capturas:** [Guía visual de referencias - Snapchat](./08-referencias-apps-visuales.md#6️⃣-snapchat)
 
 ### 4. **Spotify**
 - ✅ **Por qué:** tipografía clara, paleta restringida pero efectiva, transiciones rápidas.
 - 🎨 **Estilo:** negro + verde neón; cards con hover claro; micro-interacciones suave.
 - 💡 **Lecciones:** menos es más; paleta reducida pero con un accent color fuerte; feedback de hover sutil.
 - **Diferencia clave:** Spotify es minimalista; BebéMatch puede ser más colorido, pero manteniendo claridad.
+- 📸 **Ver capturas:** [Guía visual de referencias - Spotify](./08-referencias-apps-visuales.md#3️⃣-spotify)
 
 ### 5. **Duolingo**
 - ✅ **Por qué:** UI divertida, copy con personalidad, animaciones playful.

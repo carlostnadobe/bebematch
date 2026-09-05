@@ -54,6 +54,8 @@
   - ✅ Audio (opcional, pero está)
 - **Por qué:** Celebraciones crean emoción; no es neutral
 
+> 📸 **Captura de referencia:** `docs/assets/image-20260905-124028.png`
+
 ---
 
 ## 2️⃣ BUMBLE — Paleta femenina, botones grandes, personalidad
@@ -91,6 +93,8 @@
   - ✅ Información clara, bien jerarquizada
   - ✅ Iconografía clara (no emojis, iconos simples)
 - **Por qué:** Claridad sin sobrerecargar
+
+> 📸 **Captura de referencia:** `docs/assets/image-20260905-124135.png`
 
 ---
 
@@ -130,6 +134,8 @@
   - ✅ Imagen/color ocupa todo el espacio
   - ✅ Información mínima (solo nombre, sin extras)
 - **Por qué:** Menos es más
+
+> 📸 **Captura de referencia:** `docs/assets/image-20260905-124456.png`
 
 ---
 
