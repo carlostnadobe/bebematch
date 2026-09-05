@@ -19,6 +19,7 @@ Cuando algo cambie, se actualiza el documento correspondiente (no se crean copia
 | 05 | [Registro de decisiones (ADR)](./05-decisiones.md) | Decisiones importantes y su porqué, incl. las pendientes | 🟢 Base lista |
 | 06 | [Backlog de ideas](./06-backlog-ideas.md) | Cajón de funcionalidades e ideas para el futuro | 🟢 Base lista |
 | 07 | [Análisis y mejoras de UI/UX](./07-analisis-ui-mejoras.md) | Rediseño para hacerla atractiva, divertida, rápida y con personalidad (no "AI") | 🟢 Completo |
+| 08 | [Guía visual de referencias](./08-referencias-apps-visuales.md) | Qué capturar de 6 apps (Tinder, Bumble, Spotify, Duolingo, Figma, HotSpot) y por qué | 🟢 Guía completa |
 
 Leyenda de estado: 🟢 base lista · 🟡 borrador / en construcción · 🔴 pendiente
 
