@@ -101,7 +101,7 @@ export const ConfettiEffect: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 99,
   },
   piece: {

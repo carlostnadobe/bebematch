@@ -1,4 +1,5 @@
 export * from './colors';
 export * from './spacing';
 export * from './typography';
-export * from '../contexts/ThemeContext';
+export { useTheme, ThemeProvider } from '../contexts/ThemeContext';
+export type { ThemeMode } from '../contexts/ThemeContext';

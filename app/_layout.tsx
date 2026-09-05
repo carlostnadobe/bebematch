@@ -1,8 +1,8 @@
+import 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ThemeProvider, useTheme } from '../src/theme';
-import { SoloProvider, RoomProvider } from '../src/contexts';
+import { ThemeProvider, useTheme, SoloProvider, RoomProvider } from '../src/contexts';
 
 function RootNavigation() {
   const { isDark } = useTheme();
