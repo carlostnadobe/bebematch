@@ -25,39 +25,30 @@ Las decisiones **pendientes** también se listan para no perderlas de vista.
 
 ## ADR-002 · Backend de la app
 
-- **Estado:** 🟡 **Pendiente** de decisión del equipo.
-- **Contexto:** La web usa Supabase (Postgres + Realtime) con una única tabla `votes` y la
-  clave anon embebida. Funciona, pero el modelo es mínimo y sin seguridad para producción.
-- **Opciones:**
-  - *Mantener Supabase tal cual* — lo más rápido, arrastra la deuda de seguridad.
-  - *Mantener Supabase y rediseñar* — separar salas/votos/presencia, añadir auth y RLS.
-  - *Otro backend* — a valorar solo si aparece una razón de peso.
-- **Decisión:** pendiente. Por defecto seguimos con Supabase para no bloquear la migración
-  de UI; la decisión final se toma antes de la Fase 4 (multijugador).
-- **Consecuencias:** El diseño de datos de [03](./03-arquitectura-objetivo.md) se marca como
-  provisional hasta cerrar esta decisión.
+- **Estado:** ✅ **Aceptada** (2026-09-05).
+- **Contexto:** La web usa Supabase (Postgres + Realtime) con una tabla `votes`.
+- **Decisión:** Mantener **Supabase** como backend de tiempo real mediante el SDK oficial `@supabase/supabase-js`, aislando la lógica en `RoomContext`.
+- **Consecuencias:** Permite sincronización inmediata entre dispositivos sin necesidad de mantener un servidor propio.
 
 ---
 
 ## ADR-003 · Seguridad de credenciales y datos
 
-- **Estado:** 🟡 **Pendiente / a implementar** en la migración.
-- **Contexto:** Hoy la clave anon de Supabase está embebida en `index.html` y no se observa
-  RLS; cualquiera podría leer/escribir en `votes`.
-- **Dirección propuesta:**
-  - Mover configuración a variables de entorno / `app.config.ts` (no hardcodear).
-  - Activar **Row Level Security** y políticas por sala.
-  - Revisar si hace falta autenticación (aunque sea anónima de Supabase).
-- **Decisión:** se abordará en Fase 5 como requisito previo a publicar. Registrar aquí la
-  solución final cuando se implemente.
+- **Estado:** ✅ **Aceptada e Implementada** (2026-09-05).
+- **Contexto:** La clave anon no debe estar en el repositorio ni desprotegida en la BD.
+- **Decisión:**
+  - Variables de entorno en `.env` leídas por Expo (`EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY`).
+  - Habilitación de **Row Level Security (RLS)** mediante el script `docs/supabase-rls.sql` para aislar los votos por `room_code`.
+- **Consecuencias:** Cumplimiento de seguridad para la publicación en App Store y Google Play.
 
 ---
 
 ## ADR-004 · Futuro del easter egg (mini-juego)
 
-- **Estado:** 🟡 **Pendiente** (bajo impacto).
-- **Contexto:** La web incluye un mini-juego oculto de "saltar obstáculos" con confeti.
-- **Decisión:** decidir en Fase 5 si se porta a la app o se descarta. No bloquea nada.
+- **Estado:** ✅ **Decidida** (2026-09-05).
+- **Contexto:** La web incluía un mini-juego oculto de saltar obstáculos con confeti.
+- **Decisión:** No incluir el mini-juego en el MVP v1.0 para mantener el bundle limpio y garantizar el cumplimiento estricto de las guías de revisión de las tiendas de apps. Se reevaluará como actualización opcional en v1.1.
+- **Consecuencias:** Menor peso del bundle y foco total en la experiencia de match de nombres.
 
 ---
 

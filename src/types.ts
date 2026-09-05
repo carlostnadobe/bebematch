@@ -1,5 +1,5 @@
 // nombres de bebé
-export type Gender = 'girl' | 'boy';
+export type Gender = 'girl' | 'boy' | 'neutral';
 
 export interface IName {
   n: string;
@@ -49,7 +49,16 @@ export interface IRoomState {
 }
 
 // filtros
+export type FilterGender = 'girl' | 'boy' | 'neutral' | 'all';
+
 export interface IFilters {
-  gender: 'girl' | 'boy' | 'all';
-  origin: string;
+  gender: FilterGender;
+  origins: string[]; // vacío significa todos
+}
+
+// sesión en solitario
+export interface ISoloVote {
+  name: IName;
+  liked: boolean;
+  timestamp: number;
 }

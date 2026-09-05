@@ -9,47 +9,47 @@
 - No romper la web actual (`index.html` sigue como referencia en `main`).
 - Reutilizar datos y lógica antes de reescribir UI.
 
-## Fase 0 — Preparación (documentación) ✅ en curso
+## Fase 0 — Preparación (documentación) ✅ completada
 
 - [x] Clonar el repo y crear la rama `transform-to-app`.
 - [x] Documentar definición funcional y arquitectura actual.
-- [ ] Confirmar decisión de backend (ver [ADR-002](./05-decisiones.md)).
+- [x] Confirmar decisión de backend (ver [ADR-002](./05-decisiones.md)).
 
-## Fase 1 — Andamiaje del proyecto Expo
+## Fase 1 — Andamiaje del proyecto Expo ✅ completada
 
-- [ ] Crear el proyecto Expo + TypeScript en el repo.
-- [ ] Configurar Expo Router y la estructura de carpetas de [03](./03-arquitectura-objetivo.md).
-- [ ] Arrancar en Expo Go (iOS y Android) con una pantalla "Hola BebéMatch".
-- [ ] Configurar `eas.json` con perfiles dev/preview/production.
+- [x] Crear el proyecto Expo + TypeScript en el repo.
+- [x] Configurar Expo Router y la estructura de carpetas de [03](./03-arquitectura-objetivo.md).
+- [x] Arrancar en Expo Go (iOS y Android) con una pantalla "Hola BebéMatch".
+- [x] Configurar `eas.json` con perfiles dev/preview/production.
 
-## Fase 2 — Datos y tema
+## Fase 2 — Datos y tema ✅ completada
 
-- [ ] Extraer `NAMES_DB` del `index.html` a `src/data/names.ts` (tipado).
-- [ ] Portar los tokens de color y el tema claro/oscuro.
-- [ ] Componente **Carta de nombre** con todos los campos (significado, santo, curioso...).
+- [x] Extraer `NAMES_DB` del `index.html` a `src/data/names.ts` (tipado).
+- [x] Portar los tokens de color y el tema claro/oscuro.
+- [x] Componente **Carta de nombre** con todos los campos (significado, santo, curioso...).
 
-## Fase 3 — Flujo en solitario (sin red)
+## Fase 3 — Flujo en solitario (sin red) ✅ completada
 
-- [ ] Pantalla de inicio.
-- [ ] Pantalla de setup (filtros de género y origen).
-- [ ] Pantalla de swipe con gestos fluidos (Reanimated + Gesture Handler).
-- [ ] Pantalla de resumen con los "me gusta".
+- [x] Pantalla de inicio.
+- [x] Pantalla de setup (filtros de género y origen).
+- [x] Pantalla de swipe con gestos fluidos (Reanimated + Gesture Handler).
+- [x] Pantalla de resumen con los "me gusta".
 - *Meta:* una persona puede recorrer toda la app sin backend.
 
-## Fase 4 — Multijugador (Supabase)
+## Fase 4 — Multijugador (Supabase) ✅ completada
 
-- [ ] Cliente `supabase.ts` con credenciales por variables de entorno.
-- [ ] Crear/unirse a sala + presencia (modelo revisado, sin `__presence__` si se decide).
-- [ ] Suscripción Realtime por sala y detección de match en vivo.
-- [ ] QR para unirse a la sala.
+- [x] Cliente `supabase.ts` con credenciales por variables de entorno.
+- [x] Crear/unirse a sala + presencia (modelo en Supabase Realtime).
+- [x] Suscripción Realtime por sala y detección de match en vivo.
+- [x] Compartir código nativo / unirse a la sala.
 - *Meta:* dos móviles en la misma sala, con matches en tiempo real.
 
-## Fase 5 — Endurecer y pulir
+## Fase 5 — Endurecer y pulir ✅ completada
 
-- [ ] Seguridad de Supabase: RLS, secretos fuera del código (ver [ADR-003](./05-decisiones.md)).
-- [ ] Animaciones de match/confeti y detalles de experiencia.
-- [ ] Decidir si migra el easter egg.
-- [ ] Iconos, splash y nombre de app definitivos.
+- [x] Seguridad de Supabase: RLS, secretos fuera del código (ver [ADR-003](./05-decisiones.md)).
+- [x] Animaciones de match/confeti y detalles de experiencia.
+- [x] Decidir si migra el easter egg (ver [ADR-004](./05-decisiones.md)).
+- [x] Iconos, splash y nombre de app definitivos.
 
 ## Fase 6 — Publicación
 
@@ -59,6 +59,5 @@
 - [ ] Prueba en TestFlight / pista interna de Play antes del lanzamiento.
 
 ## Estado actual
-
-Estamos entre **Fase 0** y la preparación de **Fase 1**. Próximo hito sugerido: confirmar
-backend y crear el andamiaje del proyecto Expo.
+ 
+Fases 0, 1, 2, 3, 4 y 5 completadas con éxito. En curso: **Fase 6 (Publicación)**. Próximo hito: Política de privacidad, configuración de EAS Build para producción y preparación de tiendas.

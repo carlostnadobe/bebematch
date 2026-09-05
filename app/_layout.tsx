@@ -1,9 +1,15 @@
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ThemeProvider, useTheme } from '../src/theme';
+import { SoloProvider, RoomProvider } from '../src/contexts';
 
-export default function RootLayout() {
+function RootNavigation() {
+  const { isDark } = useTheme();
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -15,6 +21,20 @@ export default function RootLayout() {
         <Stack.Screen name="swipe" />
         <Stack.Screen name="summary" />
       </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <RoomProvider>
+          <SoloProvider>
+            <RootNavigation />
+          </SoloProvider>
+        </RoomProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   );
 }
