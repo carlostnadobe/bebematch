@@ -23,6 +23,10 @@ Overview del proyecto:
 - MVP scope
 - Timeline estimado
 
+### 📊 Riesgos
+Los riesgos del proyecto (matriz, severidad, timeline de resolución) están documentados en:
+**[docs/09-riesgos.md](../docs/09-riesgos.md)** — Lista completa a monitorear y trabajar durante el desarrollo.
+
 ### ARCHITECTURE/ (próximo)
 Documentación técnica profunda:
 - `stack.md` — Detalle de cada librería y por qué

@@ -288,17 +288,9 @@ interface Room {
 
 ---
 
-## ⚠️ Riesgos críticos (consultar antes de decisiones)
+## ⚠️ Riesgos identificados
 
-**Ver [.github/RISKS.md](./RISKS.md) para análisis completo.**
-
-Riesgos bloqueantes para publicación:
-1. **Supabase conexiones limitadas** (Free: 10, Pro: 60) — resolver antes de publicar
-2. **Seguridad: clave anon embebida** — RLS + variables de entorno (Fase 5)
-3. **Autenticación débil** — implementar Supabase Auth (Fase 4)
-4. **Modelo de datos mínimo** — redesign table schema (Fase 4)
-5. **Offline behavior no definido** — estrategia clara (Fase 4)
-6. **Privacidad / GDPR** — política + derecho al olvido (Fase 5)
+**Ver [docs/09-riesgos.md](../../docs/09-riesgos.md) para análisis completo con matriz de severidad y timeline de resolución.**
 
 ## 🔑 Decisiones bloqueantes (por resolver)
 
