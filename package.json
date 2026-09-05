@@ -6,9 +6,12 @@
   "scripts": {
     "start": "npx expo start",
     "dev": "npx expo start",
-    "android": "npx expo start --android",
-    "ios": "npx expo start --ios",
     "web": "npx expo start --web",
+    "tunnel": "npx expo start --tunnel",
+    "a": "npx expo start --android",
+    "i": "npx expo start --ios",
+    "a-t": "npx expo start --android --tunnel",
+    "i-t": "npx expo start --ios --tunnel",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "type-check": "tsc --noEmit"
