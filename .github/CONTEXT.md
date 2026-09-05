@@ -331,4 +331,32 @@ Una funcionalidad se considera **hecho** cuando:
 
 ---
 
+## 📋 Sincronización del Checklist de Construcción
+
+**Obligatorio:** Cada vez que completes una tarea, **actualiza** [docs/00-checklist-construccion.md](../../docs/00-checklist-construccion.md) marcando el item como ✅.
+
+**Cómo:**
+1. Completas feature/fix en una fase
+2. En el mismo PR: actualiza checklist (marca item como ✅ + anota fecha/commit)
+3. Commit message referencia el item: `"feat: implement room creation (checklist: design + backend)"`
+
+**Por qué:**
+- El checklist es la **definición de "done"** para cada fase
+- Previene duplicación de esfuerzo
+- Transparencia: cualquiera sabe qué falta
+- Base para estimaciones futuras
+
+**Ejemplo:**
+```markdown
+### Fase 1: Andamiaje
+- [x] Expo + TypeScript setup (9c6a310)
+- [x] Store compliance rules (9c6a310)
+- [ ] First build in Expo Go
+- [ ] Unit tests setup
+```
+
+Mantén el checklist **sincronizado con realidad**.
+
+---
+
 **Usa este archivo como referencia antes de cada consulta de desarrollo. Mantén este contexto en mente siempre.**
