@@ -35,7 +35,9 @@
       },
       "eas": {
         "projectId": "placeholder-project-id"
-      }
+      },
+      "EXPO_PUBLIC_SUPABASE_URL": "https://myakshqgodbvwnbnvjjn.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": ""
     }
   }
 }
