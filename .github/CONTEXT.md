@@ -288,11 +288,23 @@ interface Room {
 
 ---
 
+## ⚠️ Riesgos críticos (consultar antes de decisiones)
+
+**Ver [.github/RISKS.md](./RISKS.md) para análisis completo.**
+
+Riesgos bloqueantes para publicación:
+1. **Supabase conexiones limitadas** (Free: 10, Pro: 60) — resolver antes de publicar
+2. **Seguridad: clave anon embebida** — RLS + variables de entorno (Fase 5)
+3. **Autenticación débil** — implementar Supabase Auth (Fase 4)
+4. **Modelo de datos mínimo** — redesign table schema (Fase 4)
+5. **Offline behavior no definido** — estrategia clara (Fase 4)
+6. **Privacidad / GDPR** — política + derecho al olvido (Fase 5)
+
 ## 🔑 Decisiones bloqueantes (por resolver)
 
 1. **Backend definitivo** — Mantener Supabase o cambiar (ver [ADR-002](../../docs/05-decisiones.md))
-2. **Autenticación** — ¿Anónima de Supabase o custom?
-3. **Easter egg** — ¿Migrar mini-juego a Expo o descartar?
+2. **Autenticación** — ¿Anónima de Supabase o custom? (riesgo #3)
+3. **Easter egg** — ¿Migrar mini-juego a Expo o descartar? (ADR-004)
 
 ---
 
