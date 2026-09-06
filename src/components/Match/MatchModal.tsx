@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import { SparklesIcon } from 'react-native-heroicons/solid';
+import { BookmarkIcon } from 'react-native-heroicons/solid';
 import { IName } from '../../types';
 import { useTheme } from '../../theme';
 import { ConfettiEffect } from './ConfettiEffect';
@@ -47,19 +47,19 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
             },
           ]}
         >
-          {/* Cabecera festiva */}
+          {/* Cabecera festiva del álbum */}
           <View
             style={[
               styles.celebrationBadge,
               { backgroundColor: colors.salmonLight, borderColor: colors.salmon },
             ]}
           >
-            <SparklesIcon size={36} color={colors.salmon} />
+            <BookmarkIcon size={34} color={colors.salmon} />
           </View>
 
-          <Text style={[styles.title, { color: colors.salmon }]}>¡ES UN MATCH!</Text>
+          <Text style={[styles.title, { color: colors.salmon }]}>¡PÁGINA COMPARTIDA!</Text>
           <Text style={[styles.subtitle, { color: colors.text2 }]}>
-            ¡Los dos adoráis este nombre para vuestro bebé!
+            ¡Ambos habéis anotado este nombre en vuestro álbum!
           </Text>
 
           {/* Tarjeta destacada del nombre del Match */}
@@ -103,7 +103,7 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
               style={[styles.continueButton, { backgroundColor: colors.salmon }]}
               activeOpacity={0.8}
             >
-              <Text style={styles.continueButtonText}>Seguir explorando</Text>
+              <Text style={styles.continueButtonText}>Seguir hojeando el cuaderno</Text>
             </TouchableOpacity>
 
             {onViewList && (
@@ -116,7 +116,7 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
                 activeOpacity={0.7}
               >
                 <Text style={[styles.viewListButtonText, { color: colors.text }]}>
-                  Ver todos los matches
+                  Ver páginas compartidas
                 </Text>
               </TouchableOpacity>
             )}

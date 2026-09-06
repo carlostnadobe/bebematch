@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { HeartIcon, FilterIcon } from 'react-native-heroicons/solid';
+import { BookmarkIcon, FilterIcon } from 'react-native-heroicons/solid';
 import { ShareIcon, RefreshIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
@@ -49,12 +49,12 @@ export default function SummaryScreen() {
       if (isPairMode) {
         const namesList = matches.map((m) => m.n).join(', ');
         await Share.share({
-          message: `¡Nuestros nombres favoritos de BebéMatch son: ${namesList}!`,
+          message: `¡Nuestras páginas favoritas del álbum de BebéMatch son: ${namesList}!`,
         });
       } else {
         const namesList = likedNames.map((n) => n.n).join(', ');
         await Share.share({
-          message: `Mis nombres favoritos en BebéMatch son: ${namesList}`,
+          message: `Los nombres de mi cuaderno en BebéMatch son: ${namesList}`,
         });
       }
     } catch (e) {
@@ -135,9 +135,9 @@ export default function SummaryScreen() {
                 ]}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <HeartIcon size={12} color={colors.salmon} />
+                  <BookmarkIcon size={12} color={colors.salmon} />
                   <Text style={[styles.matchBadgeText, { color: colors.salmon }]}>
-                    MATCH
+                    COMPARTIDA
                   </Text>
                 </View>
               </View>
@@ -160,7 +160,7 @@ export default function SummaryScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
-      {/* Confetti festivo si hay matches o ≥ 3 favoritos en solitario */}
+      {/* Confetti festivo si hay páginas compartidas o ≥ 3 anotados en solitario */}
       {(matches.length > 0 || likedNames.length >= 3) && <ConfettiEffect />}
 
       {/* Cabecera */}
@@ -172,7 +172,7 @@ export default function SummaryScreen() {
       >
         <HeaderHomeButton onPress={() => setShowExitModal(true)} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {isPairMode ? `Resumen Sala ${roomCode}` : 'Tus Favoritos'}
+          {isPairMode ? `Álbum Sala ${roomCode}` : 'Tu Cuaderno de Nombres'}
         </Text>
         <View style={{ width: 44 }} />
       </View>
@@ -190,26 +190,26 @@ export default function SummaryScreen() {
                 <>
                   <Text style={[styles.heroTitle, { color: colors.text }]}>
                     {matches.length > 0
-                      ? `${matches.length} matches encontrados`
-                      : '¡Habéis terminado!'}
+                      ? `${matches.length} páginas compartidas`
+                      : '¡Habéis completado el cuaderno!'}
                   </Text>
                   <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
                     {matches.length > 0
-                      ? 'Nombres que os encantan a los dos'
-                      : 'No hubo coincidencias directas. ¡Prueba a afinar filtros!'}
+                      ? 'Nombres anotados en vuestro álbum compartido'
+                      : 'No hubo coincidencias directas. ¡Podéis revisar o afinar filtros!'}
                   </Text>
                 </>
               ) : (
                 <>
                   <Text style={[styles.heroTitle, { color: colors.text }]}>
                     {likedNames.length > 0
-                      ? `${likedNames.length} favoritos guardados`
-                      : '¡Has terminado!'}
+                      ? `${likedNames.length} nombres anotados`
+                      : '¡Has completado el cuaderno!'}
                   </Text>
                   <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
                     {likedNames.length > 0
-                      ? 'Los nombres que más te han gustado'
-                      : 'No has marcado ningún favorito. Prueba con otros filtros.'}
+                      ? 'Nombres guardados en tu cuaderno de favoritos'
+                      : 'No has anotado ningún nombre. Prueba con otros filtros.'}
                   </Text>
                 </>
               )}
@@ -228,7 +228,7 @@ export default function SummaryScreen() {
                     {seenCount}
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    VISTOS
+                    HOJEADAS
                   </Text>
                 </View>
                 <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -237,7 +237,7 @@ export default function SummaryScreen() {
                     {likedNames.length}
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    TUS LIKES
+                    TUS ANOTACIONES
                   </Text>
                 </View>
                 <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -246,7 +246,7 @@ export default function SummaryScreen() {
                     {partnerLikesCount}
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    SUS LIKES
+                    SUS ANOTACIONES
                   </Text>
                 </View>
                 <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -255,19 +255,19 @@ export default function SummaryScreen() {
                     {matchPercentage}%
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    % MATCH
+                    % COINCIDENCIA
                   </Text>
                 </View>
               </View>
             )}
 
-            {/* Lista rankeada de matches (en pareja) */}
+            {/* Lista rankeada de páginas compartidas (en pareja) */}
             {isPairMode && matches.length > 0 && (
               <View style={styles.sectionContainer}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                  <HeartIcon size={18} color={colors.salmon} />
+                  <BookmarkIcon size={18} color={colors.salmon} />
                   <Text style={[styles.sectionHeading, { color: colors.salmon, marginBottom: 0 }]}>
-                    VUESTROS MATCHES
+                    PÁGINAS COMPARTIDAS
                   </Text>
                 </View>
                 {matches.map((item, index) =>
@@ -289,7 +289,7 @@ export default function SummaryScreen() {
             {isPairMode && onlyMyLikes.length > 0 && (
               <View style={styles.sectionContainer}>
                 <Text style={[styles.sectionHeading, { color: colors.text2 }]}>
-                  SOLO A TI TE GUSTARON ({onlyMyLikes.length})
+                  SOLO EN TU CUADERNO ({onlyMyLikes.length})
                 </Text>
                 {onlyMyLikes.map((item) => renderNameCard(item, undefined, false))}
               </View>
@@ -306,12 +306,12 @@ export default function SummaryScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <ShareIcon size={18} color="#FFFFFF" />
                   <Text style={styles.primaryActionBtnText}>
-                    {isPairMode ? 'Compartir matches' : 'Compartir favoritos'}
+                    {isPairMode ? 'Compartir cuaderno conjunto' : 'Compartir cuaderno'}
                   </Text>
                 </View>
               </TouchableOpacity>
 
-              {/* Afinar — votar solo los matches (requiere ≥ 2 matches) */}
+              {/* Afinar — votar solo las páginas compartidas (requiere ≥ 2 matches) */}
               {isPairMode && matches.length >= 2 && (
                 <TouchableOpacity
                   onPress={handleRefine}
@@ -332,7 +332,7 @@ export default function SummaryScreen() {
                         { color: colors.salmon },
                       ]}
                     >
-                      Afinar — votar solo los matches
+                      Afinar — revisar páginas compartidas
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -355,7 +355,7 @@ export default function SummaryScreen() {
                   <Text
                     style={[styles.secondaryActionBtnText, { color: colors.text }]}
                   >
-                    Explorar más nombres
+                    Explorar más páginas
                   </Text>
                 </View>
               </TouchableOpacity>

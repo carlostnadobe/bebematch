@@ -7,7 +7,7 @@ import {
   FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { HeartIcon } from 'react-native-heroicons/solid';
+import { BookmarkIcon } from 'react-native-heroicons/solid';
 import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../../theme';
 import { IName } from '../../types';
@@ -64,9 +64,9 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
               >
                 {isMatch ? (
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <HeartIcon size={12} color={colors.salmon} />
+                    <BookmarkIcon size={12} color={colors.salmon} />
                     <Text style={[styles.statusBadgeText, { color: colors.salmon }]}>
-                      Match
+                      Compartida
                     </Text>
                   </View>
                 ) : (
@@ -110,7 +110,7 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
             </View>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {isSolo ? 'Tus favoritos' : 'Vuestros matches'}
+            {isSolo ? 'Tu cuaderno de nombres' : 'Cuaderno compartido'}
           </Text>
           <View style={{ width: 40 }} />
         </View>
@@ -119,19 +119,19 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
         <View style={[styles.subHeader, { paddingHorizontal: spacing.md }]}>
           <Text style={[styles.subHeaderText, { color: colors.text2 }]}>
             {isSolo
-              ? `${likedNames.length} nombres guardados`
+              ? `${likedNames.length} nombres anotados en tu álbum`
               : matches.length > 0
-              ? `${matches.length} coincidencia${matches.length === 1 ? '' : 's'} con tu pareja`
-              : 'Aún sin matches con tu pareja. ¡Sigue votando!'}
+              ? `${matches.length} página${matches.length === 1 ? '' : 's'} compartida${matches.length === 1 ? '' : 's'} con tu pareja`
+              : 'Aún sin páginas compartidas. ¡Seguid hojeando el álbum!'}
           </Text>
         </View>
 
         {/* Lista */}
         {likedNames.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <HeartIcon size={44} color={colors.text3} />
+            <BookmarkIcon size={44} color={colors.text3} />
             <Text style={[styles.emptyText, { color: colors.text2, marginTop: 12 }]}>
-              Aún no has guardado ningún nombre
+              Aún no has anotado ningún nombre en el cuaderno
             </Text>
           </View>
         ) : (
