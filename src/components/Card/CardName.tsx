@@ -9,7 +9,7 @@ export interface CardNameProps {
   partnerLiked?: boolean;
 }
 
-export const CardName: React.FC<CardNameProps> = ({ item, partnerLiked = false }) => {
+export const CardName: React.FC<CardNameProps> = React.memo(({ item, partnerLiked = false }) => {
   const { colors, spacing, typography, isDark } = useTheme();
 
   const genderInfo = useMemo(() => {
@@ -287,12 +287,13 @@ export const CardName: React.FC<CardNameProps> = ({ item, partnerLiked = false }
       </ScrollView>
     </View>
   );
-};
+});
+
+CardName.displayName = 'CardName';
 
 const styles = StyleSheet.create({
   cardContainer: {
     width: '100%',
-    maxWidth: 360,
     height: 480,
     borderRadius: 24,
     borderWidth: 1.5,

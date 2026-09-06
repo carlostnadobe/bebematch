@@ -7,9 +7,10 @@ import { ConfettiEffect } from './ConfettiEffect';
 export interface MatchModalProps {
   match: IName | null;
   onClose: () => void;
+  onViewList?: () => void;
 }
 
-export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose }) => {
+export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewList }) => {
   const { colors, isDark } = useTheme();
 
   if (!match) return null;
@@ -52,7 +53,7 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose }) => {
 
           <Text style={[styles.title, { color: colors.salmon }]}>¡ES UN MATCH!</Text>
           <Text style={[styles.subtitle, { color: colors.text2 }]}>
-            A los dos os ha encantado este nombre
+            ¡Los dos adoráis este nombre para vuestro bebé!
           </Text>
 
           {/* Tarjeta destacada del nombre del Match */}
@@ -89,14 +90,31 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose }) => {
             </Text>
           </View>
 
-          {/* Botón de acción */}
-          <TouchableOpacity
-            onPress={onClose}
-            style={[styles.continueButton, { backgroundColor: colors.salmon }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.continueButtonText}>¡Genial! Seguir explorando</Text>
-          </TouchableOpacity>
+          {/* Botones de acción según especificación de pantalla 6 */}
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[styles.continueButton, { backgroundColor: colors.salmon }]}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.continueButtonText}>Seguir explorando ✨</Text>
+            </TouchableOpacity>
+
+            {onViewList && (
+              <TouchableOpacity
+                onPress={onViewList}
+                style={[
+                  styles.viewListButton,
+                  { backgroundColor: colors.surface2, borderColor: colors.border },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.viewListButtonText, { color: colors.text }]}>
+                  Ver todos los matches
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </Modal>
@@ -191,6 +209,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
+  buttonsContainer: {
+    width: '100%',
+    gap: 10,
+  },
   continueButton: {
     width: '100%',
     paddingVertical: 15,
@@ -201,5 +223,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  viewListButton: {
+    width: '100%',
+    paddingVertical: 13,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  viewListButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

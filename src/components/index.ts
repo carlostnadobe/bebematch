@@ -4,3 +4,5 @@ export * from './Filters/FilterChip';
 export * from './Buttons/ActionButton';
 export * from './Match/MatchModal';
 export * from './Match/ConfettiEffect';
+export * from './Match/LikedMatchesModal';
+export * from './Common/ConfirmExitModal';

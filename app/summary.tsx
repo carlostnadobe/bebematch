@@ -1,274 +1,372 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Share,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
 import { IName } from '../src/types';
+import { ConfettiEffect, ConfirmExitModal } from '../src/components';
 
 export default function SummaryScreen() {
   const { colors, spacing, isDark } = useTheme();
   const router = useRouter();
-  const { likedNames, history, restart } = useSolo();
-  const { roomCode, matches, leaveRoom } = useRoom();
+  const { likedNames, history, refineSession } = useSolo();
+  const {
+    roomCode,
+    matches,
+    partnerLikes,
+    leaveRoom,
+  } = useRoom();
 
-  const [activeTab, setActiveTab] = useState<'matches' | 'mine'>(
-    matches.length > 0 ? 'matches' : 'mine'
-  );
+  const isPairMode = Boolean(roomCode);
+  const [showExitModal, setShowExitModal] = useState(false);
 
-  const handleRestart = () => {
-    restart();
+  // Estadísticas para modo pareja
+  const partnerLikesCount = useMemo(() => {
+    return Object.values(partnerLikes).filter(Boolean).length;
+  }, [partnerLikes]);
+
+  const seenCount = history.length;
+  const matchPercentage =
+    seenCount > 0 ? Math.round((matches.length / seenCount) * 100) : 0;
+
+  // Nombres que solo le gustaron al usuario (en pareja)
+  const onlyMyLikes = useMemo(() => {
+    const matchNamesSet = new Set(matches.map((m) => m.n));
+    return likedNames.filter((n) => !matchNamesSet.has(n.n));
+  }, [likedNames, matches]);
+
+  const handleShare = async () => {
+    try {
+      if (isPairMode) {
+        const namesList = matches.map((m) => m.n).join(', ');
+        await Share.share({
+          message: `👶 ¡Nuestros nombres favoritos de BebéMatch son: ${namesList}! 💕`,
+        });
+      } else {
+        const namesList = likedNames.map((n) => n.n).join(', ');
+        await Share.share({
+          message: `👶 Mis nombres favoritos en BebéMatch son: ${namesList} ♥`,
+        });
+      }
+    } catch (e) {
+      console.warn('Error compartiendo:', e);
+    }
+  };
+
+  const handleRefine = () => {
+    if (matches.length < 2) return;
+    refineSession(matches);
     router.replace('/swipe');
   };
 
-  const handleExit = () => {
-    if (roomCode) {
+  const handleExploreMore = () => {
+    // Vuelve al setup conservando los filtros actuales
+    if (isPairMode) {
+      router.replace('/setup');
+    } else {
+      router.replace('/setup?mode=solo');
+    }
+  };
+
+  const handleConfirmExit = () => {
+    setShowExitModal(false);
+    if (isPairMode) {
       leaveRoom();
     }
     router.replace('/');
   };
 
-  const renderNameCard = ({ item }: { item: IName }) => {
+  const renderNameCard = (item: IName, rank?: number, isMatchCard?: boolean) => {
     const isGirl = item.g === 'girl';
     const isBoy = item.g === 'boy';
-    const isMatch = matches.some((m) => m.n === item.n);
-
-    const badgeColor = isGirl
-      ? colors.salmon
-      : isBoy
-      ? isDark
-        ? '#60A5FA'
-        : '#2563EB'
-      : isDark
-      ? '#A78BFA'
-      : '#7E22CE';
 
     return (
       <View
+        key={item.n}
         style={[
-          styles.card,
+          styles.nameCard,
           {
             backgroundColor: colors.surface,
-            borderColor: isMatch ? colors.salmon : colors.border2,
-            borderWidth: isMatch ? 1.8 : 1,
+            borderColor: isMatchCard ? colors.salmon : colors.border2,
+            borderWidth: isMatchCard ? 1.5 : 1,
           },
         ]}
       >
-        <View style={styles.cardHeader}>
-          <View style={styles.nameRow}>
-            <Text style={[styles.nameTitle, { color: colors.text }]}>{item.n}</Text>
-            {isMatch && (
-              <View
-                style={[
-                  styles.matchTag,
-                  { backgroundColor: isDark ? 'rgba(232, 115, 90, 0.2)' : 'rgba(212, 105, 79, 0.15)' },
-                ]}
-              >
-                <Text style={[styles.matchTagText, { color: colors.salmon }]}>♥ MATCH</Text>
-              </View>
+        <View style={styles.nameHeaderRow}>
+          <View style={styles.nameLeft}>
+            {rank !== undefined && (
+              <Text style={[styles.rankBadge, { color: colors.salmon }]}>
+                #{rank}
+              </Text>
             )}
+            <Text
+              style={[
+                styles.nameTitle,
+                {
+                  color: colors.text,
+                  fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+                },
+              ]}
+            >
+              {item.n}
+            </Text>
           </View>
 
-          <View
-            style={[
-              styles.badge,
-              {
-                backgroundColor: isGirl
-                  ? isDark
-                    ? 'rgba(232, 115, 90, 0.15)'
-                    : 'rgba(212, 105, 79, 0.12)'
-                  : isBoy
-                  ? isDark
-                    ? 'rgba(96, 165, 250, 0.15)'
-                    : 'rgba(37, 99, 235, 0.12)'
-                  : isDark
-                  ? 'rgba(167, 139, 250, 0.15)'
-                  : 'rgba(126, 34, 206, 0.12)',
-                borderColor: badgeColor,
-              },
-            ]}
-          >
-            <Text style={[styles.badgeText, { color: badgeColor }]}>
-              {isGirl ? 'Niña' : isBoy ? 'Niño' : 'Unisex'}
+          <View style={styles.badgesRow}>
+            {isMatchCard && (
+              <View
+                style={[
+                  styles.matchBadge,
+                  {
+                    backgroundColor: isDark
+                      ? 'rgba(232, 115, 90, 0.2)'
+                      : 'rgba(212, 105, 79, 0.15)',
+                  },
+                ]}
+              >
+                <Text style={[styles.matchBadgeText, { color: colors.salmon }]}>
+                  💞 MATCH
+                </Text>
+              </View>
+            )}
+            <Text style={[styles.genderSymbol, { color: colors.text3 }]}>
+              {isGirl ? '♀' : isBoy ? '♂' : '⚥'}
             </Text>
           </View>
         </View>
-
-        <Text style={[styles.originText, { color: colors.text3 }]}>
-          Origen {item.o.toLowerCase()}
-        </Text>
 
         <Text style={[styles.meaningText, { color: colors.text2 }]}>
           &ldquo;{item.m}&rdquo;
         </Text>
-
-        {item.santo && (
-          <Text style={[styles.santoText, { color: colors.text3 }]}>
-            Santo: {item.santo}
-          </Text>
-        )}
+        <Text style={[styles.originText, { color: colors.text3 }]}>
+          Origen {item.o.toLowerCase()}
+        </Text>
       </View>
     );
   };
 
-  const displayList = activeTab === 'matches' ? matches : likedNames;
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
+      {/* Confetti festivo si hay matches o ≥ 3 favoritos en solitario */}
+      {(matches.length > 0 || likedNames.length >= 3) && <ConfettiEffect />}
+
       {/* Cabecera */}
-      <View style={[styles.header, { paddingHorizontal: spacing.md, borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          onPress={handleExit}
-          style={[styles.headerButton, { backgroundColor: colors.surface2, borderColor: colors.border }]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.headerButtonText, { color: colors.text }]}>Inicio</Text>
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {roomCode ? `Resumen Sala ${roomCode}` : 'Tus Favoritos'}
-        </Text>
-        <View style={{ width: 50 }} />
-      </View>
-
-      {/* Selector de Pestañas (si hay sala) */}
-      {roomCode && (
-        <View style={[styles.tabsContainer, { paddingHorizontal: spacing.md, marginTop: 12 }]}>
-          <TouchableOpacity
-            onPress={() => setActiveTab('matches')}
-            style={[
-              styles.tabButton,
-              {
-                backgroundColor: activeTab === 'matches' ? colors.salmon : colors.surface2,
-                borderColor: activeTab === 'matches' ? colors.salmon : colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                { color: activeTab === 'matches' ? '#FFFFFF' : colors.text2 },
-              ]}
-            >
-              💖 Matches ({matches.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setActiveTab('mine')}
-            style={[
-              styles.tabButton,
-              {
-                backgroundColor: activeTab === 'mine' ? colors.salmon : colors.surface2,
-                borderColor: activeTab === 'mine' ? colors.salmon : colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                { color: activeTab === 'mine' ? '#FFFFFF' : colors.text2 },
-              ]}
-            >
-              Mis Favoritos ({likedNames.length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Resumen estadístico */}
-      <View style={[styles.statsBanner, { backgroundColor: colors.surface2, margin: spacing.md }]}>
-        {roomCode && (
-          <>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.salmon }]}>{matches.length}</Text>
-              <Text style={[styles.statLabel, { color: colors.text2 }]}>Matches</Text>
-            </View>
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-          </>
-        )}
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumber, { color: colors.text }]}>{likedNames.length}</Text>
-          <Text style={[styles.statLabel, { color: colors.text2 }]}>Mis Favoritos</Text>
-        </View>
-        <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-        <View style={styles.statItem}>
-          <Text style={[styles.statNumber, { color: colors.text3 }]}>{history.length}</Text>
-          <Text style={[styles.statLabel, { color: colors.text2 }]}>Explorados</Text>
-        </View>
-      </View>
-
-      {/* Lista de nombres */}
-      {displayList.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyIcon, { color: colors.text3 }]}>
-            {activeTab === 'matches' ? '🤝' : '🤍'}
-          </Text>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>
-            {activeTab === 'matches'
-              ? 'Aún no tenéis matches'
-              : 'No has seleccionado favoritos aún'}
-          </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.text2 }]}>
-            {activeTab === 'matches'
-              ? 'Seguid deslizando nombres; cuando los dos coincidáis en un nombre, aparecerá aquí.'
-              : 'Desliza a la derecha o pulsa el botón de corazón para guardar los nombres que más te gusten.'}
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.replace('/swipe')}
-            style={[styles.emptyButton, { backgroundColor: colors.salmon }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.emptyButtonText}>Seguir explorando</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={displayList}
-          keyExtractor={(item) => item.n}
-          renderItem={renderNameCard}
-          contentContainerStyle={[styles.listContent, { paddingHorizontal: spacing.md }]}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-
-      {/* Barra de acciones inferior */}
       <View
         style={[
-          styles.footer,
-          {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            padding: spacing.md,
-          },
+          styles.header,
+          { paddingHorizontal: spacing.md, borderBottomColor: colors.border },
         ]}
       >
-        <View style={styles.footerButtons}>
-          <TouchableOpacity
-            onPress={() => router.push('/setup')}
-            style={[
-              styles.footerButtonSecondary,
-              {
-                backgroundColor: colors.surface2,
-                borderColor: colors.border2,
-              },
-            ]}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.footerButtonSecondaryText, { color: colors.text }]}>
-              Cambiar filtros
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleRestart}
-            style={[styles.footerButtonPrimary, { backgroundColor: colors.salmon }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.footerButtonPrimaryText}>Explorar de nuevo</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={() => setShowExitModal(true)}
+          style={[
+            styles.headerButton,
+            { backgroundColor: colors.surface2, borderColor: colors.border },
+          ]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.headerButtonText, { color: colors.text }]}>
+            Inicio
+          </Text>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          {isPairMode ? `Resumen Sala ${roomCode}` : 'Tus Favoritos'}
+        </Text>
+        <View style={{ width: 60 }} />
       </View>
+
+      <FlatList
+        data={[]}
+        renderItem={null}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { padding: spacing.md }]}
+        ListHeaderComponent={
+          <>
+            {/* Título Principal */}
+            <View style={styles.titleSection}>
+              {isPairMode ? (
+                <>
+                  <Text style={[styles.heroTitle, { color: colors.text }]}>
+                    {matches.length > 0
+                      ? `${matches.length} matches encontrados! 💕`
+                      : '¡Habéis terminado!'}
+                  </Text>
+                  <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
+                    {matches.length > 0
+                      ? 'Nombres que os encantan a los dos'
+                      : 'No hubo coincidencias directas. ¡Prueba a afinar filtros!'}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.heroTitle, { color: colors.text }]}>
+                    {likedNames.length > 0
+                      ? `${likedNames.length} favoritos ♥`
+                      : '¡Has terminado! 🙈'}
+                  </Text>
+                  <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
+                    {likedNames.length > 0
+                      ? 'Los nombres que más te han gustado'
+                      : 'No has marcado ningún favorito. Prueba con otros filtros.'}
+                  </Text>
+                </>
+              )}
+            </View>
+
+            {/* Tira de estadísticas (solo en pareja) */}
+            {isPairMode && (
+              <View
+                style={[
+                  styles.statsRow,
+                  { backgroundColor: colors.surface, borderColor: colors.border2 },
+                ]}
+              >
+                <View style={styles.statCol}>
+                  <Text style={[styles.statValue, { color: colors.text }]}>
+                    {seenCount}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.text3 }]}>
+                    VISTOS
+                  </Text>
+                </View>
+                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.statCol}>
+                  <Text style={[styles.statValue, { color: colors.salmon }]}>
+                    {likedNames.length}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.text3 }]}>
+                    TUS ♥
+                  </Text>
+                </View>
+                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.statCol}>
+                  <Text style={[styles.statValue, { color: '#A78BFA' }]}>
+                    {partnerLikesCount}
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.text3 }]}>
+                    SUS ♥
+                  </Text>
+                </View>
+                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.statCol}>
+                  <Text style={[styles.statValue, { color: colors.success }]}>
+                    {matchPercentage}%
+                  </Text>
+                  <Text style={[styles.statLabel, { color: colors.text3 }]}>
+                    % MATCH
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* Lista rankeada de matches (en pareja) */}
+            {isPairMode && matches.length > 0 && (
+              <View style={styles.sectionContainer}>
+                <Text style={[styles.sectionHeading, { color: colors.salmon }]}>
+                  💞 VUESTROS MATCHES
+                </Text>
+                {matches.map((item, index) =>
+                  renderNameCard(item, index + 1, true)
+                )}
+              </View>
+            )}
+
+            {/* Lista rankeada de favoritos (en solitario) */}
+            {!isPairMode && likedNames.length > 0 && (
+              <View style={styles.sectionContainer}>
+                {likedNames.map((item, index) =>
+                  renderNameCard(item, index + 1, false)
+                )}
+              </View>
+            )}
+
+            {/* Sección: Solo a ti te gustaron (en pareja) */}
+            {isPairMode && onlyMyLikes.length > 0 && (
+              <View style={styles.sectionContainer}>
+                <Text style={[styles.sectionHeading, { color: colors.text2 }]}>
+                  SOLO A TI TE GUSTARON ({onlyMyLikes.length})
+                </Text>
+                {onlyMyLikes.map((item) => renderNameCard(item, undefined, false))}
+              </View>
+            )}
+
+            {/* Botones de acción principales */}
+            <View style={styles.actionsContainer}>
+              {/* Compartir */}
+              <TouchableOpacity
+                onPress={handleShare}
+                style={[styles.primaryActionBtn, { backgroundColor: colors.salmon }]}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.primaryActionBtnText}>
+                  {isPairMode ? 'Compartir matches 💞' : 'Compartir ♥'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Afinar — votar solo los matches (requiere ≥ 2 matches) */}
+              {isPairMode && matches.length >= 2 && (
+                <TouchableOpacity
+                  onPress={handleRefine}
+                  style={[
+                    styles.secondaryActionBtn,
+                    {
+                      backgroundColor: colors.surface2,
+                      borderColor: colors.salmon,
+                    },
+                  ]}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.secondaryActionBtnText,
+                      { color: colors.salmon },
+                    ]}
+                  >
+                    🎯 Afinar — votar solo los matches
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Explorar más nombres */}
+              <TouchableOpacity
+                onPress={handleExploreMore}
+                style={[
+                  styles.secondaryActionBtn,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border2,
+                  },
+                ]}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[styles.secondaryActionBtnText, { color: colors.text }]}
+                >
+                  Explorar más nombres →
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+      />
+
+      {/* Modal de confirmación al salir */}
+      <ConfirmExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onConfirm={handleConfirmExit}
+        isPairMode={isPairMode}
+      />
     </SafeAreaView>
   );
 }
@@ -285,9 +383,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerButton: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 8,
     borderWidth: 1,
   },
   headerButtonText: {
@@ -295,170 +393,139 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   headerTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
   },
-  tabsContainer: {
-    flexDirection: 'row',
-    gap: 10,
+  scrollContent: {
+    paddingBottom: 36,
   },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 14,
-    borderWidth: 1,
+  titleSection: {
     alignItems: 'center',
-    justifyContent: 'center',
+    marginVertical: 16,
   },
-  tabText: {
-    fontSize: 13,
-    fontWeight: '700',
+  heroTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 6,
   },
-  statsBanner: {
+  heroSubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingVertical: 14,
     borderRadius: 16,
+    borderWidth: 1,
+    marginBottom: 24,
   },
-  statItem: {
+  statCol: {
     alignItems: 'center',
+    flex: 1,
   },
-  statNumber: {
-    fontSize: 26,
+  statValue: {
+    fontSize: 20,
     fontWeight: '800',
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   statDivider: {
     width: 1,
-    height: 32,
+    height: 28,
   },
-  listContent: {
-    paddingBottom: 24,
-    gap: 12,
+  sectionContainer: {
+    marginBottom: 20,
   },
-  card: {
+  sectionHeading: {
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    marginBottom: 10,
+  },
+  nameCard: {
     padding: 16,
     borderRadius: 16,
-    gap: 6,
+    marginBottom: 10,
   },
-  cardHeader: {
+  nameHeaderRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
   },
-  nameRow: {
+  nameLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
+  rankBadge: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
   nameTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    letterSpacing: -0.3,
+    fontSize: 20,
+    fontWeight: '700',
   },
-  matchTag: {
+  badgesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  matchBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
-  matchTagText: {
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  badgeText: {
+  matchBadgeText: {
     fontSize: 11,
     fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  },
+  genderSymbol: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  meaningText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    marginBottom: 4,
   },
   originText: {
     fontSize: 12,
-    fontWeight: '500',
     textTransform: 'capitalize',
   },
-  meaningText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    lineHeight: 20,
-    marginTop: 2,
-  },
-  santoText: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
-  },
-  emptyButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 14,
-  },
-  emptyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  footer: {
-    borderTopWidth: 1,
-  },
-  footerButtons: {
-    flexDirection: 'row',
+  actionsContainer: {
+    marginTop: 16,
     gap: 12,
   },
-  footerButtonSecondary: {
-    flex: 1,
-    paddingVertical: 14,
+  primaryActionBtn: {
+    width: '100%',
+    paddingVertical: 16,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
   },
-  footerButtonSecondaryText: {
+  primaryActionBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  secondaryActionBtn: {
+    width: '100%',
+    paddingVertical: 15,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryActionBtnText: {
     fontSize: 15,
     fontWeight: '600',
-  },
-  footerButtonPrimary: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footerButtonPrimaryText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
   },
 });

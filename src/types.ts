@@ -50,10 +50,14 @@ export interface IRoomState {
 
 // filtros
 export type FilterGender = 'girl' | 'boy' | 'neutral' | 'all';
+export type FilterDuration = 'flash' | 'normal' | 'long';
+export type FilterExtra = 'calorro' | 'sudamerica' | 'reyes' | null;
 
 export interface IFilters {
   gender: FilterGender;
   origins: string[]; // vacío significa todos
+  duration?: FilterDuration; // flash (~5), normal (~20), long (~40)
+  extra?: FilterExtra;
 }
 
 // sesión en solitario

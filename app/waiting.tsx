@@ -1,35 +1,65 @@
-import { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Share, ActivityIndicator } from 'react-native';
+import { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Share,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../src/theme';
 import { useRoom } from '../src/contexts/RoomContext';
 import { useSolo } from '../src/contexts/SoloContext';
+import { ConfirmExitModal } from '../src/components';
 
 export default function WaitingScreen() {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing } = useTheme();
   const router = useRouter();
-  const { roomCode, partnerConnected, createRoom, leaveRoom, isLoading, error } = useRoom();
+  const {
+    roomCode,
+    isHost,
+    partnerConnected,
+    roomFilters,
+    roomSeed,
+    leaveRoom,
+    isLoading,
+    error,
+  } = useRoom();
   const { startSession } = useSolo();
 
-  // Si no hay sala creada aún, crear una automáticamente al entrar
-  useEffect(() => {
-    if (!roomCode && !isLoading) {
-      createRoom().catch(() => {});
-    }
-  }, [roomCode, isLoading, createRoom]);
+  const [copied, setCopied] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const hasNavigatedRef = useRef(false);
 
-  // Cuando la pareja se conecta, inicializamos la baraja y pasamos a la pantalla de swipe
+  // Transición 1 (Host): Cuando el guest se conecta, el host avanza automáticamente a /setup
   useEffect(() => {
-    if (!partnerConnected || !roomCode) {
-      return;
+    if (hasNavigatedRef.current) return;
+    if (isHost && partnerConnected) {
+      hasNavigatedRef.current = true;
+      router.replace('/setup');
     }
-    startSession();
-    const timer = setTimeout(() => {
+  }, [isHost, partnerConnected, router]);
+
+  // Transición 2 (Guest): Cuando el host publica los filtros, el guest entra a /swipe con la misma baraja
+  useEffect(() => {
+    if (hasNavigatedRef.current) return;
+    if (!isHost && roomFilters) {
+      hasNavigatedRef.current = true;
+      startSession(roomFilters, roomSeed ?? undefined);
       router.replace('/swipe');
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, [partnerConnected, roomCode, startSession, router]);
+    }
+  }, [isHost, roomFilters, roomSeed, startSession, router]);
+
+  const handleCopyCode = async () => {
+    if (!roomCode) return;
+    await Clipboard.setStringAsync(roomCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleShare = async () => {
     if (!roomCode) return;
@@ -42,7 +72,8 @@ export default function WaitingScreen() {
     }
   };
 
-  const handleCancel = () => {
+  const handleConfirmExit = () => {
+    setShowExitModal(false);
     leaveRoom();
     router.replace('/');
   };
@@ -52,96 +83,168 @@ export default function WaitingScreen() {
       {/* Cabecera */}
       <View style={[styles.header, { paddingHorizontal: spacing.md }]}>
         <TouchableOpacity
-          onPress={handleCancel}
-          style={[styles.backButton, { backgroundColor: colors.surface2, borderColor: colors.border }]}
+          onPress={() => setShowExitModal(true)}
+          style={[
+            styles.backButton,
+            { backgroundColor: colors.surface2, borderColor: colors.border },
+          ]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.backButtonText, { color: colors.text2 }]}>✕ Cancelar</Text>
+          <Text style={[styles.backButtonText, { color: colors.text2 }]}>
+            ← Volver al inicio
+          </Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Modo Pareja</Text>
-        <View style={{ width: 60 }} />
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          Modo Pareja
+        </Text>
+        <View style={{ width: 100 }} />
       </View>
 
       <View style={[styles.content, { padding: spacing.lg }]}>
-        {/* Ícono / Avatar */}
-        <View style={styles.iconCircle}>
-          <Text style={styles.iconEmoji}>{partnerConnected ? '💖' : '👶'}</Text>
-        </View>
-
-        <Text style={[styles.title, { color: colors.text }]}>
-          {partnerConnected ? '¡Pareja Conectada!' : 'Sala de Espera'}
-        </Text>
-
-        <Text style={[styles.subtitle, { color: colors.text2 }]}>
-          {partnerConnected
-            ? '¡Todo listo! Entrando a la baraja de nombres...'
-            : 'Comparte este código con tu pareja para sincronizar vuestras votaciones en tiempo real.'}
-        </Text>
-
-        {/* Tarjeta del Código de Sala */}
-        <View
-          style={[
-            styles.codeCard,
-            {
-              backgroundColor: colors.surface,
-              borderColor: partnerConnected ? colors.success : colors.border2,
-            },
-          ]}
-        >
-          <Text style={[styles.codeLabel, { color: colors.text3, fontSize: typography.fontSize.xs }]}>
-            CÓDIGO DE SALA
-          </Text>
-
-          {isLoading ? (
-            <ActivityIndicator size="large" color={colors.salmon} style={{ marginVertical: 12 }} />
-          ) : (
-            <Text style={[styles.codeText, { color: colors.salmon }]}>
-              {roomCode || '----'}
-            </Text>
-          )}
-
-          <TouchableOpacity
-            onPress={handleShare}
-            disabled={!roomCode}
-            style={[styles.shareButton, { backgroundColor: colors.surface2, borderColor: colors.border }]}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.shareButtonText, { color: colors.text }]}>
-              📤 Compartir código
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Estado de conexión de la pareja */}
-        <View
-          style={[
-            styles.statusBox,
-            {
-              backgroundColor: partnerConnected
-                ? 'rgba(74, 222, 128, 0.12)'
-                : colors.surface2,
-              borderColor: partnerConnected ? colors.success : colors.border,
-            },
-          ]}
-        >
-          {!partnerConnected ? (
-            <>
-              <ActivityIndicator size="small" color={colors.salmon} style={{ marginRight: 10 }} />
-              <Text style={[styles.statusText, { color: colors.text2 }]}>
-                Esperando a que tu pareja se una...
+        {isHost ? (
+          /* ================= PANTALLA DE ESPERA DEL HOST ================= */
+          <View style={styles.cardContainer}>
+            {/* Estado con punto verde pulsante */}
+            <View style={styles.statusPill}>
+              <View
+                style={[
+                  styles.dot,
+                  { backgroundColor: partnerConnected ? colors.success : '#22C55E' },
+                ]}
+              />
+              <Text style={[styles.statusPillText, { color: colors.text }]}>
+                {partnerConnected
+                  ? '¡Pareja conectada! Redirigiendo a filtros…'
+                  : 'Esperando a tu pareja...'}
               </Text>
-            </>
-          ) : (
-            <Text style={[styles.statusText, { color: colors.success, fontWeight: '700' }]}>
-              ✓ Tu pareja se ha conectado
+            </View>
+
+            <Text style={[styles.title, { color: colors.text }]}>
+              Tu código de sala
             </Text>
-          )}
-        </View>
+
+            {/* Código de sala en grande (serif) */}
+            <View
+              style={[
+                styles.codeBox,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border2,
+                },
+              ]}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="large" color={colors.salmon} />
+              ) : (
+                <Text
+                  style={[
+                    styles.codeText,
+                    {
+                      color: colors.salmon,
+                      fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+                    },
+                  ]}
+                >
+                  {roomCode || '----'}
+                </Text>
+              )}
+            </View>
+
+            {/* Acciones de compartir / copiar */}
+            <View style={styles.buttonsRow}>
+              <TouchableOpacity
+                onPress={handleCopyCode}
+                disabled={!roomCode}
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  {copied ? '✓ ¡Copiado!' : '📋 Copiar código'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleShare}
+                disabled={!roomCode}
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                  📤 Compartir
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.instructionsText, { color: colors.text2 }]}>
+              Comparte el código con tu pareja para empezar juntos.
+            </Text>
+
+            {!partnerConnected && (
+              <View style={styles.loadingFooter}>
+                <ActivityIndicator size="small" color={colors.salmon} />
+                <Text style={[styles.loadingHint, { color: colors.text3 }]}>
+                  Detectando conexión automáticamente…
+                </Text>
+              </View>
+            )}
+          </View>
+        ) : (
+          /* ================= PANTALLA DEL GUEST (ESPERANDO FILTROS) ================= */
+          <View style={styles.cardContainer}>
+            <View style={styles.statusPill}>
+              <View style={[styles.dot, { backgroundColor: colors.salmon }]} />
+              <Text style={[styles.statusPillText, { color: colors.text }]}>
+                Esperando filtros...
+              </Text>
+            </View>
+
+            <Text style={styles.emojiHero}>👀</Text>
+
+            <Text style={[styles.title, { color: colors.text }]}>
+              Estate al loro 👀
+            </Text>
+
+            <Text style={[styles.guestMessage, { color: colors.text2 }]}>
+              Tu pareja ha creado la sala y está eligiendo el sexo y el origen de los nombres con los que vais a jugar.
+            </Text>
+
+            <Text style={[styles.guestPunchline, { color: colors.salmon }]}>
+              ¡Que no te la líe!
+            </Text>
+
+            <View style={styles.loadingFooter}>
+              <ActivityIndicator size="small" color={colors.salmon} />
+              <Text style={[styles.loadingHint, { color: colors.text3 }]}>
+                Conectado a sala {roomCode}. Esperando a que el host inicie…
+              </Text>
+            </View>
+          </View>
+        )}
 
         {error && (
           <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
         )}
       </View>
+
+      {/* Modal de confirmación al salir */}
+      <ConfirmExitModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onConfirm={handleConfirmExit}
+        isPairMode={true}
+      />
     </SafeAreaView>
   );
 }
@@ -158,8 +261,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingVertical: 7,
+    borderRadius: 10,
     borderWidth: 1,
   },
   backButtonText: {
@@ -167,92 +270,108 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   headerTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
   },
   content: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(232, 115, 90, 0.14)',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
   },
-  iconEmoji: {
-    fontSize: 40,
+  cardContainer: {
+    width: '100%',
+    maxWidth: 380,
+    alignItems: 'center',
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 24,
+    gap: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  emojiHero: {
+    fontSize: 64,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 22,
-    maxWidth: 320,
-    marginBottom: 28,
-  },
-  codeCard: {
+  codeBox: {
     width: '100%',
-    maxWidth: 320,
-    borderRadius: 20,
+    paddingVertical: 24,
+    borderRadius: 18,
     borderWidth: 1.5,
-    padding: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 4,
+    justifyContent: 'center',
     marginBottom: 20,
   },
-  codeLabel: {
-    fontWeight: '700',
-    letterSpacing: 1.5,
-    marginBottom: 8,
-  },
   codeText: {
-    fontSize: 44,
-    fontWeight: '900',
+    fontSize: 46,
+    fontWeight: '800',
     letterSpacing: 6,
-    marginVertical: 6,
   },
-  shareButton: {
-    marginTop: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 14,
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+    marginBottom: 16,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 12,
     borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  shareButtonText: {
+  actionButtonText: {
     fontSize: 14,
     fontWeight: '600',
   },
-  statusBox: {
+  instructionsText: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  guestMessage: {
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 12,
+  },
+  guestPunchline: {
+    fontSize: 17,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 28,
+  },
+  loadingFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    borderWidth: 1,
-    maxWidth: 320,
-    width: '100%',
+    gap: 10,
+    marginTop: 8,
   },
-  statusText: {
-    fontSize: 14,
-    fontWeight: '500',
+  loadingHint: {
+    fontSize: 13,
   },
   errorText: {
-    marginTop: 14,
+    marginTop: 16,
     fontSize: 13,
     textAlign: 'center',
   },

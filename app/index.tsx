@@ -9,211 +9,314 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../src/theme';
 import { useRoom } from '../src/contexts/RoomContext';
 
+const VALID_CODE_REGEX = /^[A-Z2-9]*$/;
+
 export default function Home() {
   const { colors, isDark, toggleTheme, spacing, typography } = useTheme();
   const router = useRouter();
-  const { joinRoom, isLoading, error } = useRoom();
+  const {
+    createRoom,
+    joinRoom,
+    error,
+    savedRoomCode,
+    clearSavedRoom,
+  } = useRoom();
 
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [joinCodeInput, setJoinCodeInput] = useState('');
-  const [joinError, setJoinError] = useState<string | null>(null);
+  const [joinCode, setJoinCode] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(Boolean(savedRoomCode));
 
-  const handleJoinSubmit = async () => {
-    setJoinError(null);
-    const code = joinCodeInput.trim().toUpperCase();
+  const handleCodeChange = (text: string) => {
+    const uppercase = text.toUpperCase().trim();
+    // Filtrar caracteres válidos (A-Z y 2-9 sin ambigüedades)
+    if (VALID_CODE_REGEX.test(uppercase) && uppercase.length <= 4) {
+      setJoinCode(uppercase);
+      setErrorMessage(null);
+    }
+  };
+
+  const handleCreateRoom = async () => {
+    setErrorMessage(null);
+    setIsCreating(true);
+    try {
+      await createRoom();
+      router.push('/waiting');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error creando sala';
+      setErrorMessage(msg);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleJoin = async (targetCode?: string) => {
+    const code = (targetCode || joinCode).trim().toUpperCase();
     if (code.length !== 4) {
-      setJoinError('El código debe tener 4 caracteres');
+      setErrorMessage('El código debe tener 4 caracteres');
       return;
     }
+    setErrorMessage(null);
+    setIsJoining(true);
     const success = await joinRoom(code);
+    setIsJoining(false);
     if (success) {
-      setShowJoinModal(false);
-      setJoinCodeInput('');
+      if (showResumeModal) setShowResumeModal(false);
       router.push('/waiting');
     } else {
-      setJoinError(error || 'No se pudo conectar a la sala');
+      setErrorMessage(error || 'Sala no encontrada. ¿El código es correcto?');
     }
+  };
+
+  const handleSolo = () => {
+    router.push('/setup?mode=solo');
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
-      {/* Barra superior con selector de tema */}
-      <View style={[styles.topBar, { paddingHorizontal: spacing.md }]}>
-        <View />
-        <TouchableOpacity
-          onPress={toggleTheme}
-          style={[
-            styles.themeToggle,
-            {
-              backgroundColor: colors.surface2,
-              borderColor: colors.border2,
-            },
-          ]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.themeToggleText, { color: colors.text }]}>
-            {isDark ? '☀️ Claro' : '🌙 Oscuro'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Contenido principal centrado */}
-      <View style={[styles.mainContent, { paddingHorizontal: spacing.lg }]}>
-        {/* Logo / Emblema central */}
-        <View style={styles.logoBadge}>
-          <Text style={styles.logoEmoji}>👶</Text>
-        </View>
-
-        {/* Textos de Bienvenida */}
-        <Text style={[styles.title, { color: colors.salmon }]}>BebéMatch</Text>
-        <Text style={[styles.subtitle, { color: colors.text2 }]}>
-          Descubre y elige el nombre de tu bebé en pareja o a tu propio ritmo
-        </Text>
-
-        {/* Los 3 Botones Principales */}
-        <View style={styles.buttonsContainer}>
-          {/* 1. Crear Sala */}
-          <TouchableOpacity
-            onPress={() => router.push('/waiting')}
-            style={[styles.primaryButton, { backgroundColor: colors.salmon }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.primaryButtonText}>Crear sala</Text>
-            <Text style={styles.buttonHintLight}>Modo pareja · Crea código e invita</Text>
-          </TouchableOpacity>
-
-          {/* 2. Unirse a Sala */}
-          <TouchableOpacity
-            onPress={() => {
-              setJoinError(null);
-              setShowJoinModal(true);
-            }}
-            style={[
-              styles.secondaryButton,
-              {
-                backgroundColor: colors.surface2,
-                borderColor: colors.salmon,
-              },
-            ]}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.secondaryButtonText, { color: colors.salmon }]}>
-              Unirse a sala
-            </Text>
-            <Text style={[styles.buttonHint, { color: colors.text3 }]}>
-              Introduce el código de tu pareja
-            </Text>
-          </TouchableOpacity>
-
-          {/* 3. Modo Solitario */}
-          <TouchableOpacity
-            onPress={() => router.push('/setup')}
-            style={[
-              styles.tertiaryButton,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.border2,
-              },
-            ]}
-            activeOpacity={0.8}
-          >
-            <Text style={[styles.tertiaryButtonText, { color: colors.text }]}>
-              Modo solitario
-            </Text>
-            <Text style={[styles.buttonHint, { color: colors.text3 }]}>
-              Explora y guarda tus favoritos sin red
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Pie sutil */}
-      <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.text3, fontSize: typography.fontSize.xs }]}>
-          473 nombres seleccionados · Significados y curiosidades
-        </Text>
-      </View>
-
-      {/* Modal para Unirse con Código */}
-      <Modal
-        visible={showJoinModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowJoinModal(false)}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardView}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalOverlay}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <View
-            style={[
-              styles.modalCard,
-              {
-                backgroundColor: colors.surface,
-                borderColor: colors.border2,
-              },
-            ]}
-          >
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Unirse a Sala</Text>
-            <Text style={[styles.modalSubtitle, { color: colors.text2 }]}>
-              Introduce el código de 4 caracteres que te compartió tu pareja:
-            </Text>
-
-            <TextInput
-              value={joinCodeInput}
-              onChangeText={(text) => setJoinCodeInput(text.toUpperCase())}
-              placeholder="ABCD"
-              placeholderTextColor={colors.text3}
-              maxLength={4}
-              autoCapitalize="characters"
-              autoCorrect={false}
+          {/* Barra superior con selector de tema */}
+          <View style={[styles.topBar, { paddingHorizontal: spacing.md }]}>
+            <View />
+            <TouchableOpacity
+              onPress={toggleTheme}
               style={[
-                styles.inputCode,
+                styles.themeToggle,
                 {
                   backgroundColor: colors.surface2,
                   borderColor: colors.border2,
-                  color: colors.salmon,
                 },
               ]}
-            />
-
-            {(joinError || error) && (
-              <Text style={[styles.modalError, { color: colors.error }]}>
-                {joinError || error}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.themeToggleText, { color: colors.text }]}>
+                {isDark ? '☀️ Claro' : '🌙 Oscuro'}
               </Text>
-            )}
+            </TouchableOpacity>
+          </View>
 
-            <View style={styles.modalButtonsRow}>
+          {/* Contenido principal centrado */}
+          <View style={[styles.mainSection, { paddingHorizontal: spacing.lg }]}>
+            {/* Logo y Encabezado según especificación */}
+            <View style={styles.brandContainer}>
+              <Text style={[styles.brandTitle, { color: colors.salmon }]}>
+                bebématch
+              </Text>
+              <Text style={[styles.brandByline, { color: colors.text3 }]}>
+                BY CARLOS TN
+              </Text>
+              <Text style={[styles.brandTagline, { color: colors.text2 }]}>
+                encontrad juntos el nombre perfecto ✨
+              </Text>
+            </View>
+
+            {/* Acciones principales */}
+            <View style={styles.actionsContainer}>
+              {/* Botón primario: Crear sala nueva */}
               <TouchableOpacity
-                onPress={() => setShowJoinModal(false)}
-                style={[styles.modalButtonCancel, { backgroundColor: colors.surface2 }]}
+                onPress={handleCreateRoom}
+                disabled={isCreating || isJoining}
+                style={[
+                  styles.primaryButton,
+                  { backgroundColor: colors.salmon },
+                ]}
+                activeOpacity={0.8}
               >
-                <Text style={[styles.modalButtonCancelText, { color: colors.text2 }]}>
-                  Cancelar
+                {isCreating ? (
+                  <View style={styles.loadingRow}>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <Text style={styles.primaryButtonText}>Conectando…</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.primaryButtonText}>✦ Crear sala nueva</Text>
+                )}
+              </TouchableOpacity>
+
+              {/* Botón secundario: Modo un jugador */}
+              <TouchableOpacity
+                onPress={handleSolo}
+                disabled={isCreating || isJoining}
+                style={[
+                  styles.secondaryButton,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border2,
+                  },
+                ]}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>
+                  👤 Modo un jugador
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={handleJoinSubmit}
-                disabled={isLoading}
-                style={[styles.modalButtonConfirm, { backgroundColor: colors.salmon }]}
-              >
-                {isLoading ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Text style={styles.modalButtonConfirmText}>Entrar</Text>
-                )}
-              </TouchableOpacity>
+              {/* Separador */}
+              <View style={styles.separatorContainer}>
+                <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
+                <Text style={[styles.separatorText, { color: colors.text3 }]}>
+                  o únete a una sala
+                </Text>
+                <View style={[styles.separatorLine, { backgroundColor: colors.border }]} />
+              </View>
+
+              {/* Campo directo de código de sala + Botón Unirse (especificación directa sin modal) */}
+              <View style={styles.joinInputRow}>
+                <TextInput
+                  value={joinCode}
+                  onChangeText={handleCodeChange}
+                  placeholder="CÓDIGO"
+                  placeholderTextColor={colors.text3}
+                  maxLength={4}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  style={[
+                    styles.joinInput,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border2,
+                      color: colors.text,
+                    },
+                  ]}
+                />
+                <TouchableOpacity
+                  onPress={() => handleJoin()}
+                  disabled={joinCode.length !== 4 || isJoining}
+                  style={[
+                    styles.joinButton,
+                    {
+                      backgroundColor:
+                        joinCode.length === 4 ? colors.salmon : colors.surface2,
+                      borderColor:
+                        joinCode.length === 4 ? colors.salmon : colors.border,
+                    },
+                  ]}
+                  activeOpacity={0.8}
+                >
+                  {isJoining ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text
+                      style={[
+                        styles.joinButtonText,
+                        {
+                          color:
+                            joinCode.length === 4 ? '#FFFFFF' : colors.text3,
+                        },
+                      ]}
+                    >
+                      Unirse →
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {/* Mensaje de error si falla la unión */}
+              {errorMessage && (
+                <Text style={[styles.errorText, { color: colors.error }]}>
+                  {errorMessage}
+                </Text>
+              )}
+
+              {/* Nota explicativa inferior */}
+              <Text style={[styles.helperNote, { color: colors.text3 }]}>
+                Dos personas pueden conectarse desde cualquier dispositivo usando el mismo código de sala
+              </Text>
             </View>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+
+          {/* Pie de página sutil */}
+          <View style={styles.footer}>
+            <Text
+              style={[
+                styles.footerText,
+                { color: colors.text3, fontSize: typography.fontSize.xs },
+              ]}
+            >
+              473 nombres seleccionados · Significados y curiosidades
+            </Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Modal de reanudar sala si hay una sala activa guardada */}
+      {savedRoomCode && (
+        <Modal
+          visible={showResumeModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowResumeModal(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View
+              style={[
+                styles.modalCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border2,
+                },
+              ]}
+            >
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                ¿Volver a tu sala?
+              </Text>
+              <Text style={[styles.modalSubtitle, { color: colors.text2 }]}>
+                Tienes una partida en curso con el código:
+              </Text>
+              <Text style={[styles.modalCode, { color: colors.salmon }]}>
+                {savedRoomCode}
+              </Text>
+
+              <View style={styles.modalButtonsRow}>
+                <TouchableOpacity
+                  onPress={() => {
+                    clearSavedRoom();
+                    setShowResumeModal(false);
+                  }}
+                  style={[
+                    styles.modalButtonCancel,
+                    { backgroundColor: colors.surface2, borderColor: colors.border },
+                  ]}
+                >
+                  <Text style={[styles.modalButtonCancelText, { color: colors.text2 }]}>
+                    Nueva sala
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handleJoin(savedRoomCode)}
+                  disabled={isJoining}
+                  style={[
+                    styles.modalButtonConfirm,
+                    { backgroundColor: colors.salmon },
+                  ]}
+                >
+                  {isJoining ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <Text style={styles.modalButtonConfirmText}>Volver →</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -221,10 +324,16 @@ export default function Home() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'space-between',
+    paddingBottom: 16,
   },
   topBar: {
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -240,153 +349,181 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  mainContent: {
+  mainSection: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    maxWidth: 440,
+    width: '100%',
+    alignSelf: 'center',
   },
-  logoBadge: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: 'rgba(232, 115, 90, 0.15)',
+  brandContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 36,
   },
-  logoEmoji: {
-    fontSize: 44,
-  },
-  title: {
-    fontSize: 42,
-    fontWeight: '900',
+  brandTitle: {
+    fontSize: 48,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    fontStyle: 'italic',
+    fontWeight: '600',
     letterSpacing: -0.5,
-    textAlign: 'center',
+    marginBottom: 4,
   },
-  subtitle: {
+  brandByline: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2.2,
+    marginBottom: 10,
+    textTransform: 'uppercase',
+  },
+  brandTagline: {
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
-    marginTop: 8,
-    marginBottom: 36,
-    maxWidth: 320,
   },
-  buttonsContainer: {
+  actionsContainer: {
     width: '100%',
-    maxWidth: 340,
-    gap: 14,
   },
   primaryButton: {
+    width: '100%',
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 16,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  buttonHintLight: {
-    color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
+    fontSize: 17,
+    fontWeight: '700',
   },
   secondaryButton: {
+    width: '100%',
     paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    borderWidth: 1.8,
+    borderRadius: 14,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 24,
   },
   secondaryButtonText: {
-    fontSize: 17,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '600',
   },
-  buttonHint: {
+  separatorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  separatorLine: {
+    flex: 1,
+    height: 1,
+  },
+  separatorText: {
     fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
+    marginHorizontal: 12,
+    textTransform: 'lowercase',
   },
-  tertiaryButton: {
-    paddingVertical: 15,
+  joinInputRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+    marginBottom: 12,
+  },
+  joinInput: {
+    flex: 1,
+    height: 52,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    paddingHorizontal: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 4,
+    textAlign: 'center',
+  },
+  joinButton: {
     paddingHorizontal: 20,
-    borderRadius: 16,
+    height: 52,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tertiaryButtonText: {
-    fontSize: 17,
+  joinButtonText: {
+    fontSize: 15,
     fontWeight: '700',
   },
+  errorText: {
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  helperNote: {
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
   footer: {
-    paddingBottom: 20,
+    paddingVertical: 8,
     alignItems: 'center',
   },
   footerText: {
-    fontWeight: '500',
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 24,
   },
   modalCard: {
     width: '100%',
-    maxWidth: 320,
-    borderRadius: 22,
-    borderWidth: 1.5,
-    padding: 24,
+    maxWidth: 340,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 22,
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 6,
+    fontSize: 19,
+    fontWeight: '700',
+    marginBottom: 8,
   },
   modalSubtitle: {
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 18,
+    marginBottom: 10,
   },
-  inputCode: {
-    width: '100%',
-    height: 56,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    textAlign: 'center',
-    fontSize: 28,
+  modalCode: {
+    fontSize: 32,
     fontWeight: '800',
-    letterSpacing: 6,
-    marginBottom: 12,
-  },
-  modalError: {
-    fontSize: 12,
-    marginBottom: 12,
-    textAlign: 'center',
+    letterSpacing: 4,
+    marginBottom: 20,
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
   },
   modalButtonsRow: {
     flexDirection: 'row',
     gap: 12,
     width: '100%',
-    marginTop: 8,
   },
   modalButtonCancel: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
+    borderWidth: 1,
     alignItems: 'center',
   },
   modalButtonCancelText: {
@@ -400,8 +537,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalButtonConfirmText: {
-    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '700',
+    color: '#FFFFFF',
   },
 });

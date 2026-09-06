@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { IName } from '../types';
+import { IName, IFilters } from '../types';
 import { NAMES_DB } from '../data/names';
 
 export interface RoomContextValue {
@@ -10,22 +10,34 @@ export interface RoomContextValue {
   roomCode: string | null;
   isHost: boolean;
   partnerConnected: boolean;
+  partnerDone: boolean;
+  partnerProgress: number;
   myLikes: Record<string, boolean>;
   partnerLikes: Record<string, boolean>;
   matches: IName[];
   lastMatch: IName | null;
+  rushMode: boolean;
+  roomFilters: IFilters | null;
+  roomSeed: number | null;
+  savedRoomCode: string | null;
   isLoading: boolean;
   error: string | null;
+  setRushMode: (rush: boolean) => void;
   createRoom: () => Promise<string>;
   joinRoom: (code: string) => Promise<boolean>;
+  publishFilters: (filters: IFilters, seed: number) => Promise<void>;
   submitVote: (name: IName, liked: boolean) => Promise<void>;
+  notifyProgress: (index: number) => Promise<void>;
+  notifyDone: () => Promise<void>;
   clearLastMatch: () => void;
+  clearSavedRoom: () => void;
   leaveRoom: () => void;
 }
 
 const USER_ID_STORAGE_KEY = '@bebematch_user_id';
+const ROOM_STORAGE_KEY = 'bm_room';
 
-// Caracteres legibles para código de sala (sin 0, O, 1, I para evitar confusiones)
+// Alfabeto sin ambigüedades (A-Z sin I/O y 2-9 sin 0/1)
 const ROOM_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 function generateRoomCode(): string {
@@ -43,6 +55,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState<boolean>(false);
   const [partnerConnected, setPartnerConnected] = useState<boolean>(false);
+  const [partnerDone, setPartnerDone] = useState<boolean>(false);
+  const [partnerProgress, setPartnerProgress] = useState<number>(0);
+  const [rushMode, setRushMode] = useState<boolean>(false);
+  const [roomFilters, setRoomFilters] = useState<IFilters | null>(null);
+  const [roomSeed, setRoomSeed] = useState<number | null>(null);
+  const [savedRoomCode, setSavedRoomCode] = useState<string | null>(null);
+
   const [myLikes, setMyLikes] = useState<Record<string, boolean>>({});
   const [partnerLikes, setPartnerLikes] = useState<Record<string, boolean>>({});
   const [matches, setMatches] = useState<IName[]>([]);
@@ -51,8 +70,9 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const processedRecordIdsRef = useRef<Set<string>>(new Set());
 
-  // Inicializar o recuperar myId
+  // Inicializar o recuperar myId y sala guardada
   useEffect(() => {
     AsyncStorage.getItem(USER_ID_STORAGE_KEY).then((stored) => {
       if (stored) {
@@ -63,7 +83,121 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMyId(newId);
       }
     });
+
+    AsyncStorage.getItem(ROOM_STORAGE_KEY).then((saved) => {
+      if (saved && saved.length === 4) {
+        setSavedRoomCode(saved);
+      }
+    });
   }, []);
+
+  // Procesa un registro entrante (vía Realtime o vía Polling)
+  const processRecord = useCallback(
+    (
+      record: {
+        id?: string;
+        room_code: string;
+        user_id: string;
+        name: string;
+        liked: boolean;
+      },
+      currentUserId: string
+    ) => {
+      if (!record || record.user_id === currentUserId) return;
+
+      // Si este registro ya fue procesado antes por ID, ignorarlo para no provocar re-renders
+      if (record.id) {
+        if (processedRecordIdsRef.current.has(record.id)) {
+          return;
+        }
+        processedRecordIdsRef.current.add(record.id);
+      }
+
+      // Cualquier registro de otro usuario confirma la presencia de la pareja
+      setPartnerConnected((prev) => (prev ? prev : true));
+
+      // Mensaje de presencia pura
+      if (record.name === '__presence__') {
+        return;
+      }
+
+      // Mensaje de filtros: formato web clásico (name='__filters__', user_id=JSON)
+      if (record.name === '__filters__') {
+        try {
+          const data = JSON.parse(record.user_id);
+          const seed = data._seed ?? data.seed;
+          setRoomFilters((prev) => {
+            if (prev && JSON.stringify(prev) === JSON.stringify(data)) return prev;
+            return data;
+          });
+          if (seed !== undefined) {
+            setRoomSeed((prev) => (prev === seed ? prev : seed));
+          }
+        } catch (e) {
+          console.warn('Error parseando filtros web en processRecord:', e);
+        }
+        return;
+      }
+
+      // Mensaje de filtros: formato directo (name='__filters__:<json>')
+      if (record.name.startsWith('__filters__:')) {
+        try {
+          const data = JSON.parse(record.name.substring(12));
+          if (data.filters) {
+            setRoomFilters((prev) => {
+              if (prev && JSON.stringify(prev) === JSON.stringify(data.filters)) return prev;
+              return data.filters;
+            });
+          }
+          if (data.seed !== undefined) {
+            setRoomSeed((prev) => (prev === data.seed ? prev : data.seed));
+          }
+        } catch (e) {
+          console.warn('Error parseando filtros recibidos:', e);
+        }
+        return;
+      }
+
+      // Mensaje de progreso de la baraja
+      if (record.name.startsWith('__progress__:')) {
+        const count = parseInt(record.name.substring(13), 10);
+        if (!isNaN(count)) {
+          setPartnerProgress((prev) => (prev === count ? prev : count));
+        }
+        return;
+      }
+
+      // Mensaje de fin de baraja
+      if (record.name === '__done__') {
+        setPartnerDone((prev) => (prev ? prev : true));
+        return;
+      }
+
+      // Voto normal de nombre
+      setPartnerLikes((prev) => {
+        if (prev[record.name] === record.liked) return prev;
+        return { ...prev, [record.name]: record.liked };
+      });
+
+      // Comprobar si ya me gustaba a mí -> ¡MATCH!
+      setMyLikes((currentMyLikes) => {
+        if (record.liked && currentMyLikes[record.name]) {
+          const matchedName = NAMES_DB.find((n) => n.n === record.name);
+          if (matchedName) {
+            setMatches((prevMatches) => {
+              if (!prevMatches.some((m) => m.n === matchedName.n)) {
+                return [...prevMatches, matchedName];
+              }
+              return prevMatches;
+            });
+            setLastMatch(matchedName);
+          }
+        }
+        return currentMyLikes;
+      });
+    },
+    []
+  );
 
   // Función para suscribirse a cambios de Supabase Realtime
   const subscribeToRoom = useCallback(
@@ -89,45 +223,41 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
               name: string;
               liked: boolean;
             };
-
-            // Si el voto viene del otro usuario
-            if (record && record.user_id !== currentUserId) {
-              setPartnerConnected(true);
-
-              if (record.name === '__presence__') {
-                return;
-              }
-
-              setPartnerLikes((prev) => {
-                const next = { ...prev, [record.name]: record.liked };
-                return next;
-              });
-
-              // Comprobar si ya me gustaba a mí -> ¡MATCH!
-              setMyLikes((currentMyLikes) => {
-                if (record.liked && currentMyLikes[record.name]) {
-                  const matchedName = NAMES_DB.find((n) => n.n === record.name);
-                  if (matchedName) {
-                    setMatches((prevMatches) => {
-                      if (!prevMatches.some((m) => m.n === matchedName.n)) {
-                        return [...prevMatches, matchedName];
-                      }
-                      return prevMatches;
-                    });
-                    setLastMatch(matchedName);
-                  }
-                }
-                return currentMyLikes;
-              });
-            }
+            processRecord(record, currentUserId);
           }
         )
         .subscribe();
 
       channelRef.current = channel;
     },
-    []
+    [processRecord]
   );
+
+  // Polling continuo de respaldo (idéntico a la versión web original)
+  // Garantiza que la sala se sincronice aun si el websocket sufre reconexión o retraso en Expo Go / túnel
+  useEffect(() => {
+    if (!roomCode) return;
+    const currentUserId = myId;
+
+    const interval = setInterval(async () => {
+      try {
+        const { data: votes } = await supabase
+          .from('votes')
+          .select('*')
+          .eq('room_code', roomCode);
+
+        if (!votes || votes.length === 0) return;
+
+        votes.forEach((v) => {
+          processRecord(v, currentUserId);
+        });
+      } catch (e) {
+        // Ignorar fallos transitorios de red en el sondeo
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [roomCode, myId, processRecord]);
 
   // Limpiar canal al desmontar
   useEffect(() => {
@@ -143,7 +273,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     try {
       const code = generateRoomCode();
-      const userId = myId || `user_${Date.now()}`;
+      let userId = myId;
+      if (!userId) {
+        userId = `user_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
+        setMyId(userId);
+        AsyncStorage.setItem(USER_ID_STORAGE_KEY, userId).catch(() => {});
+      }
 
       // Insertar presencia inicial en Supabase
       const { error: insertError } = await supabase.from('votes').insert([
@@ -162,10 +297,17 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setRoomCode(code);
       setIsHost(true);
       setPartnerConnected(false);
+      setPartnerDone(false);
+      setPartnerProgress(0);
+      setRoomFilters(null);
+      setRoomSeed(null);
       setMyLikes({});
       setPartnerLikes({});
       setMatches([]);
       setLastMatch(null);
+
+      AsyncStorage.setItem(ROOM_STORAGE_KEY, code).catch(() => {});
+      setSavedRoomCode(code);
 
       subscribeToRoom(code, userId);
 
@@ -190,7 +332,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       setError(null);
       try {
-        const userId = myId || `user_${Date.now()}`;
+        let userId = myId;
+        if (!userId) {
+          userId = `user_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
+          setMyId(userId);
+          AsyncStorage.setItem(USER_ID_STORAGE_KEY, userId).catch(() => {});
+        }
 
         // Verificar si existe la sala en la tabla votes
         const { data: existingVotes, error: fetchError } = await supabase
@@ -203,7 +350,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (!existingVotes || existingVotes.length === 0) {
-          setError('No encontramos ninguna sala con ese código.');
+          setError('Sala no encontrada. ¿El código es correcto?');
           return false;
         }
 
@@ -217,20 +364,61 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
         ]);
 
-        // Cargar votos previos de la pareja
+        // Cargar votos previos de la pareja y filtros si ya existen
         const initialPartnerLikes: Record<string, boolean> = {};
-        const otherVotes = existingVotes.filter((v) => v.user_id !== userId && v.name !== '__presence__');
+        let receivedFilters: IFilters | null = null;
+        let receivedSeed: number | null = null;
+        let partnerFinished = false;
+
+        const otherVotes = existingVotes.filter((v) => v.user_id !== userId);
         otherVotes.forEach((v) => {
+          if (v.name === '__presence__') return;
+          if (v.name === '__done__') {
+            partnerFinished = true;
+            return;
+          }
+          if (v.name === '__filters__') {
+            try {
+              const data = JSON.parse(v.user_id);
+              receivedFilters = data;
+              if (data._seed !== undefined || data.seed !== undefined) {
+                receivedSeed = data._seed ?? data.seed;
+              }
+            } catch (e) {
+              console.warn('Error parseando filtros web en joinRoom:', e);
+            }
+            return;
+          }
+          if (v.name.startsWith('__filters__:')) {
+            try {
+              const data = JSON.parse(v.name.substring(12));
+              if (data.filters) receivedFilters = data.filters;
+              if (data.seed !== undefined) receivedSeed = data.seed;
+            } catch (e) {
+              console.warn('Error parseando filtros existentes:', e);
+            }
+            return;
+          }
+          if (v.name.startsWith('__progress__:')) {
+            return;
+          }
           initialPartnerLikes[v.name] = v.liked;
         });
 
         setRoomCode(code);
         setIsHost(false);
         setPartnerConnected(true);
+        setPartnerDone(partnerFinished);
+        setPartnerProgress(0);
+        setRoomFilters(receivedFilters);
+        setRoomSeed(receivedSeed);
         setMyLikes({});
         setPartnerLikes(initialPartnerLikes);
         setMatches([]);
         setLastMatch(null);
+
+        AsyncStorage.setItem(ROOM_STORAGE_KEY, code).catch(() => {});
+        setSavedRoomCode(code);
 
         subscribeToRoom(code, userId);
 
@@ -245,6 +433,71 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
     [myId, subscribeToRoom]
   );
+
+  const publishFilters = useCallback(
+    async (filters: IFilters, seed: number) => {
+      if (!roomCode) return;
+      setRoomFilters(filters);
+      setRoomSeed(seed);
+      const userId = myId || `user_${Date.now()}`;
+      try {
+        await supabase.from('votes').insert([
+          {
+            room_code: roomCode,
+            user_id: JSON.stringify({ ...filters, seed }),
+            name: '__filters__',
+            liked: false,
+          },
+          {
+            room_code: roomCode,
+            user_id: userId,
+            name: `__filters__:${JSON.stringify({ filters, seed })}`,
+            liked: false,
+          },
+        ]);
+      } catch (e) {
+        console.warn('Error publicando filtros a Supabase:', e);
+      }
+    },
+    [roomCode, myId]
+  );
+
+  const notifyProgress = useCallback(
+    async (index: number) => {
+      if (!roomCode) return;
+      const userId = myId || `user_${Date.now()}`;
+      try {
+        await supabase.from('votes').insert([
+          {
+            room_code: roomCode,
+            user_id: userId,
+            name: `__progress__:${index}`,
+            liked: false,
+          },
+        ]);
+      } catch (e) {
+        console.warn('Error notificando progreso:', e);
+      }
+    },
+    [roomCode, myId]
+  );
+
+  const notifyDone = useCallback(async () => {
+    if (!roomCode) return;
+    const userId = myId || `user_${Date.now()}`;
+    try {
+      await supabase.from('votes').insert([
+        {
+          room_code: roomCode,
+          user_id: userId,
+          name: '__done__',
+          liked: false,
+        },
+      ]);
+    } catch (e) {
+      console.warn('Error notificando fin de baraja:', e);
+    }
+  }, [roomCode, myId]);
 
   const submitVote = useCallback(
     async (name: IName, liked: boolean) => {
@@ -286,20 +539,31 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLastMatch(null);
   }, []);
 
+  const clearSavedRoom = useCallback(() => {
+    AsyncStorage.removeItem(ROOM_STORAGE_KEY).catch(() => {});
+    setSavedRoomCode(null);
+  }, []);
+
   const leaveRoom = useCallback(() => {
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
+    clearSavedRoom();
+    processedRecordIdsRef.current.clear();
     setRoomCode(null);
     setIsHost(false);
     setPartnerConnected(false);
+    setPartnerDone(false);
+    setPartnerProgress(0);
+    setRoomFilters(null);
+    setRoomSeed(null);
     setMyLikes({});
     setPartnerLikes({});
     setMatches([]);
     setLastMatch(null);
     setError(null);
-  }, []);
+  }, [clearSavedRoom]);
 
   const value = useMemo(
     () => ({
@@ -307,16 +571,27 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       roomCode,
       isHost,
       partnerConnected,
+      partnerDone,
+      partnerProgress,
       myLikes,
       partnerLikes,
       matches,
       lastMatch,
+      rushMode,
+      roomFilters,
+      roomSeed,
+      savedRoomCode,
       isLoading,
       error,
+      setRushMode,
       createRoom,
       joinRoom,
+      publishFilters,
       submitVote,
+      notifyProgress,
+      notifyDone,
       clearLastMatch,
+      clearSavedRoom,
       leaveRoom,
     }),
     [
@@ -324,16 +599,27 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       roomCode,
       isHost,
       partnerConnected,
+      partnerDone,
+      partnerProgress,
       myLikes,
       partnerLikes,
       matches,
       lastMatch,
+      rushMode,
+      roomFilters,
+      roomSeed,
+      savedRoomCode,
       isLoading,
       error,
+      setRushMode,
       createRoom,
       joinRoom,
+      publishFilters,
       submitVote,
+      notifyProgress,
+      notifyDone,
       clearLastMatch,
+      clearSavedRoom,
       leaveRoom,
     ]
   );

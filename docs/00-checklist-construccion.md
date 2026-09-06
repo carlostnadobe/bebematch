@@ -16,8 +16,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 - [ ] Alcance de la primera versión (MVP) cerrado: qué entra y qué **no**.
 - [x] **Los dos modos soportados:** en pareja (gancho comercial, tiempo real) y en solitario
       (sin sala). El flujo en solitario no depende de la sala ni del tiempo real.
-- [ ] Flujos de usuario definidos de principio a fin (ver [01 · Funcional](./01-definicion-funcional.md)).
-- [ ] Casos límite acordados: sala inexistente, pareja que se desconecta, sin conexión,
+- [x] Flujos de usuario definidos de principio a fin (ver [docs/flujos/](./flujos/)).
+- [x] Casos límite acordados: sala inexistente, pareja que se desconecta, sin conexión,
       baraja terminada, ambos votan a la vez, etc.
 - [ ] Criterios de éxito del producto (qué significa que "funciona bien").
 
@@ -25,8 +25,8 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 
 - [x] **Design system** definido: colores (claro/oscuro), tipografías, espaciados, radios,
       sombras, tamaños de botón/toque (mínimo 44×44 pt).
-- [~] Componentes clave diseñados: carta de nombre ([x]), botones de swipe ([x]), cabeceras ([x]),
-      resumen ([x]), pantalla de match ([x]), toasts.
+- [x] Componentes clave diseñados: carta de nombre ([x]), botones de swipe ([x]), cabeceras ([x]),
+      resumen ([x]), pantalla de match ([x]), toasts ([x]), modales ([x]).
 - [ ] Estados de cada pantalla: normal, **cargando**, **vacío**, **error**, **sin conexión**.
 - [ ] Prototipo o wireframes de las pantallas principales antes de codificar.
 - [x] Microinteracciones y animaciones: swipe fluido con Reanimated ([x]), confeti ([x]), partículas ([x]).
