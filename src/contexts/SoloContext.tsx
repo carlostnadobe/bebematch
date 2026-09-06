@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { IName, IFilters, ISoloVote } from '../types';
+import { IName, IFilters, ISoloVote, AffinityVote } from '../types';
 import { NAMES_DB } from '../data/names';
 
 interface SoloContextValue {
@@ -9,14 +9,20 @@ interface SoloContextValue {
   currentCard: IName | null;
   history: ISoloVote[];
   likedNames: IName[];
+  selectedMap: Record<string, boolean>;
+  top1Names: IName[];
   isFinished: boolean;
   totalCards: number;
   remainingCount: number;
   setFilters: React.Dispatch<React.SetStateAction<IFilters>>;
   startSession: (customFilters?: IFilters, seed?: number, preserveHistory?: boolean) => void;
   refineSession: (matches: IName[]) => void;
-  vote: (liked: boolean) => void;
+  vote: (likedOrAffinity: boolean | AffinityVote) => void;
+  stampCard: (targetIndex?: number, liked?: boolean) => void;
+  advance: () => void;
+  removeVote: (targetIndex?: number) => void;
   undo: () => void;
+  toggleVote: (targetIndex?: number) => void;
   restart: () => void;
 }
 
@@ -57,9 +63,9 @@ export function filterNames(names: IName[], filters: IFilters): IName[] {
         return false;
       }
     }
-    // Filtro de origen
-    if (filters.origins.length > 0 && !filters.origins.includes('todos')) {
-      if (!filters.origins.includes(item.o.toLowerCase())) {
+    // Filtro de orígenes
+    if (filters.origins.length > 0) {
+      if (!filters.origins.includes(item.o)) {
         return false;
       }
     }
@@ -73,7 +79,7 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [filters, setFilters] = useState<IFilters>(defaultFilters);
   const [deck, setDeck] = useState<IName[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [history, setHistory] = useState<ISoloVote[]>([]);
+  const [votesByIndex, setVotesByIndex] = useState<Record<number, ISoloVote>>({});
 
   const startSession = useCallback(
     (customFilters?: IFilters, seed?: number, preserveHistory: boolean = false) => {
@@ -95,7 +101,7 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setDeck(limitedDeck);
       setCurrentIndex(0);
       if (!preserveHistory) {
-        setHistory([]);
+        setVotesByIndex({});
       }
     },
     [filters]
@@ -104,31 +110,120 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refineSession = useCallback((matches: IName[]) => {
     setDeck(matches);
     setCurrentIndex(0);
-    setHistory([]);
+    setVotesByIndex({});
   }, []);
 
   const vote = useCallback(
-    (liked: boolean) => {
+    (likedOrAffinity: boolean | AffinityVote) => {
       if (currentIndex >= deck.length) return;
       const currentName = deck[currentIndex];
-      setHistory((prev) => [
+      const affinity: AffinityVote =
+        typeof likedOrAffinity === 'string'
+          ? likedOrAffinity
+          : likedOrAffinity
+          ? 'like'
+          : 'pass';
+      const liked = affinity !== 'pass';
+      setVotesByIndex((prev) => ({
         ...prev,
-        {
+        [currentIndex]: {
           name: currentName,
           liked,
+          affinity,
           timestamp: Date.now(),
         },
-      ]);
+      }));
       setCurrentIndex((prev) => prev + 1);
     },
     [currentIndex, deck]
   );
 
+  // Sellar ficha sin avanzar el índice (el avance lo hace manualmente el usuario)
+  const stampCard = useCallback(
+    (targetIndex?: number, liked: boolean = true) => {
+      const idx = targetIndex ?? currentIndex;
+      if (idx >= deck.length) return;
+      const card = deck[idx];
+      setVotesByIndex((prev) => ({
+        ...prev,
+        [idx]: {
+          name: card,
+          liked,
+          affinity: liked ? 'like' : 'pass',
+          timestamp: Date.now(),
+        },
+      }));
+    },
+    [currentIndex, deck]
+  );
+
+  const advance = useCallback(() => {
+    if (currentIndex >= deck.length) return;
+    setVotesByIndex((prev) => {
+      // Si ya tiene un voto registrado (sea like o pass), NO lo sobreescribimos
+      if (prev[currentIndex] !== undefined) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [currentIndex]: {
+          name: deck[currentIndex],
+          liked: false,
+          affinity: 'pass',
+          timestamp: Date.now(),
+        },
+      };
+    });
+    setCurrentIndex((prev) => prev + 1);
+  }, [currentIndex, deck]);
+
+  const removeVote = useCallback(
+    (targetIndex?: number) => {
+      const idx = targetIndex ?? currentIndex;
+      if (idx >= deck.length) return;
+      setVotesByIndex((prev) => {
+        const next = { ...prev };
+        if (next[idx]) {
+          next[idx] = {
+            ...next[idx],
+            liked: false,
+            affinity: 'pass',
+            timestamp: Date.now(),
+          };
+        }
+        return next;
+      });
+    },
+    [currentIndex, deck]
+  );
+
+  const toggleVote = useCallback(
+    (targetIndex?: number) => {
+      const idx = targetIndex ?? currentIndex;
+      if (idx >= deck.length) return;
+      const card = deck[idx];
+      setVotesByIndex((prev) => {
+        const currentVote = prev[idx];
+        const newLiked = !currentVote?.liked;
+        return {
+          ...prev,
+          [idx]: {
+            name: card,
+            liked: newLiked,
+            affinity: newLiked ? 'like' : 'pass',
+            timestamp: Date.now(),
+          },
+        };
+      });
+    },
+    [currentIndex, deck]
+  );
+
   const undo = useCallback(() => {
-    if (currentIndex <= 0 || history.length === 0) return;
-    setHistory((prev) => prev.slice(0, prev.length - 1));
+    if (currentIndex <= 0) return;
+    // En la bobina continua, retroceder la cinta no borra la marca de la ficha
     setCurrentIndex((prev) => prev - 1);
-  }, [currentIndex, history.length]);
+  }, [currentIndex]);
 
   const restart = useCallback(() => {
     startSession(filters);
@@ -141,16 +236,38 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   }, [currentIndex, deck]);
 
+  const history = useMemo(() => {
+    return Object.values(votesByIndex).sort((a, b) => a.timestamp - b.timestamp);
+  }, [votesByIndex]);
+
   const likedNames = useMemo(() => {
-    return history.filter((v) => v.liked).map((v) => v.name);
-  }, [history]);
+    return Object.values(votesByIndex)
+      .filter((v) => v.liked)
+      .map((v) => v.name);
+  }, [votesByIndex]);
+
+  const selectedMap = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const v of Object.values(votesByIndex)) {
+      if (v.liked) {
+        map[v.name.n] = true;
+      }
+    }
+    return map;
+  }, [votesByIndex]);
+
+  const top1Names = useMemo(() => {
+    return Object.values(votesByIndex)
+      .filter((v) => v.affinity === 'top1')
+      .map((v) => v.name);
+  }, [votesByIndex]);
 
   const isFinished = useMemo(() => {
     return deck.length > 0 && currentIndex >= deck.length;
   }, [currentIndex, deck.length]);
 
   const totalCards = deck.length;
-  const remainingCount = Math.max(0, totalCards - currentIndex);
+  const remainingCount = Math.max(0, totalCards - Object.keys(votesByIndex).length);
 
   const value = useMemo(
     () => ({
@@ -160,6 +277,8 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentCard,
       history,
       likedNames,
+      selectedMap,
+      top1Names,
       isFinished,
       totalCards,
       remainingCount,
@@ -167,7 +286,11 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
       startSession,
       refineSession,
       vote,
+      stampCard,
+      advance,
+      removeVote,
       undo,
+      toggleVote,
       restart,
     }),
     [
@@ -177,13 +300,19 @@ export const SoloProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentCard,
       history,
       likedNames,
+      selectedMap,
+      top1Names,
       isFinished,
       totalCards,
       remainingCount,
       startSession,
       refineSession,
       vote,
+      stampCard,
+      advance,
+      removeVote,
       undo,
+      toggleVote,
       restart,
     ]
   );

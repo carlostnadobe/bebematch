@@ -60,9 +60,13 @@ export interface IFilters {
   extra?: FilterExtra;
 }
 
+// afinidad de voto (Opción 3: El Podio)
+export type AffinityVote = 'pass' | 'like' | 'top1';
+
 // sesión en solitario
 export interface ISoloVote {
   name: IName;
   liked: boolean;
+  affinity?: AffinityVote;
   timestamp: number;
 }

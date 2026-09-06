@@ -7,3 +7,5 @@ export * from './Match/MatchModal';
 export * from './Match/ConfettiEffect';
 export * from './Match/LikedMatchesModal';
 export * from './Common/ConfirmExitModal';
+export * from './Teletype/PaperTapeRoll';
+export * from './Teletype/TypewriterKeyboard';

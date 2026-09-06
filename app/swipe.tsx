@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,17 @@ import { useRouter } from 'expo-router';
 import {
   HeartIcon,
   LightningBoltIcon,
-  FireIcon,
   SparklesIcon,
   AdjustmentsIcon,
-  CheckIcon,
+  BadgeCheckIcon,
 } from 'react-native-heroicons/solid';
-import { ArrowRightIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
 import {
-  SwipeableCardDeck,
-  SwipeableCardDeckRef,
-  ActionButton,
+  PaperTapeRoll,
+  PaperTapeRollRef,
+  TypewriterKeyboard,
   MatchModal,
   LikedMatchesModal,
   ConfirmExitModal,
@@ -33,18 +31,20 @@ import {
 export default function SwipeScreen() {
   const { colors, spacing, isDark } = useTheme();
   const router = useRouter();
-  const deckRef = useRef<SwipeableCardDeckRef>(null);
+  const tapeRef = useRef<PaperTapeRollRef>(null);
 
   const {
     deck,
     currentIndex,
     currentCard,
     totalCards,
-    remainingCount,
-    history,
     likedNames,
+    selectedMap,
     isFinished,
-    vote,
+    stampCard,
+    advance,
+    removeVote,
+    undo,
     startSession,
   } = useSolo();
 
@@ -127,32 +127,30 @@ export default function SwipeScreen() {
     }
   }, [lastMatch, rushMode, clearLastMatch, toastOpacity]);
 
-  const handleVote = (liked: boolean) => {
+  const handleStamp = () => {
     if (!currentCard) return;
     if (isPairMode) {
-      submitVote(currentCard, liked).catch(() => {});
+      submitVote(currentCard, true).catch(() => {});
+    }
+    stampCard(currentIndex, true);
+  };
+
+  const handleAdvance = () => {
+    if (!currentCard) return;
+    if (isPairMode && !selectedMap[currentCard.n]) {
+      submitVote(currentCard, false).catch(() => {});
       notifyProgress(currentIndex + 1).catch(() => {});
     }
-    vote(liked);
+    advance();
   };
 
-  const handleSkip = () => {
-    // Saltar equivale a voto neutral/no decidir
-    handleVote(false);
-  };
-
-  // Racha de me gustas consecutivos
-  const streak = useMemo(() => {
-    let count = 0;
-    for (let i = history.length - 1; i >= 0; i--) {
-      if (history[i].liked) {
-        count++;
-      } else {
-        break;
-      }
+  const handleUnstamp = () => {
+    if (!currentCard) return;
+    if (isPairMode) {
+      submitVote(currentCard, false).catch(() => {});
     }
-    return count;
-  }, [history]);
+    removeVote(currentIndex);
+  };
 
   const handleConfirmExit = () => {
     setShowExitModal(false);
@@ -166,14 +164,6 @@ export default function SwipeScreen() {
     router.push('/setup?mode=solo&midGame=true');
   };
 
-  const nextCard = currentIndex + 1 < deck.length ? deck[currentIndex + 1] : null;
-  const thirdCard = currentIndex + 2 < deck.length ? deck[currentIndex + 2] : null;
-  const isCurrentPartnerLiked = Boolean(currentCard && partnerLikes[currentCard.n]);
-  const isNextPartnerLiked = Boolean(nextCard && partnerLikes[nextCard.n]);
-  const isThirdPartnerLiked = Boolean(thirdCard && partnerLikes[thirdCard.n]);
-
-  // Barra de progreso calculada (0 a 1)
-  const myProgressRatio = totalCards > 0 ? currentIndex / totalCards : 0;
   const partnerProgressRatio =
     totalCards > 0 ? Math.min(1, partnerProgress / totalCards) : 0;
 
@@ -365,7 +355,7 @@ export default function SwipeScreen() {
           )}
         </View>
 
-        {/* Ver guardados / lista */}
+        {/* Ver guardados / lista seleccionada */}
         <TouchableOpacity
           onPress={() => setShowLikedModal(true)}
           style={[
@@ -374,56 +364,27 @@ export default function SwipeScreen() {
           ]}
           activeOpacity={0.7}
         >
-          <HeartIcon size={20} color={colors.text2} />
+          <BadgeCheckIcon size={20} color={likedNames.length > 0 ? colors.salmon : colors.text2} />
         </TouchableOpacity>
       </View>
 
-      {/* Barras de Progreso */}
-      <View style={[styles.progressSection, { paddingHorizontal: spacing.lg }]}>
-        <View style={styles.progressTextRow}>
-          <Text style={[styles.progressLabel, { color: colors.text2 }]}>
-            {remainingCount} restantes
+      {/* Tira de estado del Teletipo */}
+      <View style={[styles.teletypeStatusRow, { paddingHorizontal: spacing.lg }]}>
+        <View style={styles.teletypeLabelBlock}>
+          <View style={[styles.teletypeDot, { backgroundColor: colors.salmon }]} />
+          <Text style={[styles.teletypeLabelText, { color: colors.text2 }]}>
+            BOBINA CONTINUA · FICHA {Math.min(currentIndex + 1, totalCards)} DE {totalCards}
           </Text>
-          {streak >= 3 && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <FireIcon size={14} color={colors.salmon} />
-              <Text style={[styles.streakBadge, { color: colors.salmon }]}>
-                {streak} seguidos
-              </Text>
-            </View>
-          )}
-          {isPairMode && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <CheckIcon size={14} color={colors.success} />
-              <Text style={[styles.partnerStatusText, { color: colors.success }]}>
-                pareja lista
-              </Text>
-            </View>
-          )}
         </View>
+        <Text style={[styles.teletypeCountBadge, { color: colors.salmon }]}>
+          {likedNames.length} seleccionados
+        </Text>
+      </View>
 
-        {/* Barra de progreso propia (tú) */}
-        <View style={[styles.progressBarTrack, { backgroundColor: colors.surface2 }]}>
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                backgroundColor: colors.salmon,
-                width: `${myProgressRatio * 100}%`,
-              },
-            ]}
-          />
-        </View>
-
-        {/* Barra de progreso de pareja si está en modo sala */}
-        {isPairMode && (
-          <View
-            style={[
-              styles.progressBarTrack,
-              styles.partnerTrack,
-              { backgroundColor: colors.surface2 },
-            ]}
-          >
+      {/* Barra de progreso de pareja si está en modo sala */}
+      {isPairMode && (
+        <View style={{ paddingHorizontal: spacing.lg, marginBottom: 4 }}>
+          <View style={[styles.progressBarTrack, styles.partnerTrack, { backgroundColor: colors.surface2 }]}>
             <View
               style={[
                 styles.progressBarFill,
@@ -434,57 +395,43 @@ export default function SwipeScreen() {
               ]}
             />
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
-      {/* Baraja central */}
-      <View style={[styles.deckContainer, { paddingHorizontal: spacing.lg }]}>
+      {/* Zona Central: Cinta Continua de Papel de Teletipo */}
+      <View style={styles.deckContainer}>
         {currentCard ? (
-          <SwipeableCardDeck
-            ref={deckRef}
+          <PaperTapeRoll
+            ref={tapeRef}
+            deck={deck}
             currentIndex={currentIndex}
-            currentCard={currentCard}
-            nextCard={nextCard}
-            thirdCard={thirdCard}
-            partnerLiked={isCurrentPartnerLiked}
-            nextPartnerLiked={isNextPartnerLiked}
-            thirdPartnerLiked={isThirdPartnerLiked}
-            onSwipeLeft={() => handleVote(false)}
-            onSwipeRight={() => handleVote(true)}
-            onSwipeUp={handleSkip}
+            totalCards={totalCards}
+            partnerLikes={partnerLikes}
+            selectedMap={selectedMap}
+            onStampVote={handleStamp}
+            onAdvance={handleAdvance}
+            onRewind={undo}
           />
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.text2 }]}>
-              Cargando baraja…
+              Cargando teletipo…
             </Text>
           </View>
         )}
       </View>
 
-      {/* Botones inferiores de acción (Descartar · Like · Saltar) */}
-      <View style={[styles.bottomBar, { paddingHorizontal: spacing.lg }]}>
-        <ActionButton
-          type="dislike"
-          onPress={() => deckRef.current?.swipeLeft()}
+      {/* Teclado Mecánico de Máquina de Escribir (Retroceso · Avanzar · Sello Seleccionar/Deseleccionar) */}
+      <View style={styles.bottomBarTeletype}>
+        <TypewriterKeyboard
+          onStamp={() => tapeRef.current?.stamp()}
+          onUnstamp={handleUnstamp}
+          onAdvance={() => tapeRef.current?.advanceWithoutStamp()}
+          onRewind={() => tapeRef.current?.rewind()}
+          isCurrentStamped={Boolean(currentCard && selectedMap[currentCard.n])}
+          canRewind={currentIndex > 0}
           disabled={!currentCard}
         />
-        <ActionButton
-          type="like"
-          onPress={() => deckRef.current?.swipeRight()}
-          disabled={!currentCard}
-        />
-        <TouchableOpacity
-          onPress={() => deckRef.current?.swipeUp()}
-          disabled={!currentCard}
-          style={[
-            styles.skipButton,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <ArrowRightIcon size={20} color={colors.text2} />
-        </TouchableOpacity>
       </View>
 
       {/* Modal de Match completo (solo cuando RUSH está desactivado) */}
@@ -629,24 +576,37 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
   },
-  bottomBar: {
+  teletypeStatusRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 14,
-    gap: 20,
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    marginBottom: 4,
   },
-  skipButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
+  teletypeLabelBlock: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
   },
-  skipButtonText: {
-    fontSize: 22,
+  teletypeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  teletypeLabelText: {
+    fontSize: 11,
     fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  teletypeCountBadge: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  bottomBarTeletype: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 8,
   },
   rushToast: {
     position: 'absolute',
