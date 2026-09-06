@@ -3,7 +3,7 @@ import {
   useImperativeHandle,
   forwardRef,
 } from 'react';
-import { View, StyleSheet, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -56,7 +56,7 @@ export const SwipeableCardDeck = forwardRef<SwipeableCardDeckRef, SwipeableCardD
     },
     ref
   ) => {
-    const { colors } = useTheme();
+    const { colors, isDark } = useTheme();
 
     const activeSlot = useSharedValue(currentIndex % 3);
     const translateX = useSharedValue(0);
@@ -246,28 +246,33 @@ export const SwipeableCardDeck = forwardRef<SwipeableCardDeckRef, SwipeableCardD
     const slot1Style = createSlotStyle(1);
     const slot2Style = createSlotStyle(2);
 
-    // Creador de sellos ME GUSTA / PASAR (solo visibles en el slot activo)
-    const createStampStyle = (slotIndex: number, type: 'like' | 'nope') => {
+    // 1. Resplandor (Glow) del borde y fondo de la tarjeta al arrastrar
+    const createGlowStyle = (slotIndex: number) => {
       return useAnimatedStyle(() => {
         if (activeSlot.value !== slotIndex) {
           return { opacity: 0 };
         }
-        if (type === 'like') {
-          const opacity = interpolate(translateX.value, [20, 90], [0, 1], Extrapolation.CLAMP);
-          return { opacity, transform: [{ rotate: '-15deg' }] };
+        if (translateX.value > 0) {
+          const opacity = interpolate(translateX.value, [10, 100], [0, 1], Extrapolation.CLAMP);
+          return {
+            opacity,
+            borderColor: colors.salmon,
+            backgroundColor: colors.salmonLight,
+          };
         } else {
-          const opacity = interpolate(translateX.value, [-90, -20], [1, 0], Extrapolation.CLAMP);
-          return { opacity, transform: [{ rotate: '15deg' }] };
+          const opacity = interpolate(translateX.value, [-100, -10], [1, 0], Extrapolation.CLAMP);
+          return {
+            opacity,
+            borderColor: colors.border2,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.03)',
+          };
         }
       });
     };
 
-    const slot0LikeStamp = createStampStyle(0, 'like');
-    const slot0NopeStamp = createStampStyle(0, 'nope');
-    const slot1LikeStamp = createStampStyle(1, 'like');
-    const slot1NopeStamp = createStampStyle(1, 'nope');
-    const slot2LikeStamp = createStampStyle(2, 'like');
-    const slot2NopeStamp = createStampStyle(2, 'nope');
+    const slot0Glow = createGlowStyle(0);
+    const slot1Glow = createGlowStyle(1);
+    const slot2Glow = createGlowStyle(2);
 
     // Mapeo estable de cartas a slots rotativos (la carta visible NUNCA cambia su contenido)
     const getSlotData = (slotIndex: number) => {
@@ -302,28 +307,7 @@ export const SwipeableCardDeck = forwardRef<SwipeableCardDeckRef, SwipeableCardD
           {slot0Data.card && (
             <Animated.View style={[styles.cardWrapper, slot0Style]}>
               <CardName item={slot0Data.card} partnerLiked={slot0Data.liked} />
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.likeStamp,
-                  { borderColor: colors.success },
-                  slot0LikeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.success }]}>ME GUSTA</Text>
-              </Animated.View>
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.nopeStamp,
-                  { borderColor: colors.salmon },
-                  slot0NopeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.salmon }]}>PASAR</Text>
-              </Animated.View>
+              <Animated.View style={[styles.glowBorder, slot0Glow]} pointerEvents="none" />
             </Animated.View>
           )}
 
@@ -331,28 +315,7 @@ export const SwipeableCardDeck = forwardRef<SwipeableCardDeckRef, SwipeableCardD
           {slot1Data.card && (
             <Animated.View style={[styles.cardWrapper, slot1Style]}>
               <CardName item={slot1Data.card} partnerLiked={slot1Data.liked} />
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.likeStamp,
-                  { borderColor: colors.success },
-                  slot1LikeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.success }]}>ME GUSTA</Text>
-              </Animated.View>
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.nopeStamp,
-                  { borderColor: colors.salmon },
-                  slot1NopeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.salmon }]}>PASAR</Text>
-              </Animated.View>
+              <Animated.View style={[styles.glowBorder, slot1Glow]} pointerEvents="none" />
             </Animated.View>
           )}
 
@@ -360,28 +323,7 @@ export const SwipeableCardDeck = forwardRef<SwipeableCardDeckRef, SwipeableCardD
           {slot2Data.card && (
             <Animated.View style={[styles.cardWrapper, slot2Style]}>
               <CardName item={slot2Data.card} partnerLiked={slot2Data.liked} />
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.likeStamp,
-                  { borderColor: colors.success },
-                  slot2LikeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.success }]}>ME GUSTA</Text>
-              </Animated.View>
-              <Animated.View
-                style={[
-                  styles.stamp,
-                  styles.nopeStamp,
-                  { borderColor: colors.salmon },
-                  slot2NopeStamp,
-                ]}
-                pointerEvents="none"
-              >
-                <Text style={[styles.stampText, { color: colors.salmon }]}>PASAR</Text>
-              </Animated.View>
+              <Animated.View style={[styles.glowBorder, slot2Glow]} pointerEvents="none" />
             </Animated.View>
           )}
         </View>
@@ -416,24 +358,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
     elevation: 2,
   },
-  stamp: {
+  glowBorder: {
     position: 'absolute',
-    top: 36,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 3,
-    zIndex: 15,
-  },
-  likeStamp: {
-    left: 24,
-  },
-  nopeStamp: {
-    right: 24,
-  },
-  stampText: {
-    fontSize: 22,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+    top: 0,
+    bottom: 0,
+    width: Math.min(SCREEN_WIDTH * 0.9, 360),
+    borderRadius: 24,
+    borderWidth: 2.5,
+    zIndex: 12,
   },
 });

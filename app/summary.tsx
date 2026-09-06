@@ -137,7 +137,7 @@ export default function SummaryScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                   <HeartIcon size={12} color={colors.salmon} />
                   <Text style={[styles.matchBadgeText, { color: colors.salmon }]}>
-                    MATCH
+                    Coincidencia
                   </Text>
                 </View>
               </View>
@@ -190,7 +190,7 @@ export default function SummaryScreen() {
                 <>
                   <Text style={[styles.heroTitle, { color: colors.text }]}>
                     {matches.length > 0
-                      ? `${matches.length} matches encontrados`
+                      ? `${matches.length} coincidencias encontradas`
                       : '¡Habéis terminado!'}
                   </Text>
                   <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
@@ -267,7 +267,7 @@ export default function SummaryScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                   <HeartIcon size={18} color={colors.salmon} />
                   <Text style={[styles.sectionHeading, { color: colors.salmon, marginBottom: 0 }]}>
-                    VUESTROS MATCHES
+                    VUESTRAS COINCIDENCIAS
                   </Text>
                 </View>
                 {matches.map((item, index) =>
@@ -306,7 +306,7 @@ export default function SummaryScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <ShareIcon size={18} color="#FFFFFF" />
                   <Text style={styles.primaryActionBtnText}>
-                    {isPairMode ? 'Compartir matches' : 'Compartir favoritos'}
+                    {isPairMode ? 'Compartir coincidencias' : 'Compartir favoritos'}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -332,7 +332,7 @@ export default function SummaryScreen() {
                         { color: colors.salmon },
                       ]}
                     >
-                      Afinar — votar solo los matches
+                      Afinar — votar solo las coincidencias
                     </Text>
                   </View>
                 </TouchableOpacity>

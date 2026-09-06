@@ -66,7 +66,7 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <HeartIcon size={12} color={colors.salmon} />
                     <Text style={[styles.statusBadgeText, { color: colors.salmon }]}>
-                      Match
+                      Coincidencia
                     </Text>
                   </View>
                 ) : (
@@ -110,7 +110,7 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
             </View>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {isSolo ? 'Tus favoritos' : 'Vuestros matches'}
+            {isSolo ? 'Tus favoritos' : 'Vuestras coincidencias'}
           </Text>
           <View style={{ width: 40 }} />
         </View>
@@ -122,7 +122,7 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
               ? `${likedNames.length} nombres guardados`
               : matches.length > 0
               ? `${matches.length} coincidencia${matches.length === 1 ? '' : 's'} con tu pareja`
-              : 'Aún sin matches con tu pareja. ¡Sigue votando!'}
+              : 'Aún sin coincidencias con tu pareja. ¡Seguid explorando!'}
           </Text>
         </View>
 

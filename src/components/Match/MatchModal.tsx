@@ -57,9 +57,9 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
             <SparklesIcon size={36} color={colors.salmon} />
           </View>
 
-          <Text style={[styles.title, { color: colors.salmon }]}>¡ES UN MATCH!</Text>
+          <Text style={[styles.title, { color: colors.salmon }]}>¡COINCIDENCIA!</Text>
           <Text style={[styles.subtitle, { color: colors.text2 }]}>
-            ¡Los dos adoráis este nombre para vuestro bebé!
+            ¡A los dos os encanta este nombre para vuestro bebé!
           </Text>
 
           {/* Tarjeta destacada del nombre del Match */}
@@ -116,7 +116,7 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
                 activeOpacity={0.7}
               >
                 <Text style={[styles.viewListButtonText, { color: colors.text }]}>
-                  Ver todos los matches
+                  Ver todas las coincidencias
                 </Text>
               </TouchableOpacity>
             )}

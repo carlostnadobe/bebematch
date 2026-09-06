@@ -16,7 +16,6 @@ import {
   AdjustmentsIcon,
   CheckIcon,
 } from 'react-native-heroicons/solid';
-import { ArrowRightIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
@@ -271,7 +270,7 @@ export default function SwipeScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <HeartIcon size={16} color={colors.salmon} />
             <Text style={[styles.rushToastText, { color: colors.salmon }]}>
-              ¡MATCH CON {rushToastName.toUpperCase()}!
+              ¡COINCIDENCIA CON {rushToastName.toUpperCase()}!
             </Text>
           </View>
         </Animated.View>
@@ -462,8 +461,8 @@ export default function SwipeScreen() {
         )}
       </View>
 
-      {/* Botones inferiores de acción (Descartar · Like · Saltar) */}
-      <View style={[styles.bottomBar, { paddingHorizontal: spacing.lg }]}>
+      {/* Botones inferiores de acción (Pasar · Me gusta) */}
+      <View style={[styles.bottomBar, { paddingHorizontal: spacing.md }]}>
         <ActionButton
           type="dislike"
           onPress={() => deckRef.current?.swipeLeft()}
@@ -474,17 +473,6 @@ export default function SwipeScreen() {
           onPress={() => deckRef.current?.swipeRight()}
           disabled={!currentCard}
         />
-        <TouchableOpacity
-          onPress={() => deckRef.current?.swipeUp()}
-          disabled={!currentCard}
-          style={[
-            styles.skipButton,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <ArrowRightIcon size={20} color={colors.text2} />
-        </TouchableOpacity>
       </View>
 
       {/* Modal de Match completo (solo cuando RUSH está desactivado) */}
@@ -634,19 +622,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 14,
-    gap: 20,
-  },
-  skipButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  skipButtonText: {
-    fontSize: 22,
-    fontWeight: '700',
+    gap: 12,
+    width: '100%',
+    maxWidth: 360,
+    alignSelf: 'center',
   },
   rushToast: {
     position: 'absolute',
