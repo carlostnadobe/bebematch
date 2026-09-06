@@ -60,4 +60,4 @@
 
 ## Estado actual
  
-Fases 0, 1, 2, 3, 4 y 5 completadas y validadas con éxito en dispositivos Android reales (incluida prueba multijugador con túnel y tiempo real entre 2 móviles). En curso: **Fase 6 (Publicación)**. Próximo hito: Política de privacidad, configuración de EAS Build para producción y preparación de tiendas.
+Fases 0, 1, 2, 3, 4 y 5 completadas y validadas con éxito en dispositivos reales tanto en **Android** (móvil y emulador) como en **iOS** (iPhone real, probando flujos y túnel). En curso: **Fase 6 (Publicación)**. Próximo hito: Política de privacidad, configuración de EAS Build para producción y preparación de tiendas.

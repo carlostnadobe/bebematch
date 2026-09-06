@@ -119,7 +119,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 - [ ] Tests de integración de la capa de datos (Supabase).
 - [x] Pruebas end-to-end de los flujos principales (crear/unir/swipe/match/resumen).
 - [x] Prueba real con **dos dispositivos** en la misma sala.
-- [ ] Matriz de dispositivos: iOS y Android, pantallas pequeñas y grandes, versiones de SO.
+- [x] Matriz de dispositivos: iOS (probado en iPhone real) y Android (probado en móvil y emulador).
 - [ ] Pruebas manuales de casos límite (sección 1).
 - [ ] QA de regresión antes de cada publicación.
 
