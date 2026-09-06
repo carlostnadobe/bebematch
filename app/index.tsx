@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { SunIcon, MoonIcon, ArrowRightIcon } from 'react-native-heroicons/outline';
+import { UserGroupIcon, UserIcon } from 'react-native-heroicons/solid';
 import { useTheme } from '../src/theme';
 import { useRoom } from '../src/contexts/RoomContext';
 
@@ -105,9 +107,16 @@ export default function Home() {
               ]}
               activeOpacity={0.7}
             >
-              <Text style={[styles.themeToggleText, { color: colors.text }]}>
-                {isDark ? '☀️ Claro' : '🌙 Oscuro'}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                {isDark ? (
+                  <SunIcon size={16} color={colors.text} />
+                ) : (
+                  <MoonIcon size={16} color={colors.text} />
+                )}
+                <Text style={[styles.themeToggleText, { color: colors.text }]}>
+                  {isDark ? 'Claro' : 'Oscuro'}
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -122,7 +131,7 @@ export default function Home() {
                 BY CARLOS TN
               </Text>
               <Text style={[styles.brandTagline, { color: colors.text2 }]}>
-                encontrad juntos el nombre perfecto ✨
+                encontrad juntos el nombre perfecto
               </Text>
             </View>
 
@@ -144,7 +153,10 @@ export default function Home() {
                     <Text style={styles.primaryButtonText}>Conectando…</Text>
                   </View>
                 ) : (
-                  <Text style={styles.primaryButtonText}>✦ Crear sala nueva</Text>
+                  <View style={styles.buttonInnerRow}>
+                    <UserGroupIcon size={20} color="#FFFFFF" />
+                    <Text style={styles.primaryButtonText}>Crear sala nueva</Text>
+                  </View>
                 )}
               </TouchableOpacity>
 
@@ -161,9 +173,12 @@ export default function Home() {
                 ]}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>
-                  👤 Modo un jugador
-                </Text>
+                <View style={styles.buttonInnerRow}>
+                  <UserIcon size={18} color={colors.text} />
+                  <Text style={[styles.secondaryButtonText, { color: colors.text }]}>
+                    Modo un jugador
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               {/* Separador */}
@@ -211,17 +226,23 @@ export default function Home() {
                   {isJoining ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                   ) : (
-                    <Text
-                      style={[
-                        styles.joinButtonText,
-                        {
-                          color:
-                            joinCode.length === 4 ? '#FFFFFF' : colors.text3,
-                        },
-                      ]}
-                    >
-                      Unirse →
-                    </Text>
+                    <View style={styles.buttonInnerRow}>
+                      <Text
+                        style={[
+                          styles.joinButtonText,
+                          {
+                            color:
+                              joinCode.length === 4 ? '#FFFFFF' : colors.text3,
+                          },
+                        ]}
+                      >
+                        Unirse
+                      </Text>
+                      <ArrowRightIcon
+                        size={16}
+                        color={joinCode.length === 4 ? '#FFFFFF' : colors.text3}
+                      />
+                    </View>
                   )}
                 </TouchableOpacity>
               </View>
@@ -309,7 +330,10 @@ export default function Home() {
                   {isJoining ? (
                     <ActivityIndicator size="small" color="#FFF" />
                   ) : (
-                    <Text style={styles.modalButtonConfirmText}>Volver →</Text>
+                    <View style={styles.buttonInnerRow}>
+                      <Text style={styles.modalButtonConfirmText}>Volver</Text>
+                      <ArrowRightIcon size={16} color="#FFFFFF" />
+                    </View>
                   )}
                 </TouchableOpacity>
               </View>
@@ -322,6 +346,12 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  buttonInnerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
   safeArea: {
     flex: 1,
   },

@@ -8,6 +8,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import {
+  HeartIcon,
+  LightningBoltIcon,
+  FireIcon,
+  SparklesIcon,
+  AdjustmentsIcon,
+  CheckIcon,
+} from 'react-native-heroicons/solid';
+import { ArrowRightIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
@@ -18,6 +27,7 @@ import {
   MatchModal,
   LikedMatchesModal,
   ConfirmExitModal,
+  HeaderHomeButton,
 } from '../src/components';
 
 export default function SwipeScreen() {
@@ -172,7 +182,19 @@ export default function SwipeScreen() {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
         <View style={styles.waitingSummaryContent}>
-          <Text style={styles.celebrationEmoji}>🎉</Text>
+          <View
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 36,
+              backgroundColor: colors.salmonLight,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 16,
+            }}
+          >
+            <SparklesIcon size={40} color={colors.salmon} />
+          </View>
           <Text style={[styles.waitingSummaryTitle, { color: colors.text }]}>
             ¡Ya has terminado!
           </Text>
@@ -246,25 +268,19 @@ export default function SwipeScreen() {
             },
           ]}
         >
-          <Text style={[styles.rushToastText, { color: colors.salmon }]}>
-            💞 ¡MATCH CON {rushToastName.toUpperCase()}!
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <HeartIcon size={16} color={colors.salmon} />
+            <Text style={[styles.rushToastText, { color: colors.salmon }]}>
+              ¡MATCH CON {rushToastName.toUpperCase()}!
+            </Text>
+          </View>
         </Animated.View>
       )}
 
       {/* Barra superior */}
       <View style={[styles.header, { paddingHorizontal: spacing.md }]}>
         {/* Botón Home con confirmación */}
-        <TouchableOpacity
-          onPress={() => setShowExitModal(true)}
-          style={[
-            styles.headerCircleBtn,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.headerIcon}>🏠</Text>
-        </TouchableOpacity>
+        <HeaderHomeButton onPress={() => setShowExitModal(true)} />
 
         {/* Centro de la barra */}
         <View style={styles.headerCenter}>
@@ -282,14 +298,17 @@ export default function SwipeScreen() {
                 ]}
                 activeOpacity={0.8}
               >
-                <Text
-                  style={[
-                    styles.rushToggleText,
-                    { color: rushMode ? '#FFFFFF' : colors.text2 },
-                  ]}
-                >
-                  ⚡ RUSH
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <LightningBoltIcon size={14} color={rushMode ? '#FFFFFF' : colors.text2} />
+                  <Text
+                    style={[
+                      styles.rushToggleText,
+                      { color: rushMode ? '#FFFFFF' : colors.text2 },
+                    ]}
+                  >
+                    RUSH
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               {/* Contador de Matches interactivo */}
@@ -310,17 +329,20 @@ export default function SwipeScreen() {
                 ]}
                 activeOpacity={0.7}
               >
-                <Text
-                  style={[
-                    styles.matchesBadgeText,
-                    {
-                      color:
-                        matches.length > 0 ? colors.salmon : colors.text2,
-                    },
-                  ]}
-                >
-                  💞 {matches.length}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <HeartIcon size={14} color={matches.length > 0 ? colors.salmon : colors.text2} />
+                  <Text
+                    style={[
+                      styles.matchesBadgeText,
+                      {
+                        color:
+                          matches.length > 0 ? colors.salmon : colors.text2,
+                      },
+                    ]}
+                  >
+                    {matches.length}
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           ) : (
@@ -333,9 +355,12 @@ export default function SwipeScreen() {
               ]}
               activeOpacity={0.7}
             >
-              <Text style={[styles.midGameFilterText, { color: colors.text2 }]}>
-                ⚙️ Cambiar filtros
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <AdjustmentsIcon size={14} color={colors.text2} />
+                <Text style={[styles.midGameFilterText, { color: colors.text2 }]}>
+                  Filtros
+                </Text>
+              </View>
             </TouchableOpacity>
           )}
         </View>
@@ -349,7 +374,7 @@ export default function SwipeScreen() {
           ]}
           activeOpacity={0.7}
         >
-          <Text style={styles.headerIcon}>♥</Text>
+          <HeartIcon size={20} color={colors.text2} />
         </TouchableOpacity>
       </View>
 
@@ -360,14 +385,20 @@ export default function SwipeScreen() {
             {remainingCount} restantes
           </Text>
           {streak >= 3 && (
-            <Text style={[styles.streakBadge, { color: colors.salmon }]}>
-              🔥 {streak} seguidos
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <FireIcon size={14} color={colors.salmon} />
+              <Text style={[styles.streakBadge, { color: colors.salmon }]}>
+                {streak} seguidos
+              </Text>
+            </View>
           )}
           {isPairMode && (
-            <Text style={[styles.partnerStatusText, { color: colors.success }]}>
-              ● pareja ✓
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <CheckIcon size={14} color={colors.success} />
+              <Text style={[styles.partnerStatusText, { color: colors.success }]}>
+                pareja lista
+              </Text>
+            </View>
           )}
         </View>
 
@@ -431,7 +462,7 @@ export default function SwipeScreen() {
         )}
       </View>
 
-      {/* Botones inferiores de acción (✕ · ♥ · →) */}
+      {/* Botones inferiores de acción (Descartar · Like · Saltar) */}
       <View style={[styles.bottomBar, { paddingHorizontal: spacing.lg }]}>
         <ActionButton
           type="dislike"
@@ -452,7 +483,7 @@ export default function SwipeScreen() {
           ]}
           activeOpacity={0.7}
         >
-          <Text style={[styles.skipButtonText, { color: colors.text2 }]}>→</Text>
+          <ArrowRightIcon size={20} color={colors.text2} />
         </TouchableOpacity>
       </View>
 

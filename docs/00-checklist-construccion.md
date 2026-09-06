@@ -42,10 +42,10 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 - [ ] Imágenes/ilustraciones optimizadas (peso y formato adecuados; @1x/@2x/@3x o vectoriales).
 - [ ] Feature graphic / capturas para las fichas de las stores.
 - [ ] 🔴 **Licencias de todos los assets** verificadas (fuentes, iconos, sonidos si los hay).
-- [ ] 🔴 **Iconografía vectorial** — usar librería gratuita (Feather Icons o Heroicons, **NO emojis**).
-  - [ ] Librería elegida: ______ (ver [07 · Análisis UI/UX](./07-analisis-ui-mejoras.md) para recomendaciones).
-  - [ ] Mapeo de iconos completado (emojis → ícono específico).
-  - [ ] SVGs correctamente empaquetados y optimizados en el bundle.
+- [x] 🔴 **Iconografía vectorial** — usar librería gratuita (Heroicons, **NO emojis**).
+  - [x] Librería elegida: `react-native-heroicons` (`react-native-svg`).
+  - [x] Mapeo de iconos completado (emojis eliminados y sustituidos por iconos vectoriales).
+  - [x] SVGs correctamente empaquetados y optimizados en el bundle.
 
 ## 4. Arquitectura y código
 
@@ -94,7 +94,7 @@ Leyenda: `[ ]` pendiente · `[~]` en curso · `[x]` hecho · 🔴 bloqueante par
 
 ## 9. Accesibilidad
 
-- [ ] Contraste de color suficiente (AA) en claro y oscuro.
+- [x] Contraste de color suficiente (AA) en claro y oscuro (verificado según WCAG 2.1).
 - [ ] Áreas de toque ≥ 44×44 pt.
 - [ ] Etiquetas accesibles para lectores de pantalla (VoiceOver/TalkBack).
 - [ ] Respeta el tamaño de fuente del sistema (texto escalable).

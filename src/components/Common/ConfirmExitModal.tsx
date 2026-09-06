@@ -51,7 +51,7 @@ export const ConfirmExitModal: React.FC<ConfirmExitModalProps> = ({
 
             <TouchableOpacity
               onPress={onConfirm}
-              style={[styles.button, styles.confirmButton, { backgroundColor: colors.error }]}
+              style={[styles.button, styles.confirmButton, { backgroundColor: colors.salmon }]}
               activeOpacity={0.8}
             >
               <Text style={styles.confirmButtonText}>Salir</Text>

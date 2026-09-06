@@ -156,7 +156,7 @@ export const NAMES: IName[] = [
   {n:"Robin",g:"neutral",o:"germánico",m:"brillante de fama"},
   {n:"Charlie",g:"neutral",o:"germánico",m:"hombre libre"},
 
-  // ── CALORRO 🔥 ──
+  // ── CALORRO ──
   {n:"Ulises",g:"boy",o:"calorro",m:"viajero legendario del barrio"},
   {n:"Isra",g:"boy",o:"calorro",m:"el que lucha con Dios"},
   {n:"Cristian",g:"boy",o:"calorro",m:"seguidor del Cristo"},
@@ -227,7 +227,7 @@ export const NAMES: IName[] = [
   {n:"Celestino",g:"boy",o:"latino",m:"del cielo"},
   {n:"Evangelina",g:"girl",o:"clásico",m:"portadora del evangelio"},
 
-  // ── SUDAMÉRICA FUSIÓN 🌎 ──
+  // ── SUDAMÉRICA FUSIÓN ──
   {n:"Usnavi",g:"boy",o:"sudamerica",m:"US Navy — visto en un barco al llegar a América"},
   {n:"Yotuel",g:"boy",o:"sudamerica",m:"yo + tuel, mezcla de nombres familiares"},
   {n:"Yonatan",g:"boy",o:"sudamerica",m:"Jonathan pronunciado como suena en español"},
@@ -283,7 +283,7 @@ export const NAMES: IName[] = [
   {n:"Chanel María",g:"girl",o:"sudamerica",m:"la perfumería francesa + María — glamour con fe"},
   {n:"Dolche",g:"girl",o:"sudamerica",m:"Dolce de Dolce & Gabbana, sin el ampersand — más fácil de escribir"},
 
-  // ── REYES Y EMPERADORES 👑 ──
+  // ── REYES Y EMPERADORES ──
   {n:"Constantino",g:"boy",o:"reyes",m:"Constantino el Grande — primer emperador cristiano"},
   {n:"Maximiliano",g:"boy",o:"reyes",m:"Maximiliano I — emperador del Sacro Imperio Romano",santo:"12 de octubre",curioso:"El nombre fue inventado en 1459 por el Emperador Federico III mezclando dos generales romanos: Máximo Fabio y Cornelio Escipión Emiliano.",famosos:["Maximiliano de México","Maximiliano I del S.I.R.","Maximilian Schell","Max von Sydow"]},
   {n:"Leonidas",g:"boy",o:"reyes",m:"Leonidas I — rey espartano que defendió las Termópilas",santo:"14 de abril",curioso:"Los 300 espartanos de Leonidas en las Termópilas inspiraron al escritor Frank Miller en 1998 para su novela gráfica '300', llevada al cine en 2006.",famosos:["Leonidas I de Esparta","Leonidas Da Silva","Leonidas Kavakos","Leonidas Gómez"]},

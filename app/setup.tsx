@@ -9,12 +9,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import {
+  ArrowRightIcon,
+  InformationCircleIcon,
+  LightBulbIcon,
+} from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo, filterNames } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
 import { NAMES_DB, ORIGINS } from '../src/data/names';
 import { FilterGender, FilterDuration, FilterExtra, IFilters } from '../src/types';
-import { FilterChip, ConfirmExitModal } from '../src/components';
+import { FilterChip, ConfirmExitModal, HeaderHomeButton } from '../src/components';
 
 export default function SetupScreen() {
   const { colors, spacing } = useTheme();
@@ -108,22 +113,11 @@ export default function SetupScreen() {
           { paddingHorizontal: spacing.md, borderBottomColor: colors.border },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => setShowExitModal(true)}
-          style={[
-            styles.backButton,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.backButtonText, { color: colors.text2 }]}>
-            ← Volver
-          </Text>
-        </TouchableOpacity>
+        <HeaderHomeButton onPress={() => setShowExitModal(true)} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           {isSolo ? 'Configuración' : 'Filtros de Sala'}
         </Text>
-        <View style={{ width: 70 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView
@@ -154,17 +148,17 @@ export default function SetupScreen() {
               onPress={() => setSelectedGender('all')}
             />
             <FilterChip
-              label="Niña ♀"
+              label="Niña"
               selected={selectedGender === 'girl'}
               onPress={() => setSelectedGender('girl')}
             />
             <FilterChip
-              label="Niño ♂"
+              label="Niño"
               selected={selectedGender === 'boy'}
               onPress={() => setSelectedGender('boy')}
             />
             <FilterChip
-              label="Neutro ⚥"
+              label="Unisex"
               selected={selectedGender === 'neutral'}
               onPress={() => setSelectedGender('neutral')}
             />
@@ -227,17 +221,17 @@ export default function SetupScreen() {
           </Text>
           <View style={styles.chipsWrap}>
             <FilterChip
-              label="🔥 Calorro"
+              label="Calorro"
               selected={selectedExtra === 'calorro'}
               onPress={() => handleSelectExtra('calorro')}
             />
             <FilterChip
-              label="🌎 Sudamérica Fusión"
+              label="Sudamérica Fusión"
               selected={selectedExtra === 'sudamerica'}
               onPress={() => handleSelectExtra('sudamerica')}
             />
             <FilterChip
-              label="👑 Reyes y Emperadores"
+              label="Reyes y Emperadores"
               selected={selectedExtra === 'reyes'}
               onPress={() => handleSelectExtra('reyes')}
             />
@@ -252,9 +246,12 @@ export default function SetupScreen() {
               { backgroundColor: colors.surface2, borderColor: colors.border },
             ]}
           >
-            <Text style={[styles.pairNoteText, { color: colors.salmon }]}>
-              ℹ Solo tú eliges los filtros — tu pareja recibirá los mismos.
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+              <InformationCircleIcon size={18} color={colors.salmon} style={{ marginTop: 1 }} />
+              <Text style={[styles.pairNoteText, { color: colors.salmon, flex: 1 }]}>
+                Solo tú eliges los filtros — tu pareja recibirá los mismos.
+              </Text>
+            </View>
           </View>
         )}
 
@@ -265,9 +262,12 @@ export default function SetupScreen() {
             { backgroundColor: colors.surface, borderColor: colors.border2 },
           ]}
         >
-          <Text style={[styles.tipTitle, { color: colors.text }]}>
-            💡 Consejo:
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <LightBulbIcon size={16} color={colors.warning} />
+            <Text style={[styles.tipTitle, { color: colors.text, marginBottom: 0 }]}>
+              Consejo:
+            </Text>
+          </View>
           <Text style={[styles.tipText, { color: colors.text2 }]}>
             Al final de cada partida podrás explorar más nombres y cambiar los filtros. ¡No te preocupes demasiado!
           </Text>
@@ -303,7 +303,10 @@ export default function SetupScreen() {
           {isStarting ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.startButtonText}>¡Empezar! →</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <Text style={styles.startButtonText}>¡Empezar!</Text>
+              <ArrowRightIcon size={18} color="#FFFFFF" />
+            </View>
           )}
         </TouchableOpacity>
       </View>
@@ -329,16 +332,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-  },
-  backButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  backButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 16,

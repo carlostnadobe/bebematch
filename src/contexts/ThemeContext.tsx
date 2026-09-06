@@ -10,6 +10,7 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 interface ThemeContextValue {
   mode: ThemeMode;
   isDark: boolean;
+  isLoaded: boolean;
   colors: ThemeColors;
   spacing: typeof spacing;
   typography: typeof typography;
@@ -23,16 +24,30 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>('dark'); // BebéMatch por defecto es dark
+  const [mode, setMode] = useState<ThemeMode>('dark'); // Por defecto dark
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(THEME_STORAGE_KEY).then((saved) => {
-      if (saved === 'light' || saved === 'dark' || saved === 'system') {
-        setMode(saved);
-      }
-    }).catch(() => {
-      // Ignorar error de lectura inicial
-    });
+    let isMounted = true;
+    AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then((saved) => {
+        if (isMounted) {
+          if (saved === 'light' || saved === 'dark' || saved === 'system') {
+            setMode(saved);
+          }
+          setIsLoaded(true);
+        }
+      })
+      .catch((err) => {
+        console.warn('[ThemeContext] Error al leer el tema de AsyncStorage:', err);
+        if (isMounted) {
+          setIsLoaded(true);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const isDark = useMemo(() => {
@@ -46,24 +61,28 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const setThemeMode = (newMode: ThemeMode) => {
     setMode(newMode);
-    AsyncStorage.setItem(THEME_STORAGE_KEY, newMode).catch(() => {});
+    AsyncStorage.setItem(THEME_STORAGE_KEY, newMode).catch((err) => {
+      console.warn('[ThemeContext] Error al persistir el tema en AsyncStorage:', err);
+    });
   };
 
   const toggleTheme = () => {
-    setThemeMode(isDark ? 'light' : 'dark');
+    const nextMode: ThemeMode = isDark ? 'light' : 'dark';
+    setThemeMode(nextMode);
   };
 
   const value = useMemo(
     () => ({
       mode,
       isDark,
+      isLoaded,
       colors,
       spacing,
       typography,
       setThemeMode,
       toggleTheme,
     }),
-    [mode, isDark, colors]
+    [mode, isDark, isLoaded, colors]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

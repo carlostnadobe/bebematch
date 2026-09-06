@@ -7,7 +7,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme, SoloProvider, RoomProvider } from '../src/contexts';
 
 function RootApp() {
-  const { isDark, colors } = useTheme();
+  const { isDark, colors, isLoaded } = useTheme();
+
+  if (!isLoaded) {
+    return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>

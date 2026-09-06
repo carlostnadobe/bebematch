@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+import { HeartIcon, XIcon, RefreshIcon } from 'react-native-heroicons/solid';
 import { useTheme } from '../../theme';
 
 export type ActionButtonType = 'like' | 'dislike' | 'undo';
@@ -23,9 +24,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
     switch (type) {
       case 'like':
         return {
-          icon: '♥',
+          renderIcon: (color: string) => <HeartIcon size={30} color={color} />,
           size: 64,
-          fontSize: 28,
           bg: isDark ? 'rgba(74, 222, 128, 0.15)' : 'rgba(46, 158, 91, 0.12)',
           border: isDark ? 'rgba(74, 222, 128, 0.4)' : 'rgba(46, 158, 91, 0.35)',
           color: colors.success,
@@ -33,9 +33,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         };
       case 'dislike':
         return {
-          icon: '✕',
+          renderIcon: (color: string) => <XIcon size={30} color={color} />,
           size: 64,
-          fontSize: 24,
           bg: isDark ? 'rgba(232, 115, 90, 0.15)' : 'rgba(212, 105, 79, 0.12)',
           border: isDark ? 'rgba(232, 115, 90, 0.4)' : 'rgba(212, 105, 79, 0.35)',
           color: colors.salmon,
@@ -43,9 +42,8 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         };
       case 'undo':
         return {
-          icon: '↺',
+          renderIcon: (color: string) => <RefreshIcon size={22} color={color} />,
           size: 48,
-          fontSize: 20,
           bg: colors.surface2,
           border: colors.border2,
           color: colors.text2,
@@ -69,15 +67,11 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
           backgroundColor: config.bg,
           borderColor: config.border,
           opacity: disabled ? 0.4 : 1,
-          shadowColor: '#000',
-          shadowOpacity: isDark ? 0.25 : 0.1,
         },
         style,
       ]}
     >
-      <Text style={[styles.iconText, { color: config.color, fontSize: config.fontSize }]}>
-        {config.icon}
-      </Text>
+      {config.renderIcon(config.color)}
     </TouchableOpacity>
   );
 };
@@ -87,9 +81,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 4,
   },
   iconText: {
     fontWeight: '700',

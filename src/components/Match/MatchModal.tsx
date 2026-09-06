@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { SparklesIcon } from 'react-native-heroicons/solid';
 import { IName } from '../../types';
 import { useTheme } from '../../theme';
 import { ConfettiEffect } from './ConfettiEffect';
@@ -47,8 +48,13 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
           ]}
         >
           {/* Cabecera festiva */}
-          <View style={styles.celebrationBadge}>
-            <Text style={styles.celebrationEmoji}>🎉</Text>
+          <View
+            style={[
+              styles.celebrationBadge,
+              { backgroundColor: colors.salmonLight, borderColor: colors.salmon },
+            ]}
+          >
+            <SparklesIcon size={36} color={colors.salmon} />
           </View>
 
           <Text style={[styles.title, { color: colors.salmon }]}>¡ES UN MATCH!</Text>
@@ -97,7 +103,7 @@ export const MatchModal: React.FC<MatchModalProps> = ({ match, onClose, onViewLi
               style={[styles.continueButton, { backgroundColor: colors.salmon }]}
               activeOpacity={0.8}
             >
-              <Text style={styles.continueButtonText}>Seguir explorando ✨</Text>
+              <Text style={styles.continueButtonText}>Seguir explorando</Text>
             </TouchableOpacity>
 
             {onViewList && (

@@ -6,15 +6,16 @@ import {
   TouchableOpacity,
   Share,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { ShareIcon } from 'react-native-heroicons/outline';
+import { ClipboardCopyIcon, CheckIcon, EyeIcon } from 'react-native-heroicons/solid';
 import { useTheme } from '../src/theme';
 import { useRoom } from '../src/contexts/RoomContext';
 import { useSolo } from '../src/contexts/SoloContext';
-import { ConfirmExitModal } from '../src/components';
+import { ConfirmExitModal, HeaderHomeButton } from '../src/components';
 
 export default function WaitingScreen() {
   const { colors, spacing } = useTheme();
@@ -26,7 +27,6 @@ export default function WaitingScreen() {
     roomFilters,
     roomSeed,
     leaveRoom,
-    isLoading,
     error,
   } = useRoom();
   const { startSession } = useSolo();
@@ -35,7 +35,7 @@ export default function WaitingScreen() {
   const [showExitModal, setShowExitModal] = useState(false);
   const hasNavigatedRef = useRef(false);
 
-  // Transición 1 (Host): Cuando el guest se conecta, el host avanza automáticamente a /setup
+  // Transición 1 (Host): Cuando el invitado se conecta, avanzar a /setup
   useEffect(() => {
     if (hasNavigatedRef.current) return;
     if (isHost && partnerConnected) {
@@ -65,7 +65,7 @@ export default function WaitingScreen() {
     if (!roomCode) return;
     try {
       await Share.share({
-        message: `👶 ¡Únete a mi sala de BebéMatch con el código: ${roomCode} y elijamos el nombre de nuestro bebé juntos!`,
+        message: `¡Únete a mi sala de BebéMatch con el código: ${roomCode} y elijamos el nombre de nuestro bebé juntos!`,
       });
     } catch (err) {
       console.warn('Error al compartir:', err);
@@ -82,22 +82,11 @@ export default function WaitingScreen() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg }]}>
       {/* Cabecera */}
       <View style={[styles.header, { paddingHorizontal: spacing.md }]}>
-        <TouchableOpacity
-          onPress={() => setShowExitModal(true)}
-          style={[
-            styles.backButton,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.backButtonText, { color: colors.text2 }]}>
-            ← Volver al inicio
-          </Text>
-        </TouchableOpacity>
+        <HeaderHomeButton onPress={() => setShowExitModal(true)} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           Modo Pareja
         </Text>
-        <View style={{ width: 100 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       <View style={[styles.content, { padding: spacing.lg }]}>
@@ -109,48 +98,39 @@ export default function WaitingScreen() {
               <View
                 style={[
                   styles.dot,
-                  { backgroundColor: partnerConnected ? colors.success : '#22C55E' },
+                  {
+                    backgroundColor: partnerConnected
+                      ? colors.success
+                      : colors.warning,
+                  },
                 ]}
               />
               <Text style={[styles.statusPillText, { color: colors.text }]}>
                 {partnerConnected
-                  ? '¡Pareja conectada! Redirigiendo a filtros…'
+                  ? '¡Pareja conectada!'
                   : 'Esperando a tu pareja...'}
               </Text>
             </View>
 
-            <Text style={[styles.title, { color: colors.text }]}>
-              Tu código de sala
+            {/* Código de sala grande */}
+            <Text style={[styles.codeLabel, { color: colors.text2 }]}>
+              CÓDIGO DE LA SALA
             </Text>
-
-            {/* Código de sala en grande (serif) */}
             <View
               style={[
                 styles.codeBox,
                 {
-                  backgroundColor: colors.surface,
+                  backgroundColor: colors.surface2,
                   borderColor: colors.border2,
                 },
               ]}
             >
-              {isLoading ? (
-                <ActivityIndicator size="large" color={colors.salmon} />
-              ) : (
-                <Text
-                  style={[
-                    styles.codeText,
-                    {
-                      color: colors.salmon,
-                      fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-                    },
-                  ]}
-                >
-                  {roomCode || '----'}
-                </Text>
-              )}
+              <Text style={[styles.codeText, { color: colors.salmon }]}>
+                {roomCode || '····'}
+              </Text>
             </View>
 
-            {/* Acciones de compartir / copiar */}
+            {/* Acciones de código: Copiar y Compartir */}
             <View style={styles.buttonsRow}>
               <TouchableOpacity
                 onPress={handleCopyCode}
@@ -164,9 +144,23 @@ export default function WaitingScreen() {
                 ]}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                  {copied ? '✓ ¡Copiado!' : '📋 Copiar código'}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  {copied ? (
+                    <>
+                      <CheckIcon size={16} color={colors.success} />
+                      <Text style={[styles.actionButtonText, { color: colors.success }]}>
+                        ¡Copiado!
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <ClipboardCopyIcon size={16} color={colors.text} />
+                      <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                        Copiar código
+                      </Text>
+                    </>
+                  )}
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -181,24 +175,18 @@ export default function WaitingScreen() {
                 ]}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.actionButtonText, { color: colors.text }]}>
-                  📤 Compartir
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <ShareIcon size={16} color={colors.text} />
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                    Compartir
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
 
             <Text style={[styles.instructionsText, { color: colors.text2 }]}>
               Comparte el código con tu pareja para empezar juntos.
             </Text>
-
-            {!partnerConnected && (
-              <View style={styles.loadingFooter}>
-                <ActivityIndicator size="small" color={colors.salmon} />
-                <Text style={[styles.loadingHint, { color: colors.text3 }]}>
-                  Detectando conexión automáticamente…
-                </Text>
-              </View>
-            )}
           </View>
         ) : (
           /* ================= PANTALLA DEL GUEST (ESPERANDO FILTROS) ================= */
@@ -210,10 +198,22 @@ export default function WaitingScreen() {
               </Text>
             </View>
 
-            <Text style={styles.emojiHero}>👀</Text>
+            <View
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 36,
+                backgroundColor: colors.salmonLight,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginVertical: 18,
+              }}
+            >
+              <EyeIcon size={40} color={colors.salmon} />
+            </View>
 
             <Text style={[styles.title, { color: colors.text }]}>
-              Estate al loro 👀
+              Estate al loro
             </Text>
 
             <Text style={[styles.guestMessage, { color: colors.text2 }]}>
@@ -259,16 +259,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
   },
-  backButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  backButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
   headerTitle: {
     fontSize: 16,
     fontWeight: '700',
@@ -310,6 +300,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
     textAlign: 'center',
+  },
+  codeLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    marginBottom: 8,
   },
   codeBox: {
     width: '100%',

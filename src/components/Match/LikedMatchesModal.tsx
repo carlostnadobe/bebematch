@@ -7,6 +7,8 @@ import {
   FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { HeartIcon } from 'react-native-heroicons/solid';
+import { ArrowLeftIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../../theme';
 import { IName } from '../../types';
 
@@ -25,14 +27,15 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
   matches,
   isSolo = false,
 }) => {
-  const { colors, spacing, isDark } = useTheme();
+  const { colors, spacing } = useTheme();
 
-  const matchNamesSet = new Set(matches.map((m) => m.n));
+  const isNameMatched = (name: string) => matches.some((m) => m.n === name);
 
   const renderItem = ({ item }: { item: IName }) => {
-    const isMatch = matchNamesSet.has(item.n);
+    const isMatch = isNameMatched(item.n);
     const isGirl = item.g === 'girl';
     const isBoy = item.g === 'boy';
+    const genderLabel = isGirl ? 'Niña' : isBoy ? 'Niño' : 'Unisex';
 
     return (
       <View
@@ -54,26 +57,28 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
                   styles.statusBadge,
                   {
                     backgroundColor: isMatch
-                      ? isDark
-                        ? 'rgba(232, 115, 90, 0.2)'
-                        : 'rgba(212, 105, 79, 0.15)'
+                      ? colors.salmonLight
                       : colors.surface2,
                   },
                 ]}
               >
-                <Text
-                  style={[
-                    styles.statusBadgeText,
-                    { color: isMatch ? colors.salmon : colors.text3 },
-                  ]}
-                >
-                  {isMatch ? '💞 Match' : 'Solo tú'}
-                </Text>
+                {isMatch ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <HeartIcon size={12} color={colors.salmon} />
+                    <Text style={[styles.statusBadgeText, { color: colors.salmon }]}>
+                      Match
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={[styles.statusBadgeText, { color: colors.text3 }]}>
+                    Solo tú
+                  </Text>
+                )}
               </View>
             )}
           </View>
           <Text style={[styles.genderTag, { color: colors.text3 }]}>
-            {isGirl ? '♀' : isBoy ? '♂' : '⚥'}
+            {genderLabel}
           </Text>
         </View>
 
@@ -97,12 +102,15 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
             ]}
             activeOpacity={0.7}
           >
-            <Text style={[styles.backButtonText, { color: colors.text }]}>
-              ← Seguir buscando
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <ArrowLeftIcon size={16} color={colors.text} />
+              <Text style={[styles.backButtonText, { color: colors.text }]}>
+                Volver
+              </Text>
+            </View>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {isSolo ? 'Tus favoritos ♥' : 'Vuestros matches 💞'}
+            {isSolo ? 'Tus favoritos' : 'Vuestros matches'}
           </Text>
           <View style={{ width: 40 }} />
         </View>
@@ -121,9 +129,9 @@ export const LikedMatchesModal: React.FC<LikedMatchesModalProps> = ({
         {/* Lista */}
         {likedNames.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>🤍</Text>
-            <Text style={[styles.emptyText, { color: colors.text2 }]}>
-              Aún no has dado ♥ a ningún nombre
+            <HeartIcon size={44} color={colors.text3} />
+            <Text style={[styles.emptyText, { color: colors.text2, marginTop: 12 }]}>
+              Aún no has guardado ningún nombre
             </Text>
           </View>
         ) : (

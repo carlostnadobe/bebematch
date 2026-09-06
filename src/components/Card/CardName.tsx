@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { HeartIcon } from 'react-native-heroicons/solid';
 import { IName, Gender } from '../../types';
 import { useTheme } from '../../theme';
 import { borderRadius } from '../../theme/spacing';
@@ -270,18 +271,21 @@ export const CardName: React.FC<CardNameProps> = React.memo(({ item, partnerLike
               },
             ]}
           >
-            <Text
-              style={[
-                styles.partnerVotedText,
-                {
-                  color: colors.success,
-                  fontSize: typography.fontSize.xs,
-                  fontWeight: typography.fontWeight.semibold,
-                },
-              ]}
-            >
-              ♥ A tu pareja le gusta este nombre
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <HeartIcon size={13} color={colors.success} />
+              <Text
+                style={[
+                  styles.partnerVotedText,
+                  {
+                    color: colors.success,
+                    fontSize: typography.fontSize.xs,
+                    fontWeight: typography.fontWeight.semibold,
+                  },
+                ]}
+              >
+                A tu pareja le gusta este nombre
+              </Text>
+            </View>
           </View>
         )}
       </ScrollView>

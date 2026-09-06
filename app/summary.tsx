@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { HeartIcon, FilterIcon } from 'react-native-heroicons/solid';
+import { ShareIcon, RefreshIcon } from 'react-native-heroicons/outline';
 import { useTheme } from '../src/theme';
 import { useSolo } from '../src/contexts/SoloContext';
 import { useRoom } from '../src/contexts/RoomContext';
 import { IName } from '../src/types';
-import { ConfettiEffect, ConfirmExitModal } from '../src/components';
+import { ConfettiEffect, ConfirmExitModal, HeaderHomeButton } from '../src/components';
 
 export default function SummaryScreen() {
   const { colors, spacing, isDark } = useTheme();
@@ -30,12 +32,9 @@ export default function SummaryScreen() {
   const isPairMode = Boolean(roomCode);
   const [showExitModal, setShowExitModal] = useState(false);
 
-  // Estadísticas para modo pareja
-  const partnerLikesCount = useMemo(() => {
-    return Object.values(partnerLikes).filter(Boolean).length;
-  }, [partnerLikes]);
-
+  // Estadísticas calculadas (según especificación del flujo en pareja)
   const seenCount = history.length;
+  const partnerLikesCount = Object.values(partnerLikes).filter(Boolean).length;
   const matchPercentage =
     seenCount > 0 ? Math.round((matches.length / seenCount) * 100) : 0;
 
@@ -50,12 +49,12 @@ export default function SummaryScreen() {
       if (isPairMode) {
         const namesList = matches.map((m) => m.n).join(', ');
         await Share.share({
-          message: `👶 ¡Nuestros nombres favoritos de BebéMatch son: ${namesList}! 💕`,
+          message: `¡Nuestros nombres favoritos de BebéMatch son: ${namesList}!`,
         });
       } else {
         const namesList = likedNames.map((n) => n.n).join(', ');
         await Share.share({
-          message: `👶 Mis nombres favoritos en BebéMatch son: ${namesList} ♥`,
+          message: `Mis nombres favoritos en BebéMatch son: ${namesList}`,
         });
       }
     } catch (e) {
@@ -89,6 +88,7 @@ export default function SummaryScreen() {
   const renderNameCard = (item: IName, rank?: number, isMatchCard?: boolean) => {
     const isGirl = item.g === 'girl';
     const isBoy = item.g === 'boy';
+    const genderLabel = isGirl ? 'Niña' : isBoy ? 'Niño' : 'Unisex';
 
     return (
       <View
@@ -134,13 +134,16 @@ export default function SummaryScreen() {
                   },
                 ]}
               >
-                <Text style={[styles.matchBadgeText, { color: colors.salmon }]}>
-                  💞 MATCH
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <HeartIcon size={12} color={colors.salmon} />
+                  <Text style={[styles.matchBadgeText, { color: colors.salmon }]}>
+                    MATCH
+                  </Text>
+                </View>
               </View>
             )}
             <Text style={[styles.genderSymbol, { color: colors.text3 }]}>
-              {isGirl ? '♀' : isBoy ? '♂' : '⚥'}
+              {genderLabel}
             </Text>
           </View>
         </View>
@@ -167,22 +170,11 @@ export default function SummaryScreen() {
           { paddingHorizontal: spacing.md, borderBottomColor: colors.border },
         ]}
       >
-        <TouchableOpacity
-          onPress={() => setShowExitModal(true)}
-          style={[
-            styles.headerButton,
-            { backgroundColor: colors.surface2, borderColor: colors.border },
-          ]}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.headerButtonText, { color: colors.text }]}>
-            Inicio
-          </Text>
-        </TouchableOpacity>
+        <HeaderHomeButton onPress={() => setShowExitModal(true)} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>
           {isPairMode ? `Resumen Sala ${roomCode}` : 'Tus Favoritos'}
         </Text>
-        <View style={{ width: 60 }} />
+        <View style={{ width: 44 }} />
       </View>
 
       <FlatList
@@ -198,7 +190,7 @@ export default function SummaryScreen() {
                 <>
                   <Text style={[styles.heroTitle, { color: colors.text }]}>
                     {matches.length > 0
-                      ? `${matches.length} matches encontrados! 💕`
+                      ? `${matches.length} matches encontrados`
                       : '¡Habéis terminado!'}
                   </Text>
                   <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
@@ -211,8 +203,8 @@ export default function SummaryScreen() {
                 <>
                   <Text style={[styles.heroTitle, { color: colors.text }]}>
                     {likedNames.length > 0
-                      ? `${likedNames.length} favoritos ♥`
-                      : '¡Has terminado! 🙈'}
+                      ? `${likedNames.length} favoritos guardados`
+                      : '¡Has terminado!'}
                   </Text>
                   <Text style={[styles.heroSubtitle, { color: colors.text2 }]}>
                     {likedNames.length > 0
@@ -245,7 +237,7 @@ export default function SummaryScreen() {
                     {likedNames.length}
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    TUS ♥
+                    TUS LIKES
                   </Text>
                 </View>
                 <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -254,7 +246,7 @@ export default function SummaryScreen() {
                     {partnerLikesCount}
                   </Text>
                   <Text style={[styles.statLabel, { color: colors.text3 }]}>
-                    SUS ♥
+                    SUS LIKES
                   </Text>
                 </View>
                 <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
@@ -272,9 +264,12 @@ export default function SummaryScreen() {
             {/* Lista rankeada de matches (en pareja) */}
             {isPairMode && matches.length > 0 && (
               <View style={styles.sectionContainer}>
-                <Text style={[styles.sectionHeading, { color: colors.salmon }]}>
-                  💞 VUESTROS MATCHES
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <HeartIcon size={18} color={colors.salmon} />
+                  <Text style={[styles.sectionHeading, { color: colors.salmon, marginBottom: 0 }]}>
+                    VUESTROS MATCHES
+                  </Text>
+                </View>
                 {matches.map((item, index) =>
                   renderNameCard(item, index + 1, true)
                 )}
@@ -308,9 +303,12 @@ export default function SummaryScreen() {
                 style={[styles.primaryActionBtn, { backgroundColor: colors.salmon }]}
                 activeOpacity={0.8}
               >
-                <Text style={styles.primaryActionBtnText}>
-                  {isPairMode ? 'Compartir matches 💞' : 'Compartir ♥'}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <ShareIcon size={18} color="#FFFFFF" />
+                  <Text style={styles.primaryActionBtnText}>
+                    {isPairMode ? 'Compartir matches' : 'Compartir favoritos'}
+                  </Text>
+                </View>
               </TouchableOpacity>
 
               {/* Afinar — votar solo los matches (requiere ≥ 2 matches) */}
@@ -326,14 +324,17 @@ export default function SummaryScreen() {
                   ]}
                   activeOpacity={0.8}
                 >
-                  <Text
-                    style={[
-                      styles.secondaryActionBtnText,
-                      { color: colors.salmon },
-                    ]}
-                  >
-                    🎯 Afinar — votar solo los matches
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    <FilterIcon size={18} color={colors.salmon} />
+                    <Text
+                      style={[
+                        styles.secondaryActionBtnText,
+                        { color: colors.salmon },
+                      ]}
+                    >
+                      Afinar — votar solo los matches
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               )}
 
@@ -349,11 +350,14 @@ export default function SummaryScreen() {
                 ]}
                 activeOpacity={0.8}
               >
-                <Text
-                  style={[styles.secondaryActionBtnText, { color: colors.text }]}
-                >
-                  Explorar más nombres →
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <RefreshIcon size={18} color={colors.text} />
+                  <Text
+                    style={[styles.secondaryActionBtnText, { color: colors.text }]}
+                  >
+                    Explorar más nombres
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
           </>
@@ -381,16 +385,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-  },
-  headerButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  headerButtonText: {
-    fontSize: 13,
-    fontWeight: '600',
   },
   headerTitle: {
     fontSize: 16,
