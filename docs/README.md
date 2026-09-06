@@ -34,3 +34,8 @@ Leyenda de estado: 🟢 base lista · 🟡 borrador / en construcción · 🔴 p
 1. Trabaja siempre en la rama `transform-to-app` (o ramas que salgan de ella).
 2. Si tomas una decisión de calado, añádela al [ADR](./05-decisiones.md).
 3. Mantén el índice de arriba actualizado con el estado real de cada documento.
+
+---
+
+<!-- Revisión de documentación en curso (2026-09-05) — cambio de prueba para abrir PR -->
+> 🔎 _Revisión de documentación en curso — 2026-09-05._
